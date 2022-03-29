@@ -1,5 +1,5 @@
 # Coding Battles
-A platform for challenging your others in a coding battle.
+A platform for challenging others in a coding battle.
 
 # Configurations
 ## Settings file
