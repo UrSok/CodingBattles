@@ -12,11 +12,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2FB87A20-585
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{CF41264D-35F7-467E-8EF7-EC6C67EE77C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{41A18AD8-4FEF-4DDA-8DBA-572B0BD3BB0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{41A18AD8-4FEF-4DDA-8DBA-572B0BD3BB0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{649119D2-91E7-4429-9A45-83EA43B5F533}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{649119D2-91E7-4429-9A45-83EA43B5F533}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EF9867A7-5540-4254-892D-52CCD83978CB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X.TestUI", "X.TestUI\X.TestUI.csproj", "{07B1F27D-F8FE-4574-8F80-44BF85743E30}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,10 @@ Global
 		{649119D2-91E7-4429-9A45-83EA43B5F533}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{649119D2-91E7-4429-9A45-83EA43B5F533}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{649119D2-91E7-4429-9A45-83EA43B5F533}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07B1F27D-F8FE-4574-8F80-44BF85743E30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07B1F27D-F8FE-4574-8F80-44BF85743E30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07B1F27D-F8FE-4574-8F80-44BF85743E30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07B1F27D-F8FE-4574-8F80-44BF85743E30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,6 +50,7 @@ Global
 		{CF41264D-35F7-467E-8EF7-EC6C67EE77C3} = {2FB87A20-5852-4A56-9585-A869E0C6F88E}
 		{41A18AD8-4FEF-4DDA-8DBA-572B0BD3BB0D} = {2FB87A20-5852-4A56-9585-A869E0C6F88E}
 		{649119D2-91E7-4429-9A45-83EA43B5F533} = {2FB87A20-5852-4A56-9585-A869E0C6F88E}
+		{07B1F27D-F8FE-4574-8F80-44BF85743E30} = {2FB87A20-5852-4A56-9585-A869E0C6F88E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {80DA5CCF-1E61-4541-AA2A-CE19C6744FF3}
