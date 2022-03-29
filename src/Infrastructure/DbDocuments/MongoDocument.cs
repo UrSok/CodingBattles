@@ -6,6 +6,9 @@ namespace Infrastructure.DbDocuments;
 public class MongoDocument
 {
     [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public string Id { get; set; }
+    [BsonGuidRepresentation(GuidRepresentation.Standard)]
+    public Guid Id { get; set; }
+
+    [BsonDefaultValue(true)]
+    public bool IsActive { get; set; } = true;
 }
