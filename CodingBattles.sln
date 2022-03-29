@@ -10,15 +10,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2FB87A20-5852-4A56-9585-A869E0C6F88E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{CF41264D-35F7-467E-8EF7-EC6C67EE77C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "src\Application", "src\Application\Application.csproj", "{CF41264D-35F7-467E-8EF7-EC6C67EE77C3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{41A18AD8-4FEF-4DDA-8DBA-572B0BD3BB0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "src\Infrastructure", "src\Infrastructure\Infrastructure.csproj", "{41A18AD8-4FEF-4DDA-8DBA-572B0BD3BB0D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{649119D2-91E7-4429-9A45-83EA43B5F533}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "src\Domain", "src\Domain\Domain.csproj", "{649119D2-91E7-4429-9A45-83EA43B5F533}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EF9867A7-5540-4254-892D-52CCD83978CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X.TestUI", "X.TestUI\X.TestUI.csproj", "{07B1F27D-F8FE-4574-8F80-44BF85743E30}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "src\X.TestUI", "src\X.TestUI\X.TestUI.csproj", "{07B1F27D-F8FE-4574-8F80-44BF85743E30}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
