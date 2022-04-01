@@ -3,8 +3,12 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="DbDocuments\ProgrammingProblems\ProgrammingProblemDocument.cs~RFfa781.TMP" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.3.0" />
@@ -15,14 +19,11 @@
     <PackageReference Include="MongoDB.Analyzer" Version="1.0.0" />
     <PackageReference Include="MongoDB.ApplicationInsights.DependencyInjection" Version="1.0.34" />
     <PackageReference Include="MongoDB.Driver" Version="2.15.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DbDocuments\Common\" />
   </ItemGroup>
 
 </Project>

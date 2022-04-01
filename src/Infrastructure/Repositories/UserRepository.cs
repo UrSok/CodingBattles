@@ -9,26 +9,32 @@ namespace Infrastructure.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private readonly IMongoCollection<UserDocument> _users;
-    private readonly IMapper _mapper;
+    private readonly IMongoCollection<UserDocument> users;
+    private readonly IMapper mapper;
 
     public UserRepository(IMongoDbContext mongoDbContext, IMapper mapper)
     {
-        _users = mongoDbContext.Users;
-        _mapper = mapper;
+        this.users = mongoDbContext.Users;
+        this.mapper = mapper;
     }
 
-    public async Task<List<User>> GetAll()
+    public async Task<User> GetByEmail(string email, CancellationToken cancellationToken)
     {
-        var userDocuments = await _users.FindAsync(_ => true);
+        var projection = Builders<UserDocument>
+            .Projection
+            .Exclude(x => x.HashIterations);
+        var options = new FindOptions<UserDocument, UserDocument> { Projection = projection };
 
-        return _mapper.Map<List<User>>(userDocuments.ToList());
+        var users = await this.users
+            .FindAsync(user => user.Email == email, options, cancellationToken);
+
+        return mapper.Map<User>(users.FirstOrDefault(cancellationToken));    
     }
 
-    public async Task<Guid> Insert(User user)
+    public async Task<Guid> Insert(User user, CancellationToken cancellationToken)
     {
-        var userDocument = _mapper.Map<UserDocument>(user);
-        await _users.InsertOneAsync(userDocument);
+        var userDocument = this.mapper.Map<UserDocument>(user);
+        await this.users.InsertOneAsync(userDocument, cancellationToken: cancellationToken);
         return userDocument.Id;
     }
 }
