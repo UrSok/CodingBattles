@@ -17,7 +17,7 @@ public class UserController : BaseController
 
     [AllowAnonymous]
     [HttpPost("authenticate")]
-    public async Task<IActionResult> Authenthicate([FromBody] UserLoginModel userLoginModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> Authenticate([FromBody] UserLoginModel userLoginModel, CancellationToken cancellationToken)
     {
         var command = new AuthUserCommand(userLoginModel);
         return await this.Process(command, cancellationToken);
