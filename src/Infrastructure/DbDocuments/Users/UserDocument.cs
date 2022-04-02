@@ -37,4 +37,5 @@ public class UserDocument : MongoDocument
 
     // Role: Guest, Member, Admin
     // Guest -> room rights
+    // Should add later PassedProblemsIds and their status(Passed/Failed?)
 }

@@ -20,15 +20,10 @@ public class UserRepository : IUserRepository
 
     public async Task<User> GetByEmail(string email, CancellationToken cancellationToken)
     {
-        var projection = Builders<UserDocument>
-            .Projection
-            .Exclude(x => x.HashIterations);
-        var options = new FindOptions<UserDocument, UserDocument> { Projection = projection };
-
         var users = await this.users
-            .FindAsync(user => user.Email == email, options, cancellationToken);
+            .FindAsync(user => user.Email == email, cancellationToken: cancellationToken);
 
-        return mapper.Map<User>(users.FirstOrDefault(cancellationToken));    
+        return this.mapper.Map<User>(users.FirstOrDefault(cancellationToken));    
     }
 
     public async Task<Guid> Insert(User user, CancellationToken cancellationToken)

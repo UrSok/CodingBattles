@@ -5,8 +5,8 @@ namespace Domain.Models.Responses;
 public class BaseResponse
 {
     public ErrorCode ErrorCode { get; set; }
-    public bool HasError => 
-        ErrorCode != ErrorCode.None;
+    public bool IsSuccess => 
+        ErrorCode == ErrorCode.None;
 
     public static BaseResponse Success()
     {

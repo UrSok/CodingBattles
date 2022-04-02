@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Folder Include="Entities\Common\" />
+    <Folder Include="Models\Common\" />
     <Folder Include="Utils\" />
   </ItemGroup>
 

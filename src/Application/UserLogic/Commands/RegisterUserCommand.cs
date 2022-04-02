@@ -56,8 +56,7 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseResp
             LastActive = dateTimeNow,
             Role = Role.Member,
             PasswordSalt = passwordSalt,
-            PasswordHash = passwordHash,
-            HashInterations = cryptoService.HashIterations
+            PasswordHash = passwordHash
         };
 
         return newUser;

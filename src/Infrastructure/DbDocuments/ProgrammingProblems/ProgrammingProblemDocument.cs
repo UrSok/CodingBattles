@@ -1,17 +1,40 @@
-﻿using Infrastructure.DbDocuments.Common;
+﻿using Domain.Enums;
+using Infrastructure.DbDocuments.Common;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Infrastructure.DbDocuments.ProgrammingProblems;
 
 
 public class ProgrammingProblemDocument : MongoDocument
 {
+    [BsonElement("Name")]
     public string Name { get; set; }
-    public string Description { get; set; }
-    //TODO: More descritpion props needed?
+
+    [BsonElement("Task")]
+    public string Task { get; set; }
+
+    [BsonElement("InputDescription")]
+    public string InputDescription { get; set; }
+
+    [BsonElement("OutputDescription")]
+    public string OutputDescription { get; set; }
+
+    [BsonElement("Constraints")]
+    public string Constraints { get; set; }
+
+    [BsonElement("StubGeneratorInput")]
     public string StubGeneratorInput { get; set; }
+
+    [BsonElement("Tests")]
     public List<TestDocument> Tests { get; set; }
+
+    [BsonElement("Solution")]
     public SolutionDocument Solution { get; set; }
 
-    //TODO: problem stage: bad solution and etc.
+    [BsonElement("Status")]
+    [BsonRepresentation(BsonType.String)]
+    public ProgrammingProblemStatus Status { get; set; }
+
     //TODO: tags, difficulty
 }

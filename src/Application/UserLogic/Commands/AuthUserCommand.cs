@@ -7,7 +7,7 @@ using Infrastructure.Options;
 using Infrastructure.Utils.Cryptography;
 using MediatR;
 
-namespace Application.AuthLogic.Commands;
+namespace Application.UserLogic.Commands;
 
 public record AuthUserCommand(UserLoginModel UserLoginModel) : IRequest<BaseResponse<AuthResponse>>;
 
