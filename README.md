@@ -8,6 +8,9 @@ A platform for challenging others in a coding battle.
 "MongoDbOptions": {
   "ConnectionString": "dummy",
   "DatabaseName": "dummy"
+},
+"JwtKeyOptions": {
+  "Key": "dummy"
 }
 ```
 
