@@ -3,8 +3,11 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Infrastructure;
 using Infrastructure.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.ApplicationInsights.DependencyInjection;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +35,28 @@ builder.Services.AddSwaggerGen(opt =>
 {
     opt.SwaggerDoc("v1", new OpenApiInfo { Title = "CodingBattlesApi", Version = "v1" });
 });
+
+#region Add Jwt Auth
+var jwtKeyOptions = configuration.GetSection(nameof(JwtKeyOptions)).Get<JwtKeyOptions>();
+
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtKeyOptions.Key)),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+});
+#endregion
 
 var app = builder.Build();
 

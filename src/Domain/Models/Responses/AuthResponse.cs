@@ -1,9 +1,10 @@
 ﻿using Domain.Entities.Users;
+using Domain.Models.Users;
 
 namespace Domain.Models.Responses;
 
 public class AuthResponse
 {
-    public User User { get; set; } //TODO: Probably should use a UserViewModel instead?
-    public string Token { get; set; }
+    public AuthUserModel User { get; set; }
+    public string AccessToken { get; set; }
 }

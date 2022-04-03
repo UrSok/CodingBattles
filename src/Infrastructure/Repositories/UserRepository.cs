@@ -19,10 +19,37 @@ public class UserRepository : IUserRepository
         this.mapper = mapper;
     }
 
+    public async Task<User> Get(string id, CancellationToken cancellationToken)
+    {
+        var user = (await this.users
+            .FindAsync(x => x.Id == id, cancellationToken: cancellationToken))
+            .FirstOrDefault(cancellationToken);
+
+        return this.mapper.Map<User>(user);
+    }
+
+    public async Task<User> GetByEmail(string email, CancellationToken cancellationToken)
+    {
+        var user = (await this.users
+            .FindAsync(x => x.Email == email, cancellationToken: cancellationToken))
+            .FirstOrDefault(cancellationToken);
+
+        return this.mapper.Map<User>(user);
+    }
+
+    public async Task<string> Create(User user, CancellationToken cancellationToken)
+    {
+        var userDocument = this.mapper.Map<UserDocument>(user);
+        //userDocument.Verification.Id = ObjectId.GenerateNewId().ToString();
+
+        await this.users.InsertOneAsync(userDocument, cancellationToken: cancellationToken);
+        return userDocument.Id;
+    }
+
     public async Task<bool> CreateVerification(string userId, Verification verification, CancellationToken cancellationToken)
     {
         var verificationDocument = this.mapper.Map<VerificationDocument>(verification);
-        verificationDocument.Id = ObjectId.GenerateNewId().ToString();
+        //verificationDocument.Id = ObjectId.GenerateNewId().ToString();
 
         var filter = Builders<UserDocument>.Filter.Eq(x => x.Id, userId);
         var updateDefinition = Builders<UserDocument>.Update
@@ -32,20 +59,27 @@ public class UserRepository : IUserRepository
         return result.ModifiedCount == 1;
     }
 
-    public async Task<User> GetByEmail(string email, CancellationToken cancellationToken)
+    public async Task<bool> ActivateUser(string userId, string role, CancellationToken cancellationToken)
     {
-        var users = await this.users
-            .FindAsync(user => user.Email == email, cancellationToken: cancellationToken);
+        var filter = Builders<UserDocument>.Filter.Eq(x => x.Id, userId);
+        var updateDefinition = Builders<UserDocument>.Update
+            .Unset(x => x.Verification)
+            .Set(x => x.Role, role);
 
-        return this.mapper.Map<User>(users.FirstOrDefault(cancellationToken));    
+        var result = await this.users.UpdateOneAsync(filter, updateDefinition, cancellationToken: cancellationToken);
+        return result.ModifiedCount == 1;
     }
 
-    public async Task<string> Create(User user, CancellationToken cancellationToken)
+    public async Task<bool> AddSession(string userId, Session session, CancellationToken cancellationToken)
     {
-        var userDocument = this.mapper.Map<UserDocument>(user);
-        userDocument.Id = ObjectId.GenerateNewId().ToString();
+        var sessionDocument = this.mapper.Map<SessionDocument>(session);
+        //sessionDocument.Id = ObjectId.GenerateNewId().ToString();
 
-        await this.users.InsertOneAsync(userDocument, cancellationToken: cancellationToken);
-        return userDocument.Id;
+        var filter = Builders<UserDocument>.Filter.Eq(x => x.Id, userId);
+        var updateDefinition = Builders<UserDocument>.Update
+            .AddToSet(x => x.Sessions, sessionDocument);
+
+        var result = await this.users.UpdateOneAsync(filter, updateDefinition, cancellationToken: cancellationToken);
+        return result.ModifiedCount == 1;
     }
 }

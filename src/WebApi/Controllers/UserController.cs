@@ -30,4 +30,20 @@ public class UserController : BaseController
         var command = new RegisterUserCommand(userRegistrationModel);
         return await this.Process(command, cancellationToken);
     }
+
+    [AllowAnonymous]
+    [HttpPost("{userId}/activate/{verificationCode}")]
+    public async Task<IActionResult> ActivateUser([FromRoute] string userId, [FromRoute] string verificationCode, CancellationToken cancellationToken)
+    {
+        var command = new ActivateUserCommand(userId, verificationCode);
+        return await this.Process(command, cancellationToken);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("{userId}/activate/resend")]
+    public async Task<IActionResult> ResendUserActivation([FromRoute] string userId, CancellationToken cancellationToken)
+    {
+        var command = new ResendUserActivationCommand(userId);
+        return await this.Process(command, cancellationToken);
+    }
 }

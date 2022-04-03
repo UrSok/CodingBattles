@@ -29,7 +29,7 @@ public class InfrastructureModule : Module
         var urlGeneratorOptions = this.configuration.GetSection(nameof(UrlGeneratorOptions)).Get<UrlGeneratorOptions>();
         builder.Register(b => urlGeneratorOptions).As(typeof(IUrlGeneratorOptions)).SingleInstance();
 
-        builder.RegisterAutoMapper(true, typeof(DocumentEntityProfile).Assembly);
+        builder.RegisterAutoMapper(true, typeof(DocumentToEntityProfile).Assembly);
 
         builder.RegisterType<MongoDbContext>().As<IMongoDbContext>().SingleInstance();
         builder.RegisterAssemblyTypes(typeof(UserRepository).Assembly)

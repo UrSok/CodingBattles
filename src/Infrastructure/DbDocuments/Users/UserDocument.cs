@@ -14,29 +14,24 @@ public class UserDocument : MongoDocument
     [BsonElement("Username")]
     public string Username { get; set; }
 
-    [BsonElement("IsEmailVerified")]
-    public bool IsEmailVerified { get; set; }
-
     [BsonElement("PasswordSalt")]
     public string PasswordSalt { get; set; }
 
     [BsonElement("PasswordHash")]
     public string PasswordHash { get; set; }
 
-    [BsonElement("LastActive")]
-    [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
-    public DateTime LastActive { get; set; }
-
     [BsonElement("Registered")]
     [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
     public DateTime Registered { get; set; }
 
-    [JsonConverter(typeof(StringEnumConverter))]
-    [BsonRepresentation(BsonType.String)]
-    public Role Role { get; set; }
+    [BsonElement("Role")]
+    public string Role { get; set; }
 
     [BsonElement("Verification")]
     public VerificationDocument Verification { get; set; }
+
+    [BsonElement("Sessions")]
+    public List<SessionDocument> Sessions { get; set; }
 
     // Role: Guest, Member, Admin
     // Guest -> room rights

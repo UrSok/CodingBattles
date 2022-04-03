@@ -77,10 +77,8 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseResp
         {
             Username = userRegistrationModel.Username,
             Email = userRegistrationModel.Email,
-            IsEmailVerified = false,
             Registered = dateTimeNow,
-            LastActive = dateTimeNow,
-            Role = Role.Member,
+            Role = Role.UnverifiedMember,
             PasswordSalt = passwordSalt,
             PasswordHash = passwordHash
         };
