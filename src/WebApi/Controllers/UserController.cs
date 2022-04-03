@@ -16,7 +16,7 @@ public class UserController : BaseController
     }
 
     [AllowAnonymous]
-    [HttpPost("authenticate")]
+    [HttpPost("auth")]
     public async Task<IActionResult> Authenticate([FromBody] UserLoginModel userLoginModel, CancellationToken cancellationToken)
     {
         var command = new AuthUserCommand(userLoginModel);

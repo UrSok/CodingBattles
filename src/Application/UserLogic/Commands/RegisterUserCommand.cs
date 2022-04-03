@@ -58,10 +58,10 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseResp
 
         await this.mailService.SendAccountActivation(new VerificationMailData
         {
-            UserId = newUserId, 
             Username = newUser.Username, 
             Email = newUser.Email, 
-            VerificationCode = newUser.Verification.Code
+            VerificationCode = newUser.Verification.Code,
+            VerificationUrl = this.urlGenerator.GetActivation(newUserId, newUser.Verification.Code)
         }, cancellationToken);
 
         return BaseResponse.Success();

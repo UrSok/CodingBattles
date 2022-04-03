@@ -16,14 +16,12 @@ public interface IMailService
 public class MailService : IMailService
 {
     private readonly IMailTempleRepository mailTemplateRepository;
-    private readonly IUrlGenerator urlGenerator;
     private readonly IMailOptions mailOptions;
     private readonly IGmailService gmailService;
 
-    public MailService(IMailTempleRepository mailTemplateRepository, IUrlGenerator urlGenerator, IMailOptions mailOptions)
+    public MailService(IMailTempleRepository mailTemplateRepository, IMailOptions mailOptions)
     {
         this.mailTemplateRepository = mailTemplateRepository;
-        this.urlGenerator = urlGenerator;
         this.mailOptions = mailOptions;
         var insert = this.InsertDefaultMailTemplates();
         Task.WaitAll(new Task[] { insert });
@@ -75,7 +73,7 @@ public class MailService : IMailService
             .Format(mailTemplate.Body,
                     mailData.Username,
                     mailData.VerificationCode,
-                    this.urlGenerator.GetActivation(mailData.UserId, mailData.VerificationCode));
+                    mailData.VerificationUrl);
 
         var mimeMail = this.GetMimeMessage(new MailRequest()
         {
