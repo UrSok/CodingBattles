@@ -19,4 +19,6 @@ public class User : BaseEntity
     public DateTime Registered { get; set; }
 
     public Role Role { get; set; }
+
+    public Verification Verification { get; set; }
 }

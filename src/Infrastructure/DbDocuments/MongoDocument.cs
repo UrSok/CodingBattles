@@ -6,8 +6,8 @@ namespace Infrastructure.DbDocuments;
 public class MongoDocument
 {
     [BsonId]
-    [BsonGuidRepresentation(GuidRepresentation.Standard)]
-    public Guid Id { get; set; }
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; }
 
     [BsonDefaultValue(false)]
     public bool IsDeleted { get; set; } = false;

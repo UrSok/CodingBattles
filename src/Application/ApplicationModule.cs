@@ -18,10 +18,9 @@ public class ApplicationModule : Module
 
     protected override void Load(ContainerBuilder builder)
     {
-        builder.RegisterMediatR(typeof(RegisterUserCommand).Assembly);
-        builder.RegisterType<PBKDFCryptoService>().As<ICryptoService>().SingleInstance();
-
         var jwtKeyOptions = this.configuration.GetSection(nameof(JwtKeyOptions)).Get<JwtKeyOptions>();
         builder.Register(b => jwtKeyOptions).As(typeof(IJwtKeyOptions)).SingleInstance();
+
+        builder.RegisterMediatR(typeof(RegisterUserCommand).Assembly);
     }
 }

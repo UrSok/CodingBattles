@@ -4,6 +4,7 @@ namespace Domain.Repositories;
 
 public interface IUserRepository
 {
-    Task<Guid> Insert(User user, CancellationToken cancellationToken);
+    Task<string> Create(User user, CancellationToken cancellationToken);
+    Task<bool> CreateVerification(string userId, Verification verification, CancellationToken cancellationToken);
     Task<User> GetByEmail(string email, CancellationToken cancellationToken);
 }

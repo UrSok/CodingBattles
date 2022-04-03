@@ -3,6 +3,7 @@ using Infrastructure.DbDocuments.Games;
 using Infrastructure.DbDocuments.ProgrammingProblems;
 using Infrastructure.DbDocuments.Users;
 using Infrastructure.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Infrastructure.Persistence;
@@ -17,9 +18,11 @@ public interface IMongoDbContext
 
 public class MongoDbContext : IMongoDbContext
 {
-    public MongoDbContext(IMongoClient client, IMongoDbOptions settings)
+    public MongoDbContext(IMongoDbOptions mongoDbOptions)
     {
-        var db = client.GetDatabase(settings.DatabaseName);
+        var mongoClient = new MongoClient(mongoDbOptions.ConnectionString/* + "/?uuidRepresentation=standard"*/);
+
+        var db = mongoClient.GetDatabase(mongoDbOptions.DatabaseName);
 
         Users = db.GetCollection<UserDocument>("Users");
         ProgrammingProblems = db.GetCollection<ProgrammingProblemDocument>("ProgrammingProblems");

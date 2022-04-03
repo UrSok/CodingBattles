@@ -8,12 +8,12 @@ using MongoDB.Driver;
 
 namespace Infrastructure.Repositories;
 
-public class InfrastructureRepository : IInfrastructureRepository
+public class MailTemplateRepository : IMailTempleRepository
 {
     private readonly IMongoCollection<MailTemplateDocument> mailTemplates;
     private readonly IMapper mapper;
 
-    public InfrastructureRepository(IMongoDbContext mongoDbContext, IMapper mapper)
+    public MailTemplateRepository(IMongoDbContext mongoDbContext, IMapper mapper)
     {
         this.mailTemplates = mongoDbContext.MailTemplates;
         this.mapper = mapper;

@@ -14,9 +14,10 @@ public class DocumentEntityProfile : Profile
 {
     public DocumentEntityProfile()
     {
-        CreateMap<User, UserDocument>().ReverseMap();
-        CreateMap<Game, GameDocument>().ReverseMap();
-        CreateMap<ProgrammingProblem, ProgrammingProblemDocument>().ReverseMap();
-        CreateMap<MailTemplate, MailTemplateDocument>().ReverseMap();
+        this.CreateMap<Verification, VerificationDocument>().ReverseMap();
+        this.CreateMap<User, UserDocument>().ReverseMap();
+        this.CreateMap<Game, GameDocument>().ReverseMap();
+        this.CreateMap<ProgrammingProblem, ProgrammingProblemDocument>().ReverseMap();
+        this.CreateMap<MailTemplate, MailTemplateDocument>().ReverseMap();
     }
 }

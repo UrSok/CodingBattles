@@ -14,9 +14,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 var configuration = builder.Configuration;
 
-var mongoDbOptions = configuration.GetSection(nameof(MongoDbOptions)).Get<MongoDbOptions>();
-builder.Services.AddMongoClient(mongoDbOptions.ConnectionString);
-
 builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
 {
     builder.RegisterModule(new InfrastructureModule(configuration));

@@ -5,6 +5,8 @@ using Domain.Models.Common;
 using Domain.Models.Responses;
 using Domain.Models.Users;
 using Domain.Repositories;
+using Domain.Utils.MailDataModels;
+using Infrastructure.Utils;
 using Infrastructure.Utils.Cryptography;
 using Infrastructure.Utils.Mail;
 using MediatR;
@@ -16,19 +18,19 @@ public record RegisterUserCommand(UserRegistrationModel UserRegistrationModel) :
 public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseResponse>
 {
     private readonly IUserRepository userRepository;
-    private readonly IInfrastructureRepository infrastructureRepository;
     private readonly IMailService mailService;
+    private readonly IUrlGenerator urlGenerator;
     private readonly ICryptoService cryptoService;
 
     public RegisterUserHandler(
-        IUserRepository userRepository, 
-        IInfrastructureRepository infrastructureRepository, 
+        IUserRepository userRepository,
         IMailService mailService,
+        IUrlGenerator urlGenerator,
         ICryptoService cryptoService)
     {
         this.userRepository = userRepository;
-        this.infrastructureRepository = infrastructureRepository;
         this.mailService = mailService;
+        this.urlGenerator = urlGenerator;
         this.cryptoService = cryptoService;
     }
 
@@ -36,7 +38,7 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseResp
     {
         Guard.Against.Null(request, nameof(request));
 
-        var existingUser = await userRepository
+        var existingUser = await this.userRepository
             .GetByEmail(request.UserRegistrationModel.Email, cancellationToken);
         if (existingUser is not null)
         {
@@ -44,18 +46,22 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseResp
         }
 
         var newUser = this.GetNewUser(request.UserRegistrationModel);
-        await this.userRepository.Insert(newUser, cancellationToken);
 
-        var mailTemplate = await this.infrastructureRepository
-            .GetTemplateByCode(MailTemplateCode.AccountVerification, cancellationToken);
-
-        //TODO: LOGIC TO GENERATE THE CODE
-
-        await this.mailService.Send(new MailRequest()
+        newUser.Verification = new Verification()
         {
-            Recipient = request.UserRegistrationModel.Email,
-            Subject = mailTemplate.Subject,
-            Body = string.Format(mailTemplate.Body, request.UserRegistrationModel.Username, "4546", "link:4546"), //TODO: GENERATE THE LINK AND THE CODE
+            Type = VerificationType.AccountActivation,
+            Code = CodeGenerator.GetRandomNumericString(8),
+            ExpiresAt = DateTime.UtcNow.AddMinutes(30)
+        };
+
+        var newUserId = await this.userRepository.Create(newUser, cancellationToken);
+
+        await this.mailService.SendAccountActivation(new VerificationMailData
+        {
+            UserId = newUserId, 
+            Username = newUser.Username, 
+            Email = newUser.Email, 
+            VerificationCode = newUser.Verification.Code
         }, cancellationToken);
 
         return BaseResponse.Success();

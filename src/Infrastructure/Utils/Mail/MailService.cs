@@ -2,36 +2,35 @@
 using Domain.Enums;
 using Domain.Models.Common;
 using Domain.Repositories;
+using Domain.Utils.MailDataModels;
 using Infrastructure.Options;
-using MailKit.Net.Smtp;
-using MailKit.Security;
 using MimeKit;
-using Newtonsoft.Json;
 
 namespace Infrastructure.Utils.Mail;
 
 public interface IMailService
 {
-    Task Send(MailRequest mailRequest, CancellationToken cancellationToken);
+    Task SendAccountActivation(VerificationMailData mailData, CancellationToken cancellationToken);
 }
 
 public class MailService : IMailService
 {
-    private readonly HttpClient client = new HttpClient();
-    private readonly IInfrastructureRepository infrastructureRepository;
+    private readonly IMailTempleRepository mailTemplateRepository;
+    private readonly IUrlGenerator urlGenerator;
     private readonly IMailOptions mailOptions;
-    private GoogleToken googleToken;
+    private readonly IGmailService gmailService;
 
-    public MailService(IInfrastructureRepository infrastructureRepository, IMailOptions mailOptions)
+    public MailService(IMailTempleRepository mailTemplateRepository, IUrlGenerator urlGenerator, IMailOptions mailOptions)
     {
-        this.infrastructureRepository = infrastructureRepository;
+        this.mailTemplateRepository = mailTemplateRepository;
+        this.urlGenerator = urlGenerator;
         this.mailOptions = mailOptions;
         var insert = this.InsertDefaultMailTemplates();
-        var populate = this.RefreshAccessToken();
+        Task.WaitAll(new Task[] { insert });
 
-        Task.WaitAll(new Task[] { insert, populate });
+        this.gmailService = new GmailService(mailOptions);
     }
-
+    
     private async Task InsertDefaultMailTemplates()
     {
         var templates = new List<MailTemplate>();
@@ -50,25 +49,9 @@ public class MailService : IMailService
             Body = DefaultMailTemplateGenerator.GetResetPassword()
         });
 
-        await this.infrastructureRepository.InsertTemplatesIfDontExist(templates);
+        await this.mailTemplateRepository.InsertTemplatesIfDontExist(templates);
     }
 
-    private async Task RefreshAccessToken()
-    {
-        var values = new Dictionary<string, string>
-          {
-              { "client_id", this.mailOptions.ClientId },
-              { "client_secret", this.mailOptions.ClientSecret },
-              { "refresh_token", this.mailOptions.RefreshToken },
-              { "grant_type", "refresh_token" }
-          };
-
-        var content = new FormUrlEncodedContent(values);
-        var response = await this.client.PostAsync("https://accounts.google.com/o/oauth2/token", content);
-        var responseString = await response.Content.ReadAsStringAsync();
-        this.googleToken = JsonConvert.DeserializeObject<GoogleToken>(responseString);
-        this.googleToken.GenerateExpiresAt();
-    }
     private MimeMessage GetMimeMessage(MailRequest mailRequest)
     {
         var mailMessage = new MimeMessage();
@@ -83,22 +66,24 @@ public class MailService : IMailService
         return mailMessage;
     }
 
-    public async Task Send(MailRequest mailRequest, CancellationToken cancellationToken)
+    public async Task SendAccountActivation(VerificationMailData mailData, CancellationToken cancellationToken)
     {
-            using var smtpClient = new SmtpClient
-        {
-            CheckCertificateRevocation = false,
-        };
-        smtpClient.Connect(this.mailOptions.Host, this.mailOptions.Port, SecureSocketOptions.StartTls);
+        var mailTemplate = await this.mailTemplateRepository
+            .GetTemplateByCode(MailTemplateCode.AccountVerification, cancellationToken);
 
-        if (this.googleToken.IsExpired)
-        {
-            await this.RefreshAccessToken();
-        }
+        var messageBody = string
+            .Format(mailTemplate.Body,
+                    mailData.Username,
+                    mailData.VerificationCode,
+                    this.urlGenerator.GetActivation(mailData.UserId, mailData.VerificationCode));
 
-        var oauth2 = new SaslMechanismOAuth2(this.mailOptions.Email, this.googleToken.AccessToken);
-        await smtpClient.AuthenticateAsync(oauth2);
-        await smtpClient.SendAsync(this.GetMimeMessage(mailRequest), cancellationToken);
-        await smtpClient.DisconnectAsync(true, cancellationToken);
+        var mimeMail = this.GetMimeMessage(new MailRequest()
+        {
+            Recipient = mailData.Email,
+            Subject = mailTemplate.Subject,
+            Body = messageBody
+        });
+
+        await this.gmailService.Send(mimeMail, cancellationToken);
     }
 }

@@ -35,6 +35,9 @@ public class UserDocument : MongoDocument
     [BsonRepresentation(BsonType.String)]
     public Role Role { get; set; }
 
+    [BsonElement("Verification")]
+    public VerificationDocument Verification { get; set; }
+
     // Role: Guest, Member, Admin
     // Guest -> room rights
     // Should add later PassedProblemsIds and their status(Passed/Failed?)
