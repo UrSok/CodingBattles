@@ -1,10 +1,12 @@
 ﻿using Ardalis.GuardClauses;
 using Domain.Entities.Users;
 using Domain.Enums;
+using Domain.Models.Common;
 using Domain.Models.Responses;
 using Domain.Models.Users;
 using Domain.Repositories;
 using Infrastructure.Utils.Cryptography;
+using Infrastructure.Utils.Mail;
 using MediatR;
 
 namespace Application.UserLogic.Commands;
@@ -14,11 +16,19 @@ public record RegisterUserCommand(UserRegistrationModel UserRegistrationModel) :
 public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseResponse>
 {
     private readonly IUserRepository userRepository;
+    private readonly IInfrastructureRepository infrastructureRepository;
+    private readonly IMailService mailService;
     private readonly ICryptoService cryptoService;
 
-    public RegisterUserHandler(IUserRepository userRepository, ICryptoService cryptoService)
+    public RegisterUserHandler(
+        IUserRepository userRepository, 
+        IInfrastructureRepository infrastructureRepository, 
+        IMailService mailService,
+        ICryptoService cryptoService)
     {
         this.userRepository = userRepository;
+        this.infrastructureRepository = infrastructureRepository;
+        this.mailService = mailService;
         this.cryptoService = cryptoService;
     }
 
@@ -36,7 +46,17 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseResp
         var newUser = this.GetNewUser(request.UserRegistrationModel);
         await this.userRepository.Insert(newUser, cancellationToken);
 
-        //TODO: HANDLE EMAIL CONFIRMATION AS WELL
+        var mailTemplate = await this.infrastructureRepository
+            .GetTemplateByCode(MailTemplateCode.AccountVerification, cancellationToken);
+
+        //TODO: LOGIC TO GENERATE THE CODE
+
+        await this.mailService.Send(new MailRequest()
+        {
+            Recipient = request.UserRegistrationModel.Email,
+            Subject = mailTemplate.Subject,
+            Body = string.Format(mailTemplate.Body, request.UserRegistrationModel.Username, "4546", "link:4546"), //TODO: GENERATE THE LINK AND THE CODE
+        }, cancellationToken);
 
         return BaseResponse.Success();
     }
