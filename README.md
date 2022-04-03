@@ -6,12 +6,26 @@ A platform for challenging others in a coding battle.
 *Database:*
 ```json
 "MongoDbOptions": {
-  "ConnectionString": "dummy",
-  "DatabaseName": "dummy"
+	"ConnectionString": "dummy",
+	"DatabaseName": "dummy"
 },
 "JwtKeyOptions": {
-  "Key": "dummy"
+	"Key": "dummy"
 }
+"MailOptions": {
+	"Email": "dummy",
+	"DisplayName": "dummy",
+	"ClientId": "dummy",
+	"ClientSecret": "dummy",
+	"RefreshToken": "dummy",
+	"Host": "dummy",
+	"Port": "dummy"
+},
+"UrlGeneratorOptions": {
+	"Base": "dummy",
+	"AccountActivation": "dummy",
+	"ForgotPassword": "dummy"
+},
 ```
 
 TODO: Add info
