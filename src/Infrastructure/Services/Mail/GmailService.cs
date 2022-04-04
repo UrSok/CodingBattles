@@ -1,18 +1,17 @@
-﻿using Domain.Models.Common;
-using Infrastructure.Options;
+﻿using Infrastructure.Options;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 using Newtonsoft.Json;
 
-namespace Infrastructure.Utils.Mail;
+namespace Infrastructure.Services.Mail;
 
-public interface IGmailService
+internal interface IGmailService
 {
     Task Send(MimeMessage mail, CancellationToken cancellationToken);
 }
 
-public class GmailService : IGmailService
+internal class GmailService : IGmailService
 {
     private readonly HttpClient client = new HttpClient();
     private readonly IMailOptions mailOptions;

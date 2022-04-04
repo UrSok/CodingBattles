@@ -1,25 +1,25 @@
 ﻿using Domain.Entities.Common;
 using Domain.Enums;
 using Domain.Models.Common;
-using Domain.Repositories;
 using Domain.Utils.MailDataModels;
 using Infrastructure.Options;
+using Infrastructure.Repositories;
 using MimeKit;
 
-namespace Infrastructure.Utils.Mail;
+namespace Infrastructure.Services.Mail;
 
-public interface IMailService
+internal interface IMailService
 {
     Task SendAccountActivation(VerificationMailData mailData, CancellationToken cancellationToken);
 }
 
-public class MailService : IMailService
+internal class MailService : IMailService
 {
-    private readonly IMailTempleRepository mailTemplateRepository;
+    private readonly IMailTemplateRepository mailTemplateRepository;
     private readonly IMailOptions mailOptions;
     private readonly IGmailService gmailService;
 
-    public MailService(IMailTempleRepository mailTemplateRepository, IMailOptions mailOptions)
+    public MailService(IMailTemplateRepository mailTemplateRepository, IMailOptions mailOptions)
     {
         this.mailTemplateRepository = mailTemplateRepository;
         this.mailOptions = mailOptions;
@@ -28,7 +28,7 @@ public class MailService : IMailService
 
         this.gmailService = new GmailService(mailOptions);
     }
-    
+
     private async Task InsertDefaultMailTemplates()
     {
         var templates = new List<MailTemplate>();

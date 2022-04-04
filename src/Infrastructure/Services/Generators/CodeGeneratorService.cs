@@ -1,8 +1,8 @@
 ﻿using System.Security.Cryptography;
 
-namespace Infrastructure.Utils;
+namespace Infrastructure.Services.Generators;
 
-public static class CodeGenerator
+internal static class CodeGeneratorService
 {
     public static string GetRandomNumericString(int length)
     {
@@ -35,9 +35,9 @@ public static class CodeGenerator
         var bytes = RandomNumberGenerator.GetBytes(length * 8);
         var result = new char[length];
         ;
-        for (int i = 0; i < length; i++)
+        for (var i = 0; i < length; i++)
         {
-            ulong value = BitConverter.ToUInt64(bytes, i * 8);
+            var value = BitConverter.ToUInt64(bytes, i * 8);
             result[i] = characterArray[value % (uint)characterArray.Length];
         }
         return new string(result);

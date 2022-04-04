@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.Options;
 
-public interface IJwtKeyOptions
+internal interface IJwtKeyOptions
 {
     string Key { get; set; }
 }

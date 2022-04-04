@@ -13,14 +13,14 @@ using MongoDB.Bson;
 
 namespace Infrastructure.MapperProfiles;
 
-public class DocumentToEntityProfile : Profile
+internal class DocumentToEntityProfile : Profile
 {
     public DocumentToEntityProfile()
     {
         this.CreateMap<BaseEntity, MongoDocument>()
-            .ForMember(destination => destination.Id, 
-            action => 
-                action.MapFrom(source => string.IsNullOrEmpty(source.Id) 
+            .ForMember(destination => destination.Id,
+            action =>
+                action.MapFrom(source => string.IsNullOrEmpty(source.Id)
                     ? ObjectId.GenerateNewId().ToString()
                     : source.Id));
 

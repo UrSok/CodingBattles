@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Infrastructure.DbDocuments.Users;
 
-public class VerificationDocument : MongoDocument
+internal class VerificationDocument : MongoDocument
 {
     [BsonElement("Code")]
     public string Code { get; set; }

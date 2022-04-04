@@ -1,4 +1,3 @@
-using Application;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Infrastructure;
@@ -6,7 +5,6 @@ using Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using MongoDB.ApplicationInsights.DependencyInjection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,10 +16,7 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 var configuration = builder.Configuration;
 
 builder.Host.ConfigureContainer<ContainerBuilder>(builder =>
-{
-    builder.RegisterModule(new InfrastructureModule(configuration));
-    builder.RegisterModule(new ApplicationModule(configuration));
-});
+    builder.RegisterModule(new InfrastructureInjectionModule(configuration)));
 #endregion
 
 
@@ -65,7 +60,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI(opt => 
+    app.UseSwaggerUI(opt =>
         opt.SwaggerEndpoint("/swagger/v1/swagger.json", "CodingBattlesApi v1"));
 }
 

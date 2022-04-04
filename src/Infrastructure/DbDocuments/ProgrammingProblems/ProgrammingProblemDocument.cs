@@ -5,8 +5,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Infrastructure.DbDocuments.ProgrammingProblems;
 
-
-public class ProgrammingProblemDocument : MongoDocument
+internal class ProgrammingProblemDocument : MongoDocument
 {
     [BsonElement("Name")]
     public string Name { get; set; }

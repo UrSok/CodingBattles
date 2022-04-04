@@ -1,32 +1,31 @@
 ﻿using Ardalis.GuardClauses;
-using AutoMapper;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Models.Responses;
-using Domain.Repositories;
 using Domain.Utils.MailDataModels;
-using Infrastructure.Utils;
-using Infrastructure.Utils.Mail;
+using Infrastructure.Repositories;
+using Infrastructure.Services.Generators;
+using Infrastructure.Services.Mail;
 using MediatR;
 
-namespace Application.UserLogic.Commands;
+namespace Infrastructure.Logic.Users.Commands;
 
-public record ResendUserActivationCommand(string UserId) : IRequest<BaseResponse>;
+internal record ResendUserActivationCommand(string UserId) : IRequest<BaseResponse>;
 
-public class ResendUserActivationHandler : IRequestHandler<ResendUserActivationCommand, BaseResponse>
+internal class ResendUserActivationHandler : IRequestHandler<ResendUserActivationCommand, BaseResponse>
 {
     private readonly IUserRepository userRepository;
     private readonly IMailService mailService;
-    private readonly IUrlGenerator urlGenerator;
+    private readonly IUrlGeneratorService urlGeneratorService;
 
     public ResendUserActivationHandler(
         IUserRepository userRepository,
         IMailService mailService,
-        IUrlGenerator urlGenerator)
+        IUrlGeneratorService urlGeneratorService)
     {
         this.userRepository = userRepository;
         this.mailService = mailService;
-        this.urlGenerator = urlGenerator;
+        this.urlGeneratorService = urlGeneratorService;
     }
 
     public async Task<BaseResponse> Handle(ResendUserActivationCommand request, CancellationToken cancellationToken)
@@ -48,7 +47,7 @@ public class ResendUserActivationHandler : IRequestHandler<ResendUserActivationC
         var verification = new Verification()
         {
             Type = VerificationType.AccountActivation,
-            Code = CodeGenerator.GetRandomNumericString(8), //TODO: ADD OPTIONS FOR Length and expiration..
+            Code = CodeGeneratorService.GetRandomNumericString(8), //TODO: ADD OPTIONS FOR Length and expiration..
             ExpiresAt = DateTime.UtcNow.AddMinutes(30)
         };
 
@@ -59,7 +58,7 @@ public class ResendUserActivationHandler : IRequestHandler<ResendUserActivationC
             Username = user.Username,
             Email = user.Email,
             VerificationCode = verification.Code,
-            VerificationUrl = this.urlGenerator.GetActivation(user.Id, verification.Code)
+            VerificationUrl = this.urlGeneratorService.GetActivation(user.Id, verification.Code)
         }, cancellationToken);
 
         return BaseResponse.Success();

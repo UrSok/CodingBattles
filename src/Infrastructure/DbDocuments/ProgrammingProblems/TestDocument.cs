@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DbDocuments.ProgrammingProblems;
 
-public class TestDocument
+internal class TestDocument
 {
     [BsonElement("Input")]
     public string Input { get; set; }

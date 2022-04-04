@@ -1,6 +1,6 @@
-﻿namespace Infrastructure.Utils.Cryptography;
+﻿namespace Infrastructure.Services.Cryptography;
 
-public interface ICryptoService
+internal interface ICryptoService
 {
     /// <summary>
     /// Gets or sets the number of iterations the hash will go through

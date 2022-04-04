@@ -1,12 +1,9 @@
-﻿using Domain.Enums;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json.Converters;
-using System.Text.Json.Serialization;
 
 namespace Infrastructure.DbDocuments.Users;
 
-public class UserDocument : MongoDocument
+internal class UserDocument : MongoDocument
 {
     [BsonElement("Email")]
     public string Email { get; set; }

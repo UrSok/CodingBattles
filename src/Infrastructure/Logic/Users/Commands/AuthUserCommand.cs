@@ -4,20 +4,20 @@ using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Models.Responses;
 using Domain.Models.Users;
-using Domain.Repositories;
 using Infrastructure.Options;
-using Infrastructure.Utils.Cryptography;
+using Infrastructure.Repositories;
+using Infrastructure.Services.Cryptography;
 using MediatR;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Application.UserLogic.Commands;
+namespace Infrastructure.Logic.Users.Commands;
 
-public record AuthUserCommand(UserLoginModel UserLoginModel) : IRequest<BaseResponse<AuthResponse>>;
+internal record AuthUserCommand(UserLoginModel UserLoginModel) : IRequest<BaseResponse<AuthResponse>>;
 
-public class AuthUserHandler : IRequestHandler<AuthUserCommand, BaseResponse<AuthResponse>>
+internal class AuthUserHandler : IRequestHandler<AuthUserCommand, BaseResponse<AuthResponse>>
 {
     private readonly IUserRepository userRepository;
     private readonly IMapper mapper;
@@ -25,9 +25,9 @@ public class AuthUserHandler : IRequestHandler<AuthUserCommand, BaseResponse<Aut
     private readonly string key;
 
     public AuthUserHandler(
-        IUserRepository userRepository, 
+        IUserRepository userRepository,
         IMapper mapper,
-        ICryptoService cryptoService, 
+        ICryptoService cryptoService,
         IJwtKeyOptions jwtKeyOptions)
     {
         this.userRepository = userRepository;

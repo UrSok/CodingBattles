@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Utils.Mail;
+﻿namespace Infrastructure.Services.Mail;
 
 internal static class DefaultMailTemplateGenerator
 {

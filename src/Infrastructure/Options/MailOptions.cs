@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.Options;
 
-public interface IMailOptions
+internal interface IMailOptions
 {
     string DisplayName { get; set; }
     string Email { get; set; }
@@ -11,7 +11,7 @@ public interface IMailOptions
     int Port { get; set; }
 }
 
-public class MailOptions : IMailOptions
+internal class MailOptions : IMailOptions
 {
     public string DisplayName { get; set; }
     public string Email { get; set; }

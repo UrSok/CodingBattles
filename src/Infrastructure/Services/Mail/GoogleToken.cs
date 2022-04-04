@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace Infrastructure.Utils.Mail;
+namespace Infrastructure.Services.Mail;
 
-public class GoogleToken
+internal class GoogleToken
 {
     [JsonProperty("access_token")]
     public string AccessToken { get; set; }

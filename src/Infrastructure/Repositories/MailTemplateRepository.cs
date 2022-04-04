@@ -1,14 +1,19 @@
 ﻿using AutoMapper;
 using Domain.Entities.Common;
 using Domain.Enums;
-using Domain.Repositories;
 using Infrastructure.DbDocuments.Common;
 using Infrastructure.Persistence;
 using MongoDB.Driver;
 
 namespace Infrastructure.Repositories;
 
-public class MailTemplateRepository : IMailTempleRepository
+internal interface IMailTemplateRepository
+{
+    Task<MailTemplate> GetTemplateByCode(MailTemplateCode mailTemplateCode, CancellationToken cancellationToken);
+    Task InsertTemplatesIfDontExist(IEnumerable<MailTemplate> mailTemplates, CancellationToken cancellationToken = default);
+}
+
+internal class MailTemplateRepository : IMailTemplateRepository
 {
     private readonly IMongoCollection<MailTemplateDocument> mailTemplates;
     private readonly IMapper mapper;

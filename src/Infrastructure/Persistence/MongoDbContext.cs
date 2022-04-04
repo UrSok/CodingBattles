@@ -3,12 +3,11 @@ using Infrastructure.DbDocuments.Games;
 using Infrastructure.DbDocuments.ProgrammingProblems;
 using Infrastructure.DbDocuments.Users;
 using Infrastructure.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Infrastructure.Persistence;
 
-public interface IMongoDbContext
+internal interface IMongoDbContext
 {
     IMongoCollection<GameDocument> Games { get; }
     IMongoCollection<ProgrammingProblemDocument> ProgrammingProblems { get; }
@@ -16,7 +15,7 @@ public interface IMongoDbContext
     IMongoCollection<MailTemplateDocument> MailTemplates { get; }
 }
 
-public class MongoDbContext : IMongoDbContext
+internal class MongoDbContext : IMongoDbContext
 {
     public MongoDbContext(IMongoDbOptions mongoDbOptions)
     {

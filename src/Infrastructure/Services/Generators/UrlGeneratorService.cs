@@ -1,18 +1,18 @@
 ﻿using Infrastructure.Options;
 
-namespace Infrastructure.Utils;
+namespace Infrastructure.Services.Generators;
 
-public interface IUrlGenerator
+internal interface IUrlGeneratorService
 {
     string GetActivation(string userId, string verificationCode);
     string GetResetPassword(string userId, string verificationCode);
 }
 
-public class UrlGenerator : IUrlGenerator
+internal class UrlGeneratorService : IUrlGeneratorService
 {
     private readonly IUrlGeneratorOptions urlGeneratorOptions;
 
-    public UrlGenerator(IUrlGeneratorOptions urlGeneratorOptions)
+    public UrlGeneratorService(IUrlGeneratorOptions urlGeneratorOptions)
     {
         this.urlGeneratorOptions = urlGeneratorOptions;
     }

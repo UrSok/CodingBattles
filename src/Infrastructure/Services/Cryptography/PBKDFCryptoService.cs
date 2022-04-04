@@ -1,9 +1,9 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace Infrastructure.Utils.Cryptography;
+namespace Infrastructure.Services.Cryptography;
 
-public class PBKDFCryptoService : ICryptoService
+internal class PBKDFCryptoService : ICryptoService
 {
     public int HashIterations { get; }
     public int SaltSize { get; }
@@ -19,10 +19,10 @@ public class PBKDFCryptoService : ICryptoService
         if (passwordHash1 == null || passwordHash2 == null)
             return false;
 
-        int min_length = Math.Min(passwordHash1.Length, passwordHash2.Length);
-        int result = 0;
+        var min_length = Math.Min(passwordHash1.Length, passwordHash2.Length);
+        var result = 0;
 
-        for (int i = 0; i < min_length; i++)
+        for (var i = 0; i < min_length; i++)
             result |= passwordHash1[i] ^ passwordHash2[i];
 
         return 0 == result;
@@ -49,7 +49,7 @@ public class PBKDFCryptoService : ICryptoService
 
     private string CalculateHash(string textToHash, string salt)
     {
-        byte[] saltBytes = Encoding.UTF8.GetBytes(salt);
+        var saltBytes = Encoding.UTF8.GetBytes(salt);
 
         var pbkdf2 = new Rfc2898DeriveBytes(textToHash, saltBytes, HashIterations);
         var key = pbkdf2.GetBytes(64);

@@ -1,9 +1,6 @@
-﻿using Infrastructure.DbDocuments.Users;
-using MongoDB.Bson.Serialization.Attributes;
+﻿namespace Infrastructure.DbDocuments.Games;
 
-namespace Infrastructure.DbDocuments.Games;
-
-public class GameDocument : MongoDocument
+internal class GameDocument : MongoDocument
 {
     public string Name { get; set; }
     public string Code { get; set; }

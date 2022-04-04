@@ -2,9 +2,9 @@
 using Domain.Entities.Users;
 using Domain.Models.Users;
 
-namespace Application.MapperProfiles;
+namespace Infrastructure.MapperProfiles;
 
-public class EntityToModelProfile : Profile
+internal class EntityToModelProfile : Profile
 {
     public EntityToModelProfile()
     {

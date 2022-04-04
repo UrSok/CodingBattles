@@ -2,14 +2,14 @@
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Models.Responses;
-using Domain.Repositories;
+using Infrastructure.Repositories;
 using MediatR;
 
-namespace Application.UserLogic.Commands;
+namespace Infrastructure.Logic.Users.Commands;
 
-public record ActivateUserCommand(string UserId, string VerificationCode) : IRequest<BaseResponse>;
+internal record ActivateUserCommand(string UserId, string VerificationCode) : IRequest<BaseResponse>;
 
-public class ActivateUserHandler : IRequestHandler<ActivateUserCommand, BaseResponse>
+internal class ActivateUserHandler : IRequestHandler<ActivateUserCommand, BaseResponse>
 {
     private readonly IUserRepository userRepository;
 

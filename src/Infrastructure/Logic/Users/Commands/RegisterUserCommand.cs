@@ -1,36 +1,35 @@
 ﻿using Ardalis.GuardClauses;
 using Domain.Entities.Users;
 using Domain.Enums;
-using Domain.Models.Common;
 using Domain.Models.Responses;
 using Domain.Models.Users;
-using Domain.Repositories;
 using Domain.Utils.MailDataModels;
-using Infrastructure.Utils;
-using Infrastructure.Utils.Cryptography;
-using Infrastructure.Utils.Mail;
+using Infrastructure.Repositories;
+using Infrastructure.Services.Cryptography;
+using Infrastructure.Services.Generators;
+using Infrastructure.Services.Mail;
 using MediatR;
 
-namespace Application.UserLogic.Commands;
+namespace Infrastructure.Logic.Users.Commands;
 
-public record RegisterUserCommand(UserRegistrationModel UserRegistrationModel) : IRequest<BaseResponse>;
+internal record RegisterUserCommand(UserRegistrationModel UserRegistrationModel) : IRequest<BaseResponse>;
 
-public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseResponse>
+internal class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseResponse>
 {
     private readonly IUserRepository userRepository;
     private readonly IMailService mailService;
-    private readonly IUrlGenerator urlGenerator;
+    private readonly IUrlGeneratorService urlGeneratorService;
     private readonly ICryptoService cryptoService;
 
     public RegisterUserHandler(
         IUserRepository userRepository,
         IMailService mailService,
-        IUrlGenerator urlGenerator,
+        IUrlGeneratorService urlGeneratorService,
         ICryptoService cryptoService)
     {
         this.userRepository = userRepository;
         this.mailService = mailService;
-        this.urlGenerator = urlGenerator;
+        this.urlGeneratorService = urlGeneratorService;
         this.cryptoService = cryptoService;
     }
 
@@ -50,7 +49,7 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseResp
         newUser.Verification = new Verification()
         {
             Type = VerificationType.AccountActivation,
-            Code = CodeGenerator.GetRandomNumericString(8),
+            Code = CodeGeneratorService.GetRandomNumericString(8),
             ExpiresAt = DateTime.UtcNow.AddMinutes(30)
         };
 
@@ -58,10 +57,10 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseResp
 
         await this.mailService.SendAccountActivation(new VerificationMailData
         {
-            Username = newUser.Username, 
-            Email = newUser.Email, 
+            Username = newUser.Username,
+            Email = newUser.Email,
             VerificationCode = newUser.Verification.Code,
-            VerificationUrl = this.urlGenerator.GetActivation(newUserId, newUser.Verification.Code)
+            VerificationUrl = this.urlGeneratorService.GetActivation(newUserId, newUser.Verification.Code)
         }, cancellationToken);
 
         return BaseResponse.Success();
