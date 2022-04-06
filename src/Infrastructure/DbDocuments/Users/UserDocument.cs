@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Infrastructure.DbDocuments.Users;
 
-internal class UserDocument : MongoDocument
+internal class UserDocument : MongoDocumentWithId
 {
     [BsonElement("Email")]
     public string Email { get; set; }

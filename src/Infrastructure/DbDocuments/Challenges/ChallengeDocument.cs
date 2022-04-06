@@ -3,9 +3,9 @@ using Infrastructure.DbDocuments.Common;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Infrastructure.DbDocuments.ProgrammingProblems;
+namespace Infrastructure.DbDocuments.Challenges;
 
-internal class ProgrammingProblemDocument : MongoDocument
+internal class ChallengeDocument : MongoDocumentWithId
 {
     [BsonElement("Name")]
     public string Name { get; set; }
@@ -26,14 +26,28 @@ internal class ProgrammingProblemDocument : MongoDocument
     public string StubGeneratorInput { get; set; }
 
     [BsonElement("Tests")]
-    public List<TestDocument> Tests { get; set; }
+    public List<TestPairDocument> Tests { get; set; }
 
     [BsonElement("Solution")]
     public SolutionDocument Solution { get; set; }
 
     [BsonElement("Status")]
     [BsonRepresentation(BsonType.String)]
-    public ProgrammingProblemStatus Status { get; set; }
+    public ChallengeStatus Status { get; set; }
 
-    //TODO: tags, difficulty
+    [BsonElement("StatusReason")]
+    public string StatusReason { get; set; }
+
+    [BsonElement("TagIds")]
+    public List<string> TagIds { get; set; }
+
+    [BsonElement("Feedbacks")]
+    public List<FeedbackDocument> Feedbacks { get; set; }
+
+    [BsonElement("CreatedByUserId")]
+    public string CreatedByUserId { get; set; }
+
+    [BsonElement("LastModifiedOn")]
+    [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+    public DateTime LastModifiedOn { get; set; }
 }

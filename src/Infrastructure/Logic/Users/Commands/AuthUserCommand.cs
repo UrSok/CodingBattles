@@ -40,7 +40,7 @@ internal class AuthUserHandler : IRequestHandler<AuthUserCommand, BaseResponse<A
     {
         Guard.Against.Null(request, nameof(request));
 
-        var user = await this.userRepository.GetByEmail(request.UserLoginModel.Email, cancellationToken);
+        var user = await this.userRepository.GetByEmail(request.UserLoginModel.Email, cancellationToken); //TODO: CHECH IF MAIL IS CHECKED PROPERLY(IGNORE CASE)
 
         if (user is null)
         {

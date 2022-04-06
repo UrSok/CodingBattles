@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.DbDocuments.Games;
 
-internal class GameDocument : MongoDocument
+internal class GameDocument : MongoDocumentWithId
 {
     public string Name { get; set; }
     public string Code { get; set; }

@@ -13,15 +13,13 @@ internal interface IMailTemplateRepository
     Task InsertTemplatesIfDontExist(IEnumerable<MailTemplate> mailTemplates, CancellationToken cancellationToken = default);
 }
 
-internal class MailTemplateRepository : IMailTemplateRepository
+internal class MailTemplateRepository : BaseRepository, IMailTemplateRepository
 {
     private readonly IMongoCollection<MailTemplateDocument> mailTemplates;
-    private readonly IMapper mapper;
 
-    public MailTemplateRepository(IMongoDbContext mongoDbContext, IMapper mapper)
+    public MailTemplateRepository(IMongoDbContext mongoDbContext, IMapper mapper) : base(mapper)
     {
         this.mailTemplates = mongoDbContext.MailTemplates;
-        this.mapper = mapper;
     }
 
     public async Task<MailTemplate> GetTemplateByCode(MailTemplateCode mailTemplateCode, CancellationToken cancellationToken)

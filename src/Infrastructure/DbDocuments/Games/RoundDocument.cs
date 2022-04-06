@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.DbDocuments.Games;
 
-internal class RoundDocument : MongoDocument
+internal class RoundDocument : MongoDocumentWithId
 {
     public Guid ProgrammingProblemId { get; set; }
 

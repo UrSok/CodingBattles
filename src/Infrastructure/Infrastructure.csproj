@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="DbDocuments\ProgrammingProblems\ProgrammingProblemDocument.cs~RFfa781.TMP" />
+    <None Remove="DbDocuments\Challenges\ProgrammingProblemDocument.cs~RFb0dc5.TMP" />
+    <None Remove="DbDocuments\Challenges\ProgrammingProblemDocument.cs~RFfa781.TMP" />
+    <None Remove="Logic\Users\Commands\ResendUserActivationCommand.cs~RF4fafe7f.TMP" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,10 +32,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Domain\Domain.csproj" />
+    <ProjectReference Include="..\StubGenerator\StubGenerator.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Logic\Users\Querries\" />
+    <Folder Include="Logic\Challenges\Queries\" />
+    <Folder Include="Logic\Users\Queries\" />
   </ItemGroup>
 
 </Project>

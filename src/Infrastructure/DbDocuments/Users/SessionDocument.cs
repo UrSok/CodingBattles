@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DbDocuments.Users;
 
-internal class SessionDocument : MongoDocument
+internal class SessionDocument
 {
     [BsonElement("Token")]
     public string Token { get; set; }

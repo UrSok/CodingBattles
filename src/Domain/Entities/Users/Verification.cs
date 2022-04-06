@@ -2,7 +2,7 @@
 
 namespace Domain.Entities.Users;
 
-public class Verification : BaseEntity
+public class Verification
 {
     public string Code { get; set; }
 

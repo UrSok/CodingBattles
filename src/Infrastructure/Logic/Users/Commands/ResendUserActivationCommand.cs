@@ -36,7 +36,7 @@ internal class ResendUserActivationHandler : IRequestHandler<ResendUserActivatio
         var user = await this.userRepository.Get(request.UserId, cancellationToken);
         if (user is null)
         {
-            return BaseResponse.Failure(ErrorCode.NoSuchUser);
+            return BaseResponse.Failure(ErrorCode.UserNotFound);
         }
 
         if (user.Role != Role.UnverifiedMember)

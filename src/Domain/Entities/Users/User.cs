@@ -1,8 +1,6 @@
-﻿using Domain.Enums;
+﻿namespace Domain.Entities.Users;
 
-namespace Domain.Entities.Users;
-
-public class User : BaseEntity
+public class User : EntityWithId
 {
     public string Email { get; set; }
 

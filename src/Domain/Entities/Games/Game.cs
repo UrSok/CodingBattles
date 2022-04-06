@@ -1,5 +1,5 @@
 ﻿namespace Domain.Entities.Games;
 
-public class Game : BaseEntity
+public class Game : EntityWithId
 {
 }

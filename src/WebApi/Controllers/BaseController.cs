@@ -14,4 +14,14 @@ public class BaseController : ControllerBase
         response.IsSuccess
             ? this.Ok(response)
             : this.BadRequest(response);
+
+    protected string JwtToken
+    {
+        get
+        {
+            var request = this.HttpContext.Request.Headers.Authorization;
+            var token = request.ToString().Replace("Bearer ", "");
+            return token;
+        }
+    }
 }

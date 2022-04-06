@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DbDocuments.Common;
 
-internal class SolutionDocument : MongoDocument
+internal class SolutionDocument : MongoDocumentWithId
 {
     // language enum
     // passed tests?

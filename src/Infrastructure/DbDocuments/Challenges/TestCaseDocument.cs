@@ -1,8 +1,8 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace Infrastructure.DbDocuments.ProgrammingProblems;
+namespace Infrastructure.DbDocuments.Challenges;
 
-internal class TestDocument
+internal class TestCaseDocument
 {
     [BsonElement("Input")]
     public string Input { get; set; }

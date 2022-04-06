@@ -8,7 +8,9 @@ public enum ErrorCode
     UserExists = 3,
     IncorrectLoginOrPassword = 4,
     UserEmailNotVerified = 5,
-    NoSuchUser = 6,
+    UserNotFound = 6,
     EmailAlreadyVerified = 7,
     InvalidVerificationCode = 8,
+    CannotEditForeignRecord = 9,
+    ChallengeNotFound = 10,
 }

@@ -38,7 +38,7 @@ internal class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseRe
         Guard.Against.Null(request, nameof(request));
 
         var existingUser = await this.userRepository
-            .GetByEmail(request.UserRegistrationModel.Email, cancellationToken);
+            .GetByEmail(request.UserRegistrationModel.Email, cancellationToken); //TODO: CHECH IF MAIL IS CHECKED PROPERLY(IGNORE CASE)
         if (existingUser is not null)
         {
             return BaseResponse.Failure(ErrorCode.UserExists);

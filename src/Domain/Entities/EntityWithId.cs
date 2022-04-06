@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entities;
 
-public class BaseEntity
+public class EntityWithId
 {
     public string Id { get; set; }
 }
