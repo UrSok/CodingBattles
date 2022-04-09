@@ -37,8 +37,8 @@ internal class UserRepository : BaseRepository, IUserRepository
     public async Task<User> GetByJwtToken(string jwtToken, CancellationToken cancellationToken)
     {
         var user = (await this.users
-            .FindAsync(x => 
-                x.Sessions.Any(session => session.Token == jwtToken && session.ExpiresAt > DateTime.Now), 
+            .FindAsync(x =>
+                x.Sessions.Any(session => session.Token == jwtToken && session.ExpiresAt > DateTime.Now),
                 cancellationToken: cancellationToken))
             .FirstOrDefault(cancellationToken);
 

@@ -89,11 +89,11 @@ public static class VarValidator
         {
             case VarTypeSyntax.String:
             case VarTypeSyntax.Word:
-                {
-                    if (typeAndLength.Length == 1) return VarValidationCode.LengthMissing;
+            {
+                if (typeAndLength.Length == 1) return VarValidationCode.LengthMissing;
 
-                    return ValidateLength(typeAndLength[PositionSyntax.VarLength]);
-                }
+                return ValidateLength(typeAndLength[PositionSyntax.VarLength]);
+            }
         }
 
         return ValidationCode.Valid;

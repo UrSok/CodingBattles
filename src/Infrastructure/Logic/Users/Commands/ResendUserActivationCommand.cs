@@ -1,18 +1,30 @@
 ﻿using Ardalis.GuardClauses;
 using Domain.Entities.Users;
 using Domain.Enums;
-using Domain.Models.Responses;
+using Domain.Enums.Errors;
+using Domain.Models.Results;
 using Domain.Utils.MailDataModels;
+using FluentValidation;
 using Infrastructure.Repositories;
 using Infrastructure.Services.Generators;
 using Infrastructure.Services.Mail;
+using Infrastructure.Utils.Validation;
 using MediatR;
 
 namespace Infrastructure.Logic.Users.Commands;
 
-internal record ResendUserActivationCommand(string UserId) : IRequest<BaseResponse>;
+internal record ResendUserActivationCommand(string UserId) : IRequest<Result>;
 
-internal class ResendUserActivationHandler : IRequestHandler<ResendUserActivationCommand, BaseResponse>
+internal class ResendUserActivationCommandValidator : AbstractValidator<ResendUserActivationCommand>
+{
+    public ResendUserActivationCommandValidator()
+    {
+        this.RuleFor(x => x.UserId)
+            .NotEmpty().WithError(ValidationError.EmptyId);
+    }
+}
+
+internal class ResendUserActivationHandler : IRequestHandler<ResendUserActivationCommand, Result>
 {
     private readonly IUserRepository userRepository;
     private readonly IMailService mailService;
@@ -28,20 +40,19 @@ internal class ResendUserActivationHandler : IRequestHandler<ResendUserActivatio
         this.urlGeneratorService = urlGeneratorService;
     }
 
-    public async Task<BaseResponse> Handle(ResendUserActivationCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(ResendUserActivationCommand request, CancellationToken cancellationToken) // TODO: Maybe combine password and activation resend???
     {
         Guard.Against.Null(request, nameof(request));
-        Guard.Against.NullOrEmpty(request.UserId, nameof(request.UserId));
 
         var user = await this.userRepository.Get(request.UserId, cancellationToken);
         if (user is null)
         {
-            return BaseResponse.Failure(ErrorCode.UserNotFound);
+            return Result.Failure(ProcessingError.UserNotFound);
         }
 
         if (user.Role != Role.UnverifiedMember)
         {
-            return BaseResponse.Failure(ErrorCode.EmailAlreadyVerified);
+            return Result.Failure(ProcessingError.AccountAlreadyActivated);
         }
 
         var verification = new Verification()
@@ -61,6 +72,6 @@ internal class ResendUserActivationHandler : IRequestHandler<ResendUserActivatio
             VerificationUrl = this.urlGeneratorService.GetActivation(user.Id, verification.Code)
         }, cancellationToken);
 
-        return BaseResponse.Success();
+        return Result.Success();
     }
 }

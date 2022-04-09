@@ -2,7 +2,7 @@
 
 namespace Domain.Entities.Common;
 
-public class MailTemplate
+public class MailTemplate : EntityWithId
 {
     public MailTemplateCode TemplateCode { get; set; }
 

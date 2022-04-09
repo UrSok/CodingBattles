@@ -1,6 +1,5 @@
 ﻿using Domain.Entities.Challenges;
 using Domain.Entities.Common;
-using Domain.Enums;
 
 namespace Domain.Models.Challenges;
 

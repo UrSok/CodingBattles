@@ -1,5 +1,5 @@
 ﻿using Application.Managers;
-using Domain.Models.Responses;
+using Domain.Models.Results;
 using Domain.Models.Users;
 using Infrastructure.Logic.Users.Commands;
 using MediatR;
@@ -12,25 +12,25 @@ public class UserManager : BaseManager, IUserManager
     {
     }
 
-    public async Task<BaseResponse> Register(UserRegistrationModel userRegistrationModel, CancellationToken cancellationToken)
+    public async Task<Result> Register(UserRegistrationModel userRegistrationModel, CancellationToken cancellationToken)
     {
         var command = new RegisterUserCommand(userRegistrationModel);
         return await this.SendCommand(command, cancellationToken);
     }
 
-    public async Task<BaseResponse> Activate(string userId, string verificationCode, CancellationToken cancellationToken)
+    public async Task<Result> Activate(string userId, string verificationCode, CancellationToken cancellationToken)
     {
         var command = new ActivateUserCommand(userId, verificationCode);
         return await this.SendCommand(command, cancellationToken);
     }
 
-    public async Task<BaseResponse> ResendActivation(string userId, CancellationToken cancellationToken)
+    public async Task<Result> ResendActivation(string userId, CancellationToken cancellationToken)
     {
         var command = new ResendUserActivationCommand(userId);
         return await this.SendCommand(command, cancellationToken);
     }
 
-    public async Task<BaseResponse<AuthResponse>> Authenticate(UserLoginModel userLoginModel, CancellationToken cancellationToken)
+    public async Task<Result<AuthResult>> Authenticate(UserLoginModel userLoginModel, CancellationToken cancellationToken)
     {
         var command = new AuthUserCommand(userLoginModel);
         return await this.SendCommand(command, cancellationToken);

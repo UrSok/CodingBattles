@@ -1,25 +1,25 @@
-﻿using Domain.Models.Responses;
+﻿using Domain.Models.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
 
 public class BaseController : ControllerBase
 {
-    protected IActionResult Process<T>(BaseResponse<T> response) =>
-         response.IsSuccess
-            ? this.Ok(response.Response)
-            : this.BadRequest(response);
+    protected IActionResult Process<T>(Result<T> result) =>
+         result.IsSuccess
+            ? this.Ok(result.Value)
+            : this.BadRequest(result);
 
-    protected IActionResult Process(BaseResponse response) =>
-        response.IsSuccess
-            ? this.Ok(response)
-            : this.BadRequest(response);
+    protected IActionResult Process(Result result) =>
+        result.IsSuccess
+            ? this.Ok(result)
+            : this.BadRequest(result);
 
     protected string JwtToken
     {
         get
         {
-            var request = this.HttpContext.Request.Headers.Authorization;
+            var request = HttpContext.Request.Headers.Authorization;
             var token = request.ToString().Replace("Bearer ", "");
             return token;
         }

@@ -30,13 +30,13 @@ internal class PBKDFCryptoService : ICryptoService
 
     public string Compute(string textToHash)
     {
-        var salt = GenerateSalt();
-        return Compute(textToHash, salt);
+        var salt = this.GenerateSalt();
+        return this.Compute(textToHash, salt);
     }
 
     public string Compute(string textToHash, string salt)
     {
-        return CalculateHash(textToHash, salt);
+        return this.CalculateHash(textToHash, salt);
     }
 
     public string GenerateSalt()

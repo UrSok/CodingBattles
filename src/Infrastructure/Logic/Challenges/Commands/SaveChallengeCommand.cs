@@ -1,16 +1,33 @@
 ﻿using AutoMapper;
 using Domain.Entities.Challenges;
-using Domain.Enums;
+using Domain.Enums.Errors;
 using Domain.Models.Challenges;
-using Domain.Models.Responses;
+using Domain.Models.Results;
+using FluentValidation;
 using Infrastructure.Repositories;
+using Infrastructure.Utils.Validation;
 using MediatR;
 
 namespace Infrastructure.Logic.Challenges.Commands;
 
-internal record SaveChallengeCommand(string JwtToken, string ChallengeId, ChallengeSaveModel Model) : IRequest<BaseResponse<string>>;
+internal record SaveChallengeCommand(string JwtToken, string ChallengeId, ChallengeSaveModel Model) : IRequest<Result<string>>;
 
-internal class SaveChallengeHandler : IRequestHandler<SaveChallengeCommand, BaseResponse<string>>
+internal class SaveChallengeCommandValidator : AbstractValidator<SaveChallengeCommand>
+{
+    public SaveChallengeCommandValidator()
+    {
+        this.RuleFor(x => x.JwtToken)
+            .NotEmpty().WithError(ValidationError.EmptyJwtToken);
+
+        this.RuleFor(x => x.ChallengeId)
+            .Length(8).WithError(ValidationError.EmptyId);
+
+        this.RuleFor(x => x.Model.Name)
+            .Length(8).WithError(ValidationError.EmptyChallengeName);
+    }
+}
+
+internal class SaveChallengeHandler : IRequestHandler<SaveChallengeCommand, Result<string>>
 {
     private readonly IChallengeRepository challengeRepository;
     private readonly IUserRepository userRepository;
@@ -26,7 +43,7 @@ internal class SaveChallengeHandler : IRequestHandler<SaveChallengeCommand, Base
         this.mapper = mapper;
     }
 
-    public async Task<BaseResponse<string>> Handle(SaveChallengeCommand request, CancellationToken cancellationToken) // TODO: Should add some validation for userid not being null and etc.
+    public async Task<Result<string>> Handle(SaveChallengeCommand request, CancellationToken cancellationToken)
     {
         var challenge = this.mapper.Map<Challenge>(request.Model);
         challenge.Id = request.ChallengeId;
@@ -34,7 +51,7 @@ internal class SaveChallengeHandler : IRequestHandler<SaveChallengeCommand, Base
         var user = await this.userRepository.GetByJwtToken(request.JwtToken, cancellationToken);
         if (user is null)
         {
-            return BaseResponse<string>.Failure(ErrorCode.UserNotFound);
+            return Result<string>.Failure(ProcessingError.UserNotFound);
         }
 
         challenge.LastModifiedOn = DateTime.Now;
@@ -43,26 +60,26 @@ internal class SaveChallengeHandler : IRequestHandler<SaveChallengeCommand, Base
         {
             challenge.CreatedByUserId = user.Id;
             var challengeId = await this.challengeRepository.Create(challenge, cancellationToken);
-            return BaseResponse<string>.Success(challengeId);
+            return Result<string>.Success(challengeId);
         }
 
         var existingChallenge = await this.challengeRepository.Get(request.ChallengeId, cancellationToken);
         if (existingChallenge.Id is null)
         {
-            return BaseResponse<string>.Failure(ErrorCode.ChallengeNotFound);
+            return Result<string>.Failure(ProcessingError.ChallengeNotFound);
         }
 
         if (existingChallenge.CreatedByUserId != user.Id)
         {
-            return BaseResponse<string>.Failure(ErrorCode.CannotEditForeignRecord);
+            return Result<string>.Failure(ProcessingError.CannotEditForeignRecord);
         }
 
         var result = await this.challengeRepository.Update(challenge, cancellationToken);
         if (!result)
         {
-            return BaseResponse<string>.Failure(ErrorCode.InternalError);
+            return Result<string>.Failure(Error.InternalServerError);
         }
 
-        return BaseResponse<string>.Success(existingChallenge.Id);
+        return Result<string>.Success(existingChallenge.Id);
     }
 }

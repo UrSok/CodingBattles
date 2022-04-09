@@ -4,17 +4,17 @@ namespace StubGenerator.StubOutput.Syntax;
 
 public abstract class BaseSyntax
 {
-    private List<string> generatedStubLines;
+    private readonly List<string> generatedStubLines;
     private int tabsAmount;
 
     public BaseSyntax()
     {
         this.generatedStubLines = new List<string>();
-        tabsAmount = 0;
+        this.tabsAmount = 0;
     }
 
     protected void AddLine(string line)
-        => this.generatedStubLines.Add($"{new string('\t', tabsAmount)}{line}");
+        => this.generatedStubLines.Add($"{new string('\t', this.tabsAmount)}{line}");
 
     protected void ChangeTabsAmount(int operation, bool set = false) // 0 -> reset, -1 -> decrease, 1 -> increase
     {

@@ -64,7 +64,7 @@ public class CSharpSyntax : BaseSyntax
 
     protected override string GetVariableAndInput(Variable variable)
     {
-        variableTypesDictionary.TryGetValue(variable.Type, out string variableType);
+        this.variableTypesDictionary.TryGetValue(variable.Type, out string variableType);
 
         string variableInput = variable.Type switch
         {

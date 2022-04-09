@@ -3,8 +3,6 @@ using Domain.Entities.Users;
 using Domain.Models.Challenges;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 using WebApi.Constants;
 
 namespace WebApi.Controllers;
@@ -44,17 +42,17 @@ public class ChallengeController : BaseController
     // Save -> member(only if created by them), admin(partial)
     // Should Combine SaveDraft and Save?
     // From body, id can be null if it is an insert
-    [Authorize]
+    [Authorize(Roles = AuthorizeConsts.MemberAndAdmin)]
     [HttpPost("save/{challengeId?}")]
     public async Task<IActionResult> Save([FromRoute] string? challengeId, [FromBody] ChallengeSaveModel challengeSaveModel, CancellationToken cancellationToken)
     {
-        var response = await this.challengeManager.Save(this.JwtToken, challengeId, challengeSaveModel, cancellationToken);
+        var response = await this.challengeManager.Save(JwtToken, challengeId, challengeSaveModel, cancellationToken);
         return this.Process(response);
     }
 
-    [Authorize]
-    [HttpPost("saveAndPublish/{challengeId}")]
-    public async Task<IActionResult> SaveAndPublish([FromRoute] string challengeId, [FromBody] ChallengeRequestSaveModel challengeRequestSaveModel, CancellationToken cancellationToken)
+    [Authorize(Roles = AuthorizeConsts.MemberAndAdmin)]
+    [HttpPost("publish/{challengeId}")]
+    public async Task<IActionResult> SaveAndPublish([FromRoute] string challengeId, [FromBody] ChallengeSaveModel challengeRequestSaveModel, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
         //var response = await this.challengeManager.Save(challengeRequestSaveModel, cancellationToken); // TODO: Update
@@ -63,7 +61,7 @@ public class ChallengeController : BaseController
 
     [Authorize(Roles = Role.Admin)]
     [HttpPost("saveAsAdmin/{challengeId}")]
-    public async Task<IActionResult> SaveAsAdmin(ChallengeRequestSaveModel challengeRequestSaveModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> SaveAsAdmin([FromRoute] string challengeId, [FromBody] ChallengeSaveModel challengeRequestSaveModel, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

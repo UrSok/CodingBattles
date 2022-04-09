@@ -41,10 +41,10 @@ public class UserController : BaseController
     }
 
     [AllowAnonymous]
-    [HttpGet("auth")]
+    [HttpPost("auth")]
     public async Task<IActionResult> Authenticate([FromBody] UserLoginModel userLoginModel, CancellationToken cancellationToken)
     {
         var response = await this.userManager.Authenticate(userLoginModel, cancellationToken);
-        return this.Process(response);
+        return this.Ok(response);
     }
 }

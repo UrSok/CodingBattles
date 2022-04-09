@@ -1,11 +1,15 @@
 ﻿using Autofac;
 using AutoMapper.Contrib.Autofac.DependencyInjection;
+using FluentValidation;
 using Infrastructure.Options;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.Generators;
 using Infrastructure.Services.Mail;
+using Infrastructure.Utils;
+using Infrastructure.Utils.Validation;
+using MediatR;
 using MediatR.Extensions.Autofac.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
@@ -49,7 +53,17 @@ public class InfrastructureInjectionModule : Module
         #region 3rd party Packages
         builder.RegisterAutoMapper(true, ThisAssembly);
         builder.RegisterMediatR(ThisAssembly);
+        builder.RegisterGeneric(typeof(ValidationBehaviour<,>)).As(typeof(IPipelineBehavior<,>));
         #endregion
+
+        // validators
+        builder.RegisterAssemblyTypes(ThisAssembly)
+               .Where(t => t.Name.EndsWith("Validator"))
+               .AsImplementedInterfaces()
+               .InstancePerLifetimeScope();
+
+        builder.RegisterType<AutofacValidatorFactory>().As<IValidatorFactory>().SingleInstance();
+        // validators end
 
         builder.RegisterAssemblyTypes(ThisAssembly)
             .Where(t => t.Name.EndsWith("Manager"))

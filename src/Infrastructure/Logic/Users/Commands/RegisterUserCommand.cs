@@ -1,20 +1,40 @@
 ﻿using Ardalis.GuardClauses;
 using Domain.Entities.Users;
 using Domain.Enums;
-using Domain.Models.Responses;
+using Domain.Enums.Errors;
+using Domain.Models.Results;
 using Domain.Models.Users;
 using Domain.Utils.MailDataModels;
+using FluentValidation;
 using Infrastructure.Repositories;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.Generators;
 using Infrastructure.Services.Mail;
+using Infrastructure.Utils.Validation;
 using MediatR;
 
 namespace Infrastructure.Logic.Users.Commands;
 
-internal record RegisterUserCommand(UserRegistrationModel UserRegistrationModel) : IRequest<BaseResponse>;
+internal record RegisterUserCommand(UserRegistrationModel UserRegistrationModel) : IRequest<Result>;
 
-internal class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseResponse>
+internal class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
+{
+    public RegisterUserCommandValidator()
+    {
+
+        this.RuleFor(x => x.UserRegistrationModel.Username)
+            .MinimumLength(2).WithError(ValidationError.InvalidUsername);
+
+        this.RuleFor(x => x.UserRegistrationModel.Email)
+            .EmailAddress().WithError(ValidationError.InvalidEmail);
+
+        this.RuleFor(x => x.UserRegistrationModel.Password)
+            .NotEmpty().WithError(ValidationError.InvalidPassword);
+        //.MinimumLength(6).WithError(ValidationError.InvalidPassword); TODO: Uncomment Password validation
+    }
+}
+
+internal class RegisterUserHandler : IRequestHandler<RegisterUserCommand, Result>
 {
     private readonly IUserRepository userRepository;
     private readonly IMailService mailService;
@@ -33,15 +53,17 @@ internal class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseRe
         this.cryptoService = cryptoService;
     }
 
-    public async Task<BaseResponse> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
         Guard.Against.Null(request, nameof(request));
+        var normalizedEmail = request.UserRegistrationModel.Email.ToLowerInvariant();
+
 
         var existingUser = await this.userRepository
-            .GetByEmail(request.UserRegistrationModel.Email, cancellationToken); //TODO: CHECH IF MAIL IS CHECKED PROPERLY(IGNORE CASE)
+            .GetByEmail(normalizedEmail, cancellationToken);
         if (existingUser is not null)
         {
-            return BaseResponse.Failure(ErrorCode.UserExists);
+            return Result.Failure(ProcessingError.UserExists);
         }
 
         var newUser = this.GetNewUser(request.UserRegistrationModel);
@@ -63,7 +85,7 @@ internal class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseRe
             VerificationUrl = this.urlGeneratorService.GetActivation(newUserId, newUser.Verification.Code)
         }, cancellationToken);
 
-        return BaseResponse.Success();
+        return Result.Success();
     }
 
     private User GetNewUser(UserRegistrationModel userRegistrationModel)
@@ -75,7 +97,7 @@ internal class RegisterUserHandler : IRequestHandler<RegisterUserCommand, BaseRe
         var newUser = new User()
         {
             Username = userRegistrationModel.Username,
-            Email = userRegistrationModel.Email,
+            Email = userRegistrationModel.Email.ToLowerInvariant(),
             Registered = dateTimeNow,
             Role = Role.UnverifiedMember,
             PasswordSalt = passwordSalt,

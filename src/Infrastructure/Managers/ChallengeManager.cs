@@ -1,6 +1,6 @@
 ﻿using Application.Managers;
 using Domain.Models.Challenges;
-using Domain.Models.Responses;
+using Domain.Models.Results;
 using Infrastructure.Logic.Challenges.Commands;
 using MediatR;
 
@@ -12,7 +12,7 @@ public class ChallengeManager : BaseManager, IChallengeManager
     {
     }
 
-    public async Task<BaseResponse> Save(string jwtToken, string challengeId, ChallengeSaveModel challengeSaveModel, CancellationToken cancellationToken)
+    public async Task<Result<string>> Save(string jwtToken, string challengeId, ChallengeSaveModel challengeSaveModel, CancellationToken cancellationToken)
     {
         var command = new SaveChallengeCommand(jwtToken, challengeId, challengeSaveModel);
         return await this.SendCommand(command, cancellationToken);

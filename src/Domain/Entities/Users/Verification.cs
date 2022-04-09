@@ -9,4 +9,7 @@ public class Verification
     public VerificationType Type { get; set; }
 
     public DateTime ExpiresAt { get; set; }
+
+    public bool HasExpired =>
+        DateTime.Now >= ExpiresAt;
 }

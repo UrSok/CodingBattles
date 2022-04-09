@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Infrastructure.DbDocuments.Common;
 
-internal class MailTemplateDocument
+internal class MailTemplateDocument : MongoDocumentWithId
 {
     [BsonElement("TemplateCode")]
     [BsonRepresentation(BsonType.String)]

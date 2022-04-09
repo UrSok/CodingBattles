@@ -86,19 +86,19 @@ public class FinalValidator
             }
         }
 
-        return ValidateVariables(statement.Variables, true);
+        return this.ValidateVariables(statement.Variables, true);
     }
 
     public ValidationCode Validate(Statement statement)
     {
         if (statement is InputloopStatement inputLoopStatement)
         {
-            return ValidateInputloopStatement(inputLoopStatement);
+            return this.ValidateInputloopStatement(inputLoopStatement);
         }
 
         if (statement is InputStatement inputStatement)
         {
-            return ValidateVariables(inputStatement.Variables, false);
+            return this.ValidateVariables(inputStatement.Variables, false);
         }
 
         if (statement is OutputStatement)

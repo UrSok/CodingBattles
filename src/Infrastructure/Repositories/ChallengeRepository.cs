@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Entities.Challenges;
 using Infrastructure.DbDocuments.Challenges;
-using Infrastructure.DbDocuments.Common;
 using Infrastructure.Persistence;
 using MongoDB.Driver;
 
@@ -57,6 +56,6 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
             .Set(x => x.TagIds, challenge.TagIds);
 
         var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
-        return result.ModifiedCount == 1; 
+        return result.ModifiedCount == 1;
     }
 }

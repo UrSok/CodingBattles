@@ -23,11 +23,11 @@ public static class VariableFactory
                     return new Variable(name, type);
                 case VarTypeSyntax.String:
                 case VarTypeSyntax.Word:
-                    {
-                        var length = int.Parse(typeAndLength[PositionSyntax.VarLength]);
+                {
+                    var length = int.Parse(typeAndLength[PositionSyntax.VarLength]);
 
-                        return new TextVariable(name, type, length);
-                    }
+                    return new TextVariable(name, type, length);
+                }
                 default:
                     throw new Exception("Variable Invalid Unknown!");
             }
