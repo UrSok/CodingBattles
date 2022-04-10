@@ -45,7 +45,7 @@ public static class VariableFactory
 
         if (validationCode != ValidationCode.Valid)
         {
-            return new BadVariable(validationCode, nameAndType[0]);
+            return new BadVariable(validationCode, nameAndType[PositionSyntax.VarName], nameAndType.ElementAtOrDefault(PositionSyntax.VarType));
         }
 
         return GetVariable(nameAndType);

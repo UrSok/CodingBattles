@@ -7,7 +7,7 @@ public class BaseController : ControllerBase
 {
     protected IActionResult Process<T>(Result<T> result) =>
          result.IsSuccess
-            ? this.Ok(result.Value)
+            ? this.Ok(result)
             : this.BadRequest(result);
 
     protected IActionResult Process(Result result) =>

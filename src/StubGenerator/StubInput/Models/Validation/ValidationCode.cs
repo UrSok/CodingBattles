@@ -14,7 +14,7 @@ public class ValidationCode : SmartEnum<ValidationCode>
         new(nameof(InvalidUnknown), 2);
 
     public static readonly ValidationCode BadStatement =
-        new(nameof(InvalidUnknown), 3);
+        new(nameof(BadStatement), 3);
 
     public static readonly ValidationCode BadVariable =
         new(nameof(BadVariable), 4);

@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application.Managers;
+using Domain.Models.Common;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
 
@@ -6,12 +9,19 @@ namespace WebApi.Controllers;
 [ApiController]
 public class StubGeneratorController : BaseController
 {
+    private readonly IStubGeneratorManager stubGeneratorMananger;
 
-    public StubGeneratorController()
+    public StubGeneratorController(IStubGeneratorManager stubGeneratorMananger)
     {
-
+        this.stubGeneratorMananger = stubGeneratorMananger;
     }
 
-    //Generate -> guest+
 
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> Generate([FromBody] StubGeneratorModel stubGeneratorModel, CancellationToken cancellationToken)
+    {
+        var result = await this.stubGeneratorMananger.Generate(stubGeneratorModel, cancellationToken);
+        return this.Process(result);
+    }
 }

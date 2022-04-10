@@ -5,6 +5,7 @@ namespace StubGenerator.StubInput.Models;
 public class InputParserResult
 {
     public List<Statement> Statements { get; set; }
+
     public ValidationCode ValidationCode { get; set; }
 
     public InputParserResult()
@@ -15,9 +16,11 @@ public class InputParserResult
 
     public static InputParserResult GetInvalidResultWithCode(ValidationCode validationCode, Statement statement)
     {
-        var result = new InputParserResult();
+        var result = new InputParserResult
+        {
+            ValidationCode = validationCode
+        };
 
-        result.ValidationCode = validationCode;
         result.Statements.Add(statement);
 
         return result;

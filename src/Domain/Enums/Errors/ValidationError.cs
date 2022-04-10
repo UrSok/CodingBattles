@@ -26,6 +26,12 @@ public sealed class ValidationError : Error
     public static readonly ValidationError EmptyChallengeName =
         new(nameof(EmptyChallengeName), 10007);
 
+    public static readonly ValidationError UnsupportedLanguage =
+        new(nameof(UnsupportedLanguage), 10008);
+
+    public static readonly ValidationError EmptyStubGeneratorInput =
+        new(nameof(EmptyStubGeneratorInput), 10009);
+
     public ValidationError(string name, int value) : base(name, value)
     {
     }

@@ -7,7 +7,6 @@ public static class SyntaxFactory
 {
     public static BaseSyntax Get(Language language)
     {
-
         BaseSyntax syntax = null;
 
         language

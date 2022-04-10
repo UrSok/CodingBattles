@@ -9,6 +9,6 @@ internal class MongoDocumentWithId
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; }
 
-    //[BsonDefaultValue(false)]
-    //public bool IsDeleted { get; set; } = false;
+    [BsonDefaultValue(false)]
+    public bool IsDeleted { get; set; } = false;
 }

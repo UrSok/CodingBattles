@@ -41,6 +41,9 @@ public class Result<T> : Result
     public static Result<T> Success(T value)
         => new() { Value = value };
 
+    public static Result<T> Failure(T value, Error error)
+        => new() { Value = value, Errors = new List<Error> { error } };
+
     public static new Result<T> Failure(Error error) 
         => new() { Errors = new List<Error> { error } };
 
