@@ -2,14 +2,14 @@
 
 namespace Domain.Models.Results;
 
-public interface IResult
+public interface IDomainResult
 {
     IEnumerable<Error> Errors { get; set; }
 
     bool IsSuccess { get; }
 }
 
-public class Result : IResult
+public class Result : IDomainResult
 {
     public IEnumerable<Error> Errors { get; set; }
 

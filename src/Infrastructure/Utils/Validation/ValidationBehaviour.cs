@@ -6,7 +6,7 @@ using MediatR;
 namespace Infrastructure.Utils.Validation;
 
 internal class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse> where TResponse : IResult, new()
+    where TRequest : IRequest<TResponse> where TResponse : IDomainResult, new()
 {
     private readonly IEnumerable<IValidator<TRequest>> validators;
 
