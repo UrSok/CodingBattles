@@ -19,11 +19,8 @@ internal class SaveChallengeCommandValidator : AbstractValidator<SaveChallengeCo
         this.RuleFor(x => x.JwtToken)
             .NotEmpty().WithError(ValidationError.EmptyJwtToken);
 
-        this.RuleFor(x => x.ChallengeId)
-            .Length(8).WithError(ValidationError.EmptyId);
-
         this.RuleFor(x => x.Model.Name)
-            .Length(8).WithError(ValidationError.EmptyChallengeName);
+            .NotEmpty().WithError(ValidationError.EmptyChallengeName);
     }
 }
 

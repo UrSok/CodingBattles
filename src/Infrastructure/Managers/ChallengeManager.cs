@@ -17,4 +17,10 @@ public class ChallengeManager : BaseManager, IChallengeManager
         var command = new SaveChallengeCommand(jwtToken, challengeId, challengeSaveModel);
         return await this.SendCommand(command, cancellationToken);
     }
+
+    public async Task<Result> SaveAsAdmin(string challengeId, ChallengeSaveModel challengeSaveModel, CancellationToken cancellationToken)
+    {
+        var command = new SaveAsAdminChallengeCommand(challengeId, challengeSaveModel);
+        return await this.SendCommand(command, cancellationToken);
+    }
 }

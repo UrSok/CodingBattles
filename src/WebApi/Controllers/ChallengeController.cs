@@ -46,13 +46,13 @@ public class ChallengeController : BaseController
     [HttpPost("save/{challengeId?}")]
     public async Task<IActionResult> Save([FromRoute] string? challengeId, [FromBody] ChallengeSaveModel challengeSaveModel, CancellationToken cancellationToken)
     {
-        var response = await this.challengeManager.Save(JwtToken, challengeId, challengeSaveModel, cancellationToken);
-        return this.Process(response);
+        var result = await this.challengeManager.Save(JwtToken, challengeId, challengeSaveModel, cancellationToken);
+        return this.Process(result);
     }
 
     [Authorize(Roles = AuthorizeConsts.MemberAndAdmin)]
     [HttpPost("publish/{challengeId}")]
-    public async Task<IActionResult> SaveAndPublish([FromRoute] string challengeId, [FromBody] ChallengeSaveModel challengeRequestSaveModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> SaveAndPublish([FromRoute] string challengeId, [FromBody] ChallengeSaveModel challengeSaveModel, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
         //var response = await this.challengeManager.Save(challengeRequestSaveModel, cancellationToken); // TODO: Update
@@ -61,8 +61,9 @@ public class ChallengeController : BaseController
 
     [Authorize(Roles = Role.Admin)]
     [HttpPost("saveAsAdmin/{challengeId}")]
-    public async Task<IActionResult> SaveAsAdmin([FromRoute] string challengeId, [FromBody] ChallengeSaveModel challengeRequestSaveModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> SaveAsAdmin([FromRoute] string challengeId, [FromBody] ChallengeSaveModel challengeSaveModel, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await this.challengeManager.SaveAsAdmin(challengeId, challengeSaveModel, cancellationToken);
+        return this.Process(result);
     }
 }
