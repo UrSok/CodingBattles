@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entities.Challenges;
 
-internal class Tag : EntityWithId
+public class TagEntity : EntityWithId
 {
     public string Name { get; set; }
 }
