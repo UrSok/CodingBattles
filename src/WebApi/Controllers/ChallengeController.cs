@@ -29,14 +29,14 @@ public class ChallengeController : BaseController
 
     // TODO: GetDetails -> guest+
     // id from rom route
-    [AllowAnonymous]
+    [Authorize(Roles = AuthorizeConsts.All)]
     [HttpGet("{challengeId}")]
     public async Task<IActionResult> GetDetails(CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
 
-    [Authorize(Roles = AuthorizeConsts.MemberAndAdmin)]
+    [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
     [HttpPost("save/{challengeId?}")]
     public async Task<IActionResult> Save([FromBody] ChallengeSaveModel challengeSaveModel, [FromRoute] string? challengeId = null, CancellationToken cancellationToken = default)
     {
@@ -44,7 +44,7 @@ public class ChallengeController : BaseController
         return this.Process(result);
     }
 
-    [Authorize(Roles = AuthorizeConsts.MemberAndAdmin)]
+    [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
     [HttpPost("publish/{challengeId}")]
     public async Task<IActionResult> Publish([FromRoute] string challengeId, CancellationToken cancellationToken)
     {

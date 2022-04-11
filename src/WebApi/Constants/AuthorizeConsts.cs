@@ -4,5 +4,6 @@ namespace WebApi.Constants;
 
 public static class AuthorizeConsts
 {
-    public const string MemberAndAdmin = Role.Member + "," + Role.Admin;
+    public const string MemberOrAdmin = Role.Member + "," + Role.Admin;
+    public const string All = Role.Guest + "," + Role.UnverifiedMember + "," + Role.Member + "," + Role.Admin;
 }
