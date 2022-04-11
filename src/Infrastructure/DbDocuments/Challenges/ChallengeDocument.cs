@@ -44,6 +44,9 @@ internal class ChallengeDocument : MongoDocumentWithId
     [BsonElement("Feedbacks")]
     public List<FeedbackDocument> Feedbacks { get; set; }
 
+    [BsonElement("Difficulty")]
+    public int Difficulty { get; set; }
+
     [BsonElement("CreatedByUserId")]
     public string CreatedByUserId { get; set; }
 

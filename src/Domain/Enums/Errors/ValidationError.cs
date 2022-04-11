@@ -32,6 +32,9 @@ public sealed class ValidationError : Error
     public static readonly ValidationError EmptyStubGeneratorInput =
         new(nameof(EmptyStubGeneratorInput), 10009);
 
+    public static readonly ValidationError MinimumDifficultyIsBiggerThanMaximumDifficulty =
+        new(nameof(MinimumDifficultyIsBiggerThanMaximumDifficulty), 10010);
+
     public ValidationError(string name, int value) : base(name, value)
     {
     }

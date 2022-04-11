@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Entities.Challenges;
 using Domain.Models.Challenges;
+using Domain.Models.Results;
 using Infrastructure.DbDocuments.Challenges;
 
 namespace Infrastructure.MapperProfiles;
@@ -16,5 +17,7 @@ internal class ChallengeProfile : Profile
         this.CreateMap<Challenge, ChallengeDocument>().ReverseMap();
 
         this.CreateMap<ChallengeSaveModel, Challenge>();
+
+        this.CreateMap<Challenge, ChallengeSearchResultItem>();
     }
 }

@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Domain.Entities.Challenges;
+using Domain.Models.Challenges;
 using Infrastructure.DbDocuments.Challenges;
 using Infrastructure.Persistence;
+using Infrastructure.Utils;
 using MongoDB.Driver;
 
 namespace Infrastructure.Repositories;
@@ -11,6 +13,7 @@ internal interface IChallengeRepository
     Task<string> Create(Challenge challenge, CancellationToken cancellationToken);
     Task<bool> Update(Challenge challenge, CancellationToken cancellationToken);
     Task<Challenge> Get(string id, CancellationToken cancellationToken);
+    Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> Get(ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken);
 }
 
 internal class ChallengeRepository : BaseRepository, IChallengeRepository
@@ -20,6 +23,55 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
     public ChallengeRepository(IMongoDbContext mongoDbContext, IMapper mapper) : base(mapper)
     {
         this.challenges = mongoDbContext.Challenges;
+    }
+
+    public async Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> Get(ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken)
+    {
+        var filters = new List<FilterDefinition<ChallengeDocument>>();
+
+        if (!string.IsNullOrEmpty(challengeSearchModel.Text))
+        {
+            var textFilters = Builders<ChallengeDocument>.Filter.Or(
+                    Builders<ChallengeDocument>.Filter.Regex(x
+                    => x.Name, new MongoDB.Bson.BsonRegularExpression(challengeSearchModel.Text, "i")),
+                    Builders<ChallengeDocument>.Filter.Regex(x
+                    => x.Task, new MongoDB.Bson.BsonRegularExpression(challengeSearchModel.Text, "i"))
+                );
+
+            filters.Add(textFilters);
+        }
+
+        if (challengeSearchModel.MinimumDifficulty is not null)
+        {
+            filters.Add(
+                Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty >= challengeSearchModel.MinimumDifficulty));
+        }
+
+        if (challengeSearchModel.MaximumDifficulty is not null)
+        {
+            filters.Add(
+                Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty <= challengeSearchModel.MaximumDifficulty));
+        }
+
+        if (challengeSearchModel.TagIds.Any())
+        {
+            filters.Add(
+                Builders<ChallengeDocument>.Filter.All(x => x.TagIds, challengeSearchModel.TagIds));
+        }
+
+        var filterDefinition = filters.Count > 0 
+            ? Builders<ChallengeDocument>.Filter.And(filters) 
+            : FilterDefinition<ChallengeDocument>.Empty;
+
+        var (totalPages, totalPageItems, data) = 
+            await this.challenges.AggregateByPage(
+            filterDefinition,
+            challengeSearchModel.SortBy,
+            challengeSearchModel.OrderStyle,
+            challengeSearchModel.Page,
+            challengeSearchModel.PageSize);
+
+        return (totalPages, totalPageItems, this.mapper.Map<IEnumerable<Challenge>>(data));
     }
 
     public async Task<Challenge> Get(string id, CancellationToken cancellationToken)

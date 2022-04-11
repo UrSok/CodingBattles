@@ -29,8 +29,8 @@ public class ProcessingError : Error
     public static readonly ProcessingError CannotEditForeignRecord =
         new(nameof(CannotEditForeignRecord), 108);
 
-    public static readonly ProcessingError UnsupportedLanguage =
-        new(nameof(UnsupportedLanguage), 109);
+    public static readonly ProcessingError UnsupportedStubGeneratorLanguage =
+        new(nameof(UnsupportedStubGeneratorLanguage), 109);
 
     public static readonly ProcessingError StubGeneratorError =
         new(nameof(StubGeneratorError), 110);

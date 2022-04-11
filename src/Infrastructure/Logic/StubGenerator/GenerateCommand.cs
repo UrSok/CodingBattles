@@ -39,7 +39,7 @@ internal class GenerateHandler : IRequestHandler<GenerateCommand, Result<StubGen
 
         if (stubGeneratorResult is null)
         {
-            return Task.FromResult(Result<StubGeneratorResult>.Failure(ProcessingError.UnsupportedLanguage));
+            return Task.FromResult(Result<StubGeneratorResult>.Failure(ProcessingError.UnsupportedStubGeneratorLanguage));
         }
 
         var generateResult = this.mapper.Map<StubGeneratorResult>(stubGeneratorResult);
