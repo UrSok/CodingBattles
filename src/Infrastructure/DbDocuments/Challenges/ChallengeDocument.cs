@@ -53,4 +53,7 @@ internal class ChallengeDocument : MongoDocumentWithId
     [BsonElement("LastModifiedOn")]
     [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
     public DateTime LastModifiedOn { get; set; }
+
+    //[BsonElement("ValidationFlag")]
+    //public int ValidationFlag { get; set; } = ChallengeValidation.None;
 }

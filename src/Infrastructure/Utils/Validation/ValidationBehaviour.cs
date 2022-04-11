@@ -26,7 +26,7 @@ internal class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TReq
                 v.ValidateAsync(context, cancellationToken)));
 
             var failures = validationResults.SelectMany(r => r.Errors).Where(f =>
-                f != null).ToList();
+                f is not null).ToList();
 
             if (failures.Any())
             {

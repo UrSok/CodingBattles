@@ -3,7 +3,6 @@ using StubGenerator.StubInput.Models;
 using StubGenerator.StubInput.Models.Validation;
 using StubGenerator.StubOutput;
 using StubGenerator.StubOutput.Models;
-using System;
 
 namespace StubGenerator;
 
@@ -20,6 +19,11 @@ public class StubInputError
         Line = line;
         ValidationCode = validationCode;
         CulpritName = culpritName;
+    }
+
+    public StubInputError(ValidationCode validationCode)
+    {
+        ValidationCode = validationCode;
     }
 }
 
@@ -46,7 +50,7 @@ public class GeneratorResult
 
 public static class StubGeneratorEntry
 {
-    public static GeneratorResult GenerateError(InputParserResult parserResult)
+    private static StubInputError GenerateError(InputParserResult parserResult)
     {
         StubInputError stubInputError = new StubInputError(-1, ValidationCode.InvalidUnknown, "System");
 
@@ -102,10 +106,7 @@ public static class StubGeneratorEntry
                 });
         }
 
-        return new GeneratorResult()
-        {
-            Error = stubInputError
-        };
+        return stubInputError;
     }
 
     public static GeneratorResult? Generate(int languageValue, string input)
@@ -123,10 +124,27 @@ public static class StubGeneratorEntry
 
         if (inputParserResult.ValidationCode != ValidationCode.Valid)
         {
-            return GenerateError(inputParserResult);
+            return new GeneratorResult()
+            {
+                Error = GenerateError(inputParserResult)
+            };
         }
 
         var generatedStub = OutputParser.Parse(language, inputParserResult.Statements);
         return new GeneratorResult(generatedStub);
+    }
+
+    public static StubInputError Validate(string input)
+    {
+        var inputParserResult = InputParser.Parse(input);
+
+        if (inputParserResult.ValidationCode == ValidationCode.Valid)
+        {
+            return null;
+        }
+
+        //TODO: Should handle skipped from there as well
+
+        return GenerateError(inputParserResult);
     }
 }

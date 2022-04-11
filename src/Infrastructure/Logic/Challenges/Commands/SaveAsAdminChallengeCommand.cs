@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Entities.Challenges;
+using Domain.Enums;
 using Domain.Enums.Errors;
 using Domain.Models.Challenges;
 using Domain.Models.Results;
@@ -46,6 +47,8 @@ internal class SaveAsAdminChallengeHandler : IRequestHandler<SaveAsAdminChalleng
             return Result<string>.Failure(ProcessingError.ChallengeNotFound);
         }
 
+        //TODO: Maybe add a status reason?
+        challenge.Status = ChallengeStatus.Draft;
         challenge.LastModifiedOn = DateTime.Now;
 
          var result = await this.challengeRepository.Update(challenge, cancellationToken);

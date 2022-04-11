@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Entities.Challenges;
+using Domain.Enums;
 using Domain.Models.Challenges;
 using Infrastructure.DbDocuments.Challenges;
 using Infrastructure.Persistence;
@@ -10,10 +11,11 @@ namespace Infrastructure.Repositories;
 
 internal interface IChallengeRepository
 {
+    Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> Get(ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken);
+    Task<Challenge> Get(string id, CancellationToken cancellationToken);
     Task<string> Create(Challenge challenge, CancellationToken cancellationToken);
     Task<bool> Update(Challenge challenge, CancellationToken cancellationToken);
-    Task<Challenge> Get(string id, CancellationToken cancellationToken);
-    Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> Get(ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken);
+    Task<bool> Publish(Challenge challenge, CancellationToken cancellationToken);
 }
 
 internal class ChallengeRepository : BaseRepository, IChallengeRepository
@@ -106,6 +108,17 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
             .Set(x => x.Solution, challengeDocument.Solution)
             .Set(x => x.Status, challenge.Status)
             .Set(x => x.TagIds, challenge.TagIds);
+
+        var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        return result.ModifiedCount == 1;
+    }
+
+    public async Task<bool> Publish(Challenge challenge, CancellationToken cancellationToken)
+    {
+        var filter = Builders<ChallengeDocument>.Filter.Eq(x => x.Id, challenge.Id);
+        var update = Builders<ChallengeDocument>.Update
+            .Set(x => x.Status, challenge.Status)
+            .Set(x => x.LastModifiedOn, challenge.LastModifiedOn);
 
         var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         return result.ModifiedCount == 1;

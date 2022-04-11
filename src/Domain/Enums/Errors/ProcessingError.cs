@@ -35,6 +35,9 @@ public class ProcessingError : Error
     public static readonly ProcessingError StubGeneratorError =
         new(nameof(StubGeneratorError), 110);
 
+    public static readonly ProcessingError StubInputError =
+        new(nameof(StubInputError), 111);
+
     public ProcessingError(string name, int value) : base(name, value)
     {
     }

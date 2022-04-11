@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Entities.Challenges;
+using Domain.Enums;
 using Domain.Enums.Errors;
 using Domain.Models.Challenges;
 using Domain.Models.Results;
@@ -51,6 +52,7 @@ internal class SaveChallengeHandler : IRequestHandler<SaveChallengeCommand, Resu
             return Result<string>.Failure(ProcessingError.UserNotFound);
         }
 
+        challenge.Status = ChallengeStatus.Draft;
         challenge.LastModifiedOn = DateTime.Now;
 
         if (string.IsNullOrWhiteSpace(request.ChallengeId))
@@ -61,7 +63,7 @@ internal class SaveChallengeHandler : IRequestHandler<SaveChallengeCommand, Resu
         }
 
         var existingChallenge = await this.challengeRepository.Get(request.ChallengeId, cancellationToken);
-        if (existingChallenge.Id is null)
+        if (existingChallenge is null)
         {
             return Result<string>.Failure(ProcessingError.ChallengeNotFound);
         }
@@ -74,7 +76,7 @@ internal class SaveChallengeHandler : IRequestHandler<SaveChallengeCommand, Resu
         var result = await this.challengeRepository.Update(challenge, cancellationToken);
         if (!result)
         {
-            return Result<string>.Failure(Error.InternalServerError);
+            return Result<string>.Failure(challenge.Id, Error.InternalServerError);
         }
 
         return Result<string>.Success(existingChallenge.Id);

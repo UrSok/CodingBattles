@@ -35,6 +35,27 @@ public sealed class ValidationError : Error
     public static readonly ValidationError MinimumDifficultyIsBiggerThanMaximumDifficulty =
         new(nameof(MinimumDifficultyIsBiggerThanMaximumDifficulty), 10010);
 
+    public static readonly ValidationError EmptyChallengeTask =
+        new(nameof(EmptyChallengeTask), 10011);
+
+    public static readonly ValidationError EmptyInputDescription =
+        new(nameof(EmptyInputDescription), 10012);
+
+    public static readonly ValidationError EmptyChallengeOutputDescription =
+        new(nameof(EmptyChallengeOutputDescription), 10013);
+
+    public static readonly ValidationError EmptyChallengeConstraints =
+        new(nameof(EmptyChallengeConstraints), 10014);
+
+    public static readonly ValidationError BadChallengeTest =
+        new(nameof(BadChallengeTest), 10015);
+
+    public static readonly ValidationError BadChallengeTests =
+        new(nameof(BadChallengeTests), 10016);
+
+    public static readonly ValidationError BadChallengeSolution =
+        new(nameof(BadChallengeSolution), 10017);
+
     public ValidationError(string name, int value) : base(name, value)
     {
     }
