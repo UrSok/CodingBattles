@@ -21,11 +21,14 @@ export function App() {
   return (
     <BrowserRouter>
       <Helmet
-        titleTemplate="%s - React Boilerplate"
-        defaultTitle="React Boilerplate"
+        titleTemplate="%s - CodingBattle"
+        defaultTitle="CodingBattle"
         htmlAttributes={{ lang: i18n.language }}
       >
-        <meta name="description" content="A React Boilerplate application" />
+        <meta
+          name="description"
+          content="A platform for challenging others in a coding battle."
+        />
       </Helmet>
 
       <Switch>
