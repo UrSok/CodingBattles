@@ -35,8 +35,8 @@ public sealed class ValidationError : Error
     public static readonly ValidationError MinimumDifficultyIsBiggerThanMaximumDifficulty =
         new(nameof(MinimumDifficultyIsBiggerThanMaximumDifficulty), 10010);
 
-    public static readonly ValidationError EmptyChallengeTask =
-        new(nameof(EmptyChallengeTask), 10011);
+    public static readonly ValidationError NotEnoughChallengeTask =
+        new(nameof(NotEnoughChallengeTask), 10011);
 
     public static readonly ValidationError EmptyInputDescription =
         new(nameof(EmptyInputDescription), 10012);

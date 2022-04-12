@@ -2,14 +2,12 @@
 using Domain.Entities.Challenges;
 using Domain.Enums;
 using Domain.Enums.Errors;
-using Domain.Models.Common;
 using Domain.Models.Results;
 using FluentValidation;
 using Infrastructure.Repositories;
 using Infrastructure.Utils.Validation;
 using MediatR;
 using StubGenerator;
-using StubGenerator.StubInput.Models.Validation;
 
 namespace Infrastructure.Logic.Challenges.Commands;
 internal record PublishChallengeCommand(string JwtToken, string ChallengeId) : IRequest<Result<PublishChallengeResult>>;
@@ -28,18 +26,15 @@ internal class PublishChallengeCommandValidator : AbstractValidator<PublishChall
 
 internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand, Result<PublishChallengeResult>>
 {
-    private readonly IValidator<Challenge> validator;
     private readonly IChallengeRepository challengeRepository;
     private readonly IUserRepository userRepository;
     private readonly IMapper mapper;
 
     public PublishChallengeHandler(
-        IValidator<Challenge> validator,
         IChallengeRepository challengeRepository,
         IUserRepository userRepository,
         IMapper mapper)
     {
-        this.validator = validator;
         this.challengeRepository = challengeRepository;
         this.userRepository = userRepository;
         this.mapper = mapper;
@@ -65,21 +60,10 @@ internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand
             return Result<PublishChallengeResult>.Failure(ProcessingError.CannotEditForeignRecord);
         }
 
-        var challengesValidationFailures = this.validator.Validate(challenge)
-            .Errors.Where(x => x is not null);
-
-        if (challengesValidationFailures.Any())
+        var validationResult = this.Validate(challenge);
+        if (!validationResult.IsSuccess)
         {
-            var validationErrors = new List<Error>();
-
-            foreach (var failure in challengesValidationFailures)
-            {
-                ValidationError.TryFromName(failure.ErrorCode, out Error validationError);
-                validationError ??= ValidationError.UnspecifiedError;
-                validationErrors.Add(validationError);
-            }
-
-            return Result<PublishChallengeResult>.Failure(validationErrors);
+            return Result<PublishChallengeResult>.Failure(validationResult.Errors);
         }
 
         var stubInputError = StubGeneratorEntry.Validate(challenge.StubGeneratorInput);
@@ -106,61 +90,61 @@ internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand
 
         return Result<PublishChallengeResult>.Success(new PublishChallengeResult { ChallengeId = challenge.Id });
     }
-}
 
-internal class ChallengeValidator : AbstractValidator<Challenge>
-{
-    public ChallengeValidator()
+    private Result Validate(Challenge challenge)
     {
-        this.RuleFor(x => x.Name)
-            .NotEmpty().WithError(ValidationError.EmptyChallengeName);
-
-        this.RuleFor(x => x.Task)
-            .NotEmpty().WithError(ValidationError.EmptyChallengeTask);
-
-        this.RuleFor(x => x.InputDescription)
-            .NotEmpty().WithError(ValidationError.EmptyInputDescription);
-
-        this.RuleFor(x => x.OutputDescription)
-            .NotEmpty().WithError(ValidationError.EmptyChallengeOutputDescription);
-
-        this.RuleFor(x => x.Constraints)
-            .NotEmpty().WithError(ValidationError.EmptyChallengeConstraints);
-
-        this.RuleFor(x => x.StubGeneratorInput)
-            .NotEmpty().WithError(ValidationError.EmptyStubGeneratorInput);
-
-        this.RuleFor(x => x.Tests.Count)
-            .GreaterThanOrEqualTo(4).WithError(ValidationError.EmptyChallengeTask);
-
-        this.RuleFor(x => x.Tests)
-            .ForEach(x => x.Must(this.ValidateTest).WithError(ValidationError.BadChallengeTest))
-            .WithError(ValidationError.BadChallengeTests);
-
-        this.RuleFor(x => x.Solution.SourceCode)
-            .NotEmpty().WithError(ValidationError.BadChallengeSolution);
-
-    }
-
-    private bool ValidateTest(TestPair testPair)
-    {
-        if (string.IsNullOrWhiteSpace(testPair.Title))
+        if (string.IsNullOrWhiteSpace(challenge.Name))
         {
-            return false;
+            return Result.Failure(ValidationError.EmptyChallengeName);
         }
 
-        if (string.IsNullOrWhiteSpace(testPair.Case.Input) 
-            || string.IsNullOrWhiteSpace(testPair.Case.ExpectedOutput))
+        if (string.IsNullOrWhiteSpace(challenge.Task))
         {
-            return false;
+            return Result.Failure(ValidationError.NotEnoughChallengeTask);
         }
 
-        if (string.IsNullOrWhiteSpace(testPair.Validator.Input)
-            || string.IsNullOrWhiteSpace(testPair.Validator.ExpectedOutput))
+        if (string.IsNullOrWhiteSpace(challenge.InputDescription))
         {
-            return false;
+            return Result.Failure(ValidationError.EmptyInputDescription);
         }
 
-        return true;
+        if (string.IsNullOrWhiteSpace(challenge.OutputDescription))
+        {
+            return Result.Failure(ValidationError.EmptyChallengeOutputDescription);
+        }
+
+        if (string.IsNullOrWhiteSpace(challenge.Constraints))
+        {
+            return Result.Failure(ValidationError.EmptyChallengeConstraints);
+        }
+
+        if (string.IsNullOrWhiteSpace(challenge.StubGeneratorInput))
+        {
+            return Result.Failure(ValidationError.EmptyStubGeneratorInput);
+        }
+
+        if (challenge.Tests?.Count < 4)
+        {
+            return Result.Failure(ValidationError.NotEnoughChallengeTask);
+        }
+
+        foreach (var testPair in challenge.Tests)
+        {
+            if (string.IsNullOrWhiteSpace(testPair.Title)
+                || string.IsNullOrWhiteSpace(testPair.Case?.Input)
+                || string.IsNullOrWhiteSpace(testPair.Case?.ExpectedOutput)
+                || string.IsNullOrWhiteSpace(testPair.Validator?.Input)
+                || string.IsNullOrWhiteSpace(testPair.Validator?.ExpectedOutput))
+            {
+                return Result.Failure(ValidationError.BadChallengeTest);
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(challenge.Solution?.SourceCode))
+        {
+            return Result.Failure(ValidationError.BadChallengeSolution);
+        }
+
+        return Result.Success();
     }
 }
