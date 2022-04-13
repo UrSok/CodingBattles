@@ -1,10 +1,15 @@
 import jwtDecode from 'jwt-decode';
-import { verify, sign } from 'jsonwebtoken';
-// there is decode in jsonwebtoken
 import axios from './axios';
 
-interface DecodedJwtToken {
+export interface DecodedJwtToken {
+  nameid: string;
+  email: string;
+  role: string;
   exp: number;
+}
+
+enum localStorageKey {
+  AccessToken = 'accessToken',
 }
 
 const getTokenPayload = (accessToken: string): DecodedJwtToken => {
@@ -13,7 +18,7 @@ const getTokenPayload = (accessToken: string): DecodedJwtToken => {
   return decoded;
 };
 
-const isTokenValid = (accessToken: string): boolean => {
+const isTokenValid = (accessToken: string | undefined): boolean => {
   if (!accessToken) {
     return false;
   }
@@ -43,17 +48,36 @@ const handleTokenExpired = (exp: number) => {
   }, timeLeft);
 };
 
+const getTokenForHeader = (accessToken: string): string => {
+  return `Bearer ${accessToken}`;
+}
+
 const setSession = (accessToken: string | null) => {
   if (accessToken == null) {
-    localStorage.removeItem('accessToken');
+    localStorage.removeItem(localStorageKey.AccessToken);
     delete axios.defaults.headers.common.Authorization;
     return;
   }
 
-  localStorage.setItem('accessToken', accessToken);
-  axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+  localStorage.setItem(localStorageKey.AccessToken, accessToken);
+  axios.defaults.headers.common.Authorization = getTokenForHeader(accessToken);
   const { exp } = getTokenPayload(accessToken);
   handleTokenExpired(exp);
 };
 
-export { isTokenValid, getTokenPayload, setSession, verify, sign };
+const getTokenFromLocalStorageIfValid = (): string | null => {
+  const accessToken = localStorage.getItem(localStorageKey.AccessToken);
+  if (accessToken != null && isTokenValid(accessToken)) {
+    return accessToken;
+  }
+
+  return null;
+};
+
+export {
+  getTokenFromLocalStorageIfValid,
+  isTokenValid,
+  getTokenPayload,
+  getTokenForHeader,
+  setSession,
+};

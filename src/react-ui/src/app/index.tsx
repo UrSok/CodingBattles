@@ -8,16 +8,25 @@
 
 import * as React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import { Switch, Route, BrowserRouter, Router } from 'react-router-dom';
 
 import { GlobalStyle } from 'styles/global-styles';
 
 import { HomePage } from './pages/HomePage/Loadable';
 import { NotFoundPage } from './components/NotFoundPage/Loadable';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useAuthSlice } from './slices/auth';
 
 export function App() {
   const { i18n } = useTranslation();
+  const { actions } = useAuthSlice();
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    dispatch(actions.initialize());
+  }, [actions, dispatch]);
+
   return (
     <BrowserRouter>
       <Helmet
@@ -30,7 +39,6 @@ export function App() {
           content="A platform for challenging others in a coding battle."
         />
       </Helmet>
-
       <Switch>
         <Route exact path="/" component={HomePage} />
         <Route component={NotFoundPage} />
