@@ -2,6 +2,7 @@
 using Domain.Models.Results;
 using Domain.Models.Users;
 using Infrastructure.Logic.Users.Commands;
+using Infrastructure.Logic.Users.Queries;
 using MediatR;
 
 namespace Infrastructure.Managers;
@@ -35,5 +36,11 @@ public class UserManager : BaseManager, IUserManager
         var command = new AuthUserCommand(userLoginModel);
         return await this.SendCommand(command, cancellationToken);
 
+    }
+
+    public async Task<Result<AuthUserModel>> GetAuthUserByJwtToken(string jwtToken, CancellationToken cancellationToken)
+    {
+        var command = new GetAuthUserByJwtTokenQuery(jwtToken);
+        return await this.SendCommand(command, cancellationToken);
     }
 }

@@ -90,6 +90,12 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Global cors policy
+app.UseCors(x => x
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
+
 app.MapControllers();
 
 app.Run();

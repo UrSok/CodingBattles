@@ -38,6 +38,9 @@ public class ProcessingError : Error
     public static readonly ProcessingError StubInputError =
         new(nameof(StubInputError), 111);
 
+    public static readonly ProcessingError UserSessionExpired =
+        new(nameof(UserSessionExpired), 112);
+
     public ProcessingError(string name, int value) : base(name, value)
     {
     }

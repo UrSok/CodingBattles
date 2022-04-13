@@ -9,4 +9,5 @@ public interface IUserManager
     Task<Result> Activate(string userId, string verificationCode, CancellationToken cancellationToken);
     Task<Result> ResendActivation(string userId, CancellationToken cancellationToken);
     Task<Result<AuthResult>> Authenticate(UserLoginModel userLoginModel, CancellationToken cancellationToken);
+    Task<Result<AuthUserModel>> GetAuthUserByJwtToken(string jwtToken, CancellationToken cancellationToken);
 }
