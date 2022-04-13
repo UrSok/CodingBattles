@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { useSelector } from 'react-redux';
 
 export function HomePage() {
-  const { isAuthenticated, user  } = useSelector(selectAuth)
+  const { isAuthenticated, user } = useSelector(selectAuth);
 
   return (
     <>
