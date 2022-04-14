@@ -13,13 +13,13 @@ public class Result : IDomainResult
 {
     public IEnumerable<Error> Errors { get; set; }
 
+    public bool IsSuccess =>
+        !Errors.Any();
+
     public Result()
     {
         Errors = new List<Error>();
     }
-
-    public bool IsSuccess =>
-        !Errors.Any();
 
     public static Result Success()
     {
@@ -32,7 +32,6 @@ public class Result : IDomainResult
     public static Result Failure(IEnumerable<Error> errors)
         => new() { Errors = errors };
 }
-
 
 public class Result<T> : Result
 {

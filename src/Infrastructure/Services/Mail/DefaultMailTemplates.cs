@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.Services.Mail;
 
-internal static class DefaultMailTemplateGenerator
+internal static class DefaultMailTemplates
 {
     public static string GetAccountVerification()
     {

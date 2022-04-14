@@ -20,7 +20,7 @@ internal class MongoDbContext : IMongoDbContext
 {
     public MongoDbContext(IMongoDbOptions mongoDbOptions)
     {
-        var mongoClient = new MongoClient(mongoDbOptions.ConnectionString/* + "/?uuidRepresentation=standard"*/);
+        var mongoClient = new MongoClient(mongoDbOptions.ConnectionString);
 
         var db = mongoClient.GetDatabase(mongoDbOptions.DatabaseName);
 

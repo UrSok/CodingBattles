@@ -37,14 +37,14 @@ internal class MailService : IMailService
         {
             TemplateCode = MailTemplateCode.AccountVerification,
             Subject = "Coding Battles | Account Verification",
-            Body = DefaultMailTemplateGenerator.GetAccountVerification()
+            Body = DefaultMailTemplates.GetAccountVerification()
         });
 
         templates.Add(new MailTemplate
         {
             TemplateCode = MailTemplateCode.ResetPasswordVerification,
             Subject = "Coding Battles | Reset Password",
-            Body = DefaultMailTemplateGenerator.GetResetPassword()
+            Body = DefaultMailTemplates.GetResetPassword()
         });
 
         await this.mailTemplateRepository.InsertTemplatesIfDontExist(templates);

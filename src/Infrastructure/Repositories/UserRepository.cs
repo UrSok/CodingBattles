@@ -5,6 +5,7 @@ using Infrastructure.Persistence;
 using MongoDB.Driver;
 
 namespace Infrastructure.Repositories;
+
 internal interface IUserRepository
 {
     Task<string> Create(User user, CancellationToken cancellationToken);
