@@ -17,14 +17,6 @@ public class UserController : BaseController
     }
 
     [AllowAnonymous]
-    [HttpGet("getAuth/jwt")]
-    public async Task<IActionResult> GetAuthUserByJwtToken(CancellationToken cancellationToken)
-    {
-        var result = await this.userManager.GetAuthUserByJwtToken(JwtToken, cancellationToken);
-        return this.Process(result);
-    }
-
-    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] UserRegistrationModel userRegistrationModel, CancellationToken cancellationToken)
     {
@@ -53,6 +45,14 @@ public class UserController : BaseController
     public async Task<IActionResult> Authenticate([FromBody] UserLoginModel userLoginModel, CancellationToken cancellationToken)
     {
         var response = await this.userManager.Authenticate(userLoginModel, cancellationToken);
-        return this.Ok(response);
+        return this.Process(response);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("getAuth/jwt")]
+    public async Task<IActionResult> GetAuthUserByJwtToken(CancellationToken cancellationToken)
+    {
+        var result = await this.userManager.GetAuthUserByJwtToken(JwtToken, cancellationToken);
+        return this.Process(result);
     }
 }

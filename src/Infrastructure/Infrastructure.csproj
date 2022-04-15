@@ -10,6 +10,7 @@
     <None Remove="DbDocuments\Challenges\ChallengeDocument.cs~RF7cd70b.TMP" />
     <None Remove="DbDocuments\Challenges\ProgrammingProblemDocument.cs~RFb0dc5.TMP" />
     <None Remove="DbDocuments\Challenges\ProgrammingProblemDocument.cs~RFfa781.TMP" />
+    <None Remove="Logic\Users\Commands\AuthUserCommand.cs~RF2615ddd.TMP" />
     <None Remove="Logic\Users\Commands\ResendUserActivationCommand.cs~RF4fafe7f.TMP" />
     <None Remove="Repositories\UserRepository.cs~RF239a577.TMP" />
   </ItemGroup>
