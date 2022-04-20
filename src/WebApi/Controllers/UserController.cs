@@ -55,4 +55,12 @@ public class UserController : BaseController
         var result = await this.userManager.GetAuthUserByJwtToken(JwtToken, cancellationToken);
         return this.Process(result);
     }
+
+    [AllowAnonymous]
+    [HttpGet("isUniqueEmail/{email}")]
+    public async Task<IActionResult> GetAuthUserByJwtToken([FromRoute] string email, CancellationToken cancellationToken)
+    {
+        var result = await this.userManager.IsUniqueEmail(email, cancellationToken);
+        return this.Process(result);
+    }
 }

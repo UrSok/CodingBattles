@@ -4,6 +4,8 @@ using Domain.Models.Users;
 using Infrastructure.Logic.Users.Commands;
 using Infrastructure.Logic.Users.Queries;
 using MediatR;
+using System;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Managers;
 
@@ -40,7 +42,13 @@ public class UserManager : BaseManager, IUserManager
 
     public async Task<Result<AuthUserModel>> GetAuthUserByJwtToken(string jwtToken, CancellationToken cancellationToken)
     {
-        var command = new GetAuthUserByJwtTokenQuery(jwtToken);
-        return await this.SendCommand(command, cancellationToken);
+        var query = new GetAuthUserByJwtTokenQuery(jwtToken);
+        return await this.SendCommand(query, cancellationToken);
+    }
+
+    public async Task<Result<bool>> IsUniqueEmail(string email, CancellationToken cancellationToken)
+    {
+        var query = new GetIsUniqueUserEmailQuery(email);
+        return await this.SendCommand(query, cancellationToken);
     }
 }

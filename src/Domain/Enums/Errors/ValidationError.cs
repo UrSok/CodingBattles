@@ -56,6 +56,9 @@ public sealed class ValidationError : Error
     public static readonly ValidationError BadChallengeSolution =
         new(nameof(BadChallengeSolution), 10017);
 
+    public static readonly ValidationError EmptyEmail =
+        new(nameof(EmptyEmail), 10018);
+
     public ValidationError(string name, int value) : base(name, value)
     {
     }

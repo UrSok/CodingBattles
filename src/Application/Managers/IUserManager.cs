@@ -10,4 +10,5 @@ public interface IUserManager
     Task<Result> ResendActivation(string userId, CancellationToken cancellationToken);
     Task<Result<AuthResult>> Authenticate(UserLoginModel userLoginModel, CancellationToken cancellationToken);
     Task<Result<AuthUserModel>> GetAuthUserByJwtToken(string jwtToken, CancellationToken cancellationToken);
+    Task<Result<bool>> IsUniqueEmail(string email, CancellationToken cancellationToken);
 }
