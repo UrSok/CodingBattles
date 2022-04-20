@@ -1,19 +1,24 @@
-﻿using Domain.Models.Results;
+﻿using Domain.Enums.Errors;
+using Domain.Models.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
 
 public class BaseController : ControllerBase
 {
-    protected IActionResult Process<T>(Result<T> result) =>
+    /*protected IActionResult Process<T>(Result<T> result) =>
          result.IsSuccess
             ? this.Ok(result)
-            : this.BadRequest(result);
+            : result.Errors.Contains(Error.InternalServerError) 
+                ? this.StatusCode(StatusCodes.Status500InternalServerError)
+                : this.BadRequest(result);*/
 
     protected IActionResult Process(Result result) =>
         result.IsSuccess
             ? this.Ok(result)
-            : this.BadRequest(result);
+            : result.Errors.Contains(Error.InternalServerError)
+                ? this.StatusCode(StatusCodes.Status500InternalServerError, result)
+                : this.BadRequest(result);
 
     protected string JwtToken
     {
