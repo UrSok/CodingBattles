@@ -1,3 +1,42 @@
 {
-  "title": "welcome"
+  "ok": "Ok",
+  "cancel": "Cancel",
+  "AuthBadge": {
+    "signUpButton": "Sign Up",
+    "signInButton": "Sign In",
+    "singOutButton": "Sign Out",
+    "SignInForm": {
+      "tile": "Sing In",
+      "email": "Email",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password",
+      "validationInvalidEmail": "Invalid email",
+      "validationEmailRequired": "Email is required",
+      "validationPasswordRequired": "Password is required"
+    },
+    "SignUpForm": {
+      "tile": "Sing Up",
+      "email": "Email",
+      "username": "Username",
+      "password": "Password",
+      "passwordConfimation": "Confirm password",
+      "validationInvalidEmail": "Email is invalid",
+      "validationEmailRequired": "Email is required",
+      "validationEmailNotUnique": "Email already claimed",
+      "validationUsernameRequired": "Username is required",
+      "validationPasswordRequired": "Password is required",
+      "validationPasswordDontMatch": "Password don't match"
+    }
+  },
+  "Alerts": {
+    "UnverifiedMember": {
+      "message": " To be able to access all the features, you must confirm your email!",
+      "resendButton": "Resend"
+    },
+    "Guest": {
+      "message": "If you don't want to lose this account, claim this account by adding an email!",
+      "claimButton": "Claim"
+    }
+  }
 }

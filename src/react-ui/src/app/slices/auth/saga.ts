@@ -1,34 +1,38 @@
-import axios from 'app/utils/axios';
-import {
-  getTokenForHeader,
-  getTokenFromLocalStorageIfValid,
-  getTokenPayload,
-} from 'app/utils/jwt';
+import { AuthService } from 'app/api/authService';
 import { takeLatest, put } from 'redux-saga/effects';
-import { ResultWithValue } from 'types/api-results/Result';
-import { authActions as actions } from '.';
-import { AuthUser } from './types';
+import { ResultWithValue } from 'app/utils/types/api';
+import { actions as authActions } from '.';
+import { actions as exceptionActions } from '../exception';
+import { AuthUser, AuthUserWithToken } from './types';
 
 function* initializeAuth() {
-  const accessToken = getTokenFromLocalStorageIfValid();
-
-  if (accessToken == null) {
-    yield put(actions.setNotAuthenticated());
-  } else {
-    try {
-      const { data } = yield axios.get(`v1/user/getAuth/jwt`, {
-        headers: {
-          Authorization: getTokenForHeader(accessToken),
-        },
-      });
-      const result: ResultWithValue<AuthUser> = data;
-      yield put(actions.setAuthenticated(result.value));
-    } catch (exception: any) {
-      yield put(actions.setNotAuthenticated());
+  try {
+    const result: ResultWithValue<AuthUser> = yield AuthService.initAuth();
+    if (!result.isSuccess) {
+      yield put(authActions.setNotAuthenticated());
+      return;
     }
+    yield put(authActions.setAuthenticated(result.value!));
+  } catch (ex: any) {
+    yield put(exceptionActions.handleException(ex));
   }
 }
 
+function* tryAuthenticate(action) {
+  const result: ResultWithValue<AuthUserWithToken> =
+    yield AuthService.authenticate(
+      action.payload.email,
+      action.payload.password,
+    );
+
+  if (!result.isSuccess) {
+    yield put(authActions.setNotAuthenticated());
+    return;
+  }
+  yield put(authActions.setAuthenticated(result.value!.user));
+}
+
 export function* authSaga() {
-  yield takeLatest(actions.initialize.type, initializeAuth);
+  yield takeLatest(authActions.initialize.type, initializeAuth);
+  yield takeLatest(authActions.tryAuthenticate.type, tryAuthenticate);
 }
