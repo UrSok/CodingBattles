@@ -1,0 +1,44 @@
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { useInjectReducer } from 'redux-injectors';
+import { axiosBaseQuery } from './settings';
+
+const {{ camelCase apiName }}Api = createApi({
+  reducerPath: '{{ camelCase apiName }}Api',
+  baseQuery: axiosBaseQuery({
+    baseUrl: 'url',
+  }),
+  endpoints: build => ({
+  }),
+  
+});
+
+export const use{{ properCase apiName }}Api = () => {
+  useInjectReducer({
+    key: {{ camelCase apiName }}Api.reducerPath,
+    reducer: {{ camelCase apiName }}Api.reducer,
+  });
+  return {{ camelCase apiName }}Api;
+};
+
+/**
+ * Example Mutation Usage:
+ *
+ * searchChallenges: build.mutation<
+ *     ResultWithValue<Paginated<ChallengeSearchResultItem>>,
+ *     ChallengeSearchRequest
+ *   >({
+ *     query: (request: ChallengeSearchRequest) => ({
+ *       url: '',
+ *       method: 'POST',
+ *       data: request,
+ *     }),
+ *   }),
+ */
+
+/**
+ * Example Query Usage:
+ *
+ * getTags: build.query<ResultWithValue<ChallengeTag[]>, void>({
+ *     query: () => ({ url: '', method: 'GET' }),
+ *   }),
+ */
