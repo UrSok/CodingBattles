@@ -1,5 +1,5 @@
 const CracoLessPlugin = require('craco-less');
-const CracoAntDesignPlugin = require('craco-antd');
+//const CracoAntDesignPlugin = require('craco-antd');
 
 module.exports = {
   reactScriptsVersion: 'react-scripts' /* (default value) */,
@@ -15,7 +15,7 @@ module.exports = {
         },
       },
     },
-    {
+    /*{
       plugin: CracoAntDesignPlugin,
       options: {
         customizeTheme: {
@@ -23,6 +23,6 @@ module.exports = {
           '@link-color': '#1DA57A',
         },
       },
-    },
+    },*/
   ],
 };
