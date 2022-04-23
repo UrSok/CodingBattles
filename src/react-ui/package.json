@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ant-design/pro-form": "1.64.1",
     "@ant-design/pro-layout": "6.34.11",
+    "@ant-design/pro-list": "1.21.54",
+    "@ant-design/pro-table": "2.71.7",
     "@reduxjs/toolkit": "1.7.1",
     "@testing-library/jest-dom": "5.16.1",
     "@testing-library/react": "12.1.2",

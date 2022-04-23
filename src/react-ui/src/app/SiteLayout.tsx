@@ -1,12 +1,17 @@
 import React from 'react';
-import { Alert, Button, Descriptions, Result, Space, Statistic } from 'antd';
+import { Alert, Button, Descriptions, Input, Result, Space, Statistic } from 'antd';
 import { LikeOutlined } from '@ant-design/icons';
-import ProLayout, { PageContainer } from '@ant-design/pro-layout';
+import ProLayout, { MenuDataItem, PageContainer } from '@ant-design/pro-layout';
 import { defaultProps } from './components/CustomLayout/_defaultProps';
 import { useSelector } from 'react-redux';
 import { selectAuth } from './slices/auth/selectors';
 import { ProfileBadge, AuthBadge } from './components/auth/Badges';
 import HeaderContent from './components/HeaderContent';
+import Router from './routes';
+import { proLayoutRoutes } from './routes/proLayoutRoutes';
+import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Role } from './slices/auth/types';
+import LoadingSpinner from './components/LoadingSpinner';
 
 const content = (
   <Descriptions size="small" column={2}>
@@ -24,91 +29,34 @@ const content = (
 
 export default function SiteLayout() {
   const { isAuthenticated, user } = useSelector(selectAuth);
+  const { pathname } = useLocation();
 
   return (
     <ProLayout
-      {...defaultProps}
+      title="Coding Battles"
+      {...proLayoutRoutes}
+      location={{
+        pathname: pathname,
+      }}
       fixSiderbar
       fixedHeader
-      //location={{
-      //   pathname,
-      // }}
-      waterMarkProps={{
-        content: 'Pro Layout',
+      menuDataRender={(menuData: MenuDataItem[]) => {
+        if (user?.role !== Role.Admin) {
+          menuData = menuData.filter(x => x.access !== Role.Admin);
+        }
+
+        return menuData;
       }}
-      //menuFooterRender={props => {
-      //</div>  return (
-      // <p></p>
-      //  );
-      //}}
       onMenuHeaderClick={e => console.log(e)}
-      /* {menuItemRender={(item, dom) => (
-          <a
-            onClick={() => {
-              setPathname(item.path || '/welcome');
-            }}
-          >
-            {dom}
-          </a>
-       </div> ) } */
+      menuItemRender={(item: MenuDataItem, dom) => (
+        <Link to={item.path!}>{dom}</Link>
+      )}
       headerContentRender={() => <HeaderContent />}
       rightContentRender={() =>
         isAuthenticated ? <ProfileBadge /> : <AuthBadge />
       }
     >
-      <PageContainer
-        content={content}
-        tabList={[
-          {
-            tab: '基本信息',
-            key: 'base',
-          },
-          {
-            tab: '详细信息',
-            key: 'info',
-          },
-        ]}
-        extraContent={
-          <Space size={24}>
-            <Statistic
-              title="Feedback"
-              value={1128}
-              prefix={<LikeOutlined />}
-            />
-            <Statistic title="Unmerged" value={93} suffix="/ 100" />
-          </Space>
-        }
-        extra={[
-          <Button key="3">操作</Button>,
-          <Button key="2">操作</Button>,
-          <Button key="1" type="primary">
-            主操作
-          </Button>,
-        ]}
-        footer={[
-          <Button key="3">重置</Button>,
-          <Button key="2" type="primary">
-            提交
-          </Button>,
-        ]}
-      >
-        <div
-          style={{
-            height: '120vh',
-          }}
-        >
-          <Result
-            status="404"
-            style={{
-              height: '100%',
-              background: '#fff',
-            }}
-            title="Hello World"
-            subTitle="Sorry, you are not authorized to access this page."
-            extra={<Button type="primary">Back Home</Button>}
-          />
-        </div>
-      </PageContainer>
+      <Router />
     </ProLayout>
   );
 }
