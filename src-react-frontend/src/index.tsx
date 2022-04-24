@@ -9,7 +9,7 @@ import 'react-app-polyfill/ie11';
 import 'react-app-polyfill/stable';
 
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 
 // Import root app
@@ -25,9 +25,10 @@ import reportWebVitals from 'reportWebVitals';
 import './locales/i18n';
 
 const store = configureAppStore();
-const MOUNT_NODE = document.getElementById('root') as HTMLElement;
+const container = document.getElementById('root') as HTMLElement;
+const root = createRoot(container);
 
-ReactDOM.render(
+root.render(
   <Provider store={store}>
     <HelmetProvider>
       <React.StrictMode>
@@ -35,7 +36,6 @@ ReactDOM.render(
       </React.StrictMode>
     </HelmetProvider>
   </Provider>,
-  MOUNT_NODE,
 );
 
 // Hot reloadable translation json files

@@ -1,8 +1,9 @@
 import React from 'react';
 import ProLayout, { MenuDataItem } from '@ant-design/pro-layout';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import Router from 'app/routes/Router';
-import { menuRoutes } from 'app/routes/menuRoutes';
+import Router from './routes/Router';
+import { menuRoutes } from './routes/menuRoutes';
+import AuthBadges from './components/auth/Badges';
 
 export default function AppLayout() {
   const { pathname } = useLocation();
@@ -19,7 +20,6 @@ export default function AppLayout() {
       }}
       fixSiderbar
       fixedHeader
-      //headerRender={false}
       onMenuHeaderClick={() => navigate('/')}
       menuDataRender={(menuData: MenuDataItem[]): MenuDataItem[] => {
         return menuData;
@@ -28,7 +28,7 @@ export default function AppLayout() {
         <Link to={item.path!}>{dom}</Link>
       )}
       headerContentRender={() => <p>bla bla</p>}
-      rightContentRender={() => <p>bla bla</p>}
+      rightContentRender={() => <AuthBadges />}
     >
       <Router />
     </ProLayout>

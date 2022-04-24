@@ -2,8 +2,8 @@ function combinePath(root: string, sublink: string): string {
   return `${root}${sublink}`;
 }
 
-const ROOTS_MYPROFILE: string = '/myprofile';
 const ROOTS_PROFILES: string = '/profiles';
+const ROOTS_PROFILES_ME: string = combinePath(ROOTS_PROFILES, '/me');
 const ROOTS_CHALLENGES: string = '/challenges';
 const ROOTS_GAMES: string = '/games';
 const ROOTS_IDE: string = '/ide';
@@ -15,13 +15,14 @@ export const PATH_PAGE = {
   page500: '/500',
 };
 
-export const PATH_MYPROFILE = {
-  root: ROOTS_MYPROFILE,
-  edit: combinePath(ROOTS_MYPROFILE, '/edit'),
+const PATH_PROFILES_ME = {
+  root: ROOTS_PROFILES_ME,
+  settings: combinePath(ROOTS_PROFILES_ME, '/settings'),
 };
 
 export const PATH_PROFILES = {
   root: ROOTS_PROFILES,
+  ME: PATH_PROFILES_ME,
 };
 
 export const PATH_CHALLENGES = {

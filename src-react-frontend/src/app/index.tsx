@@ -7,7 +7,7 @@ import LoadingSpinner from './components/LoadingSpinner';
 import styled from 'styled-components';
 
 import './styles/index.less';
-import AppLayout from './pages/AppLayout';
+import AppLayout from './layout';
 
 const CenteredNoLayout = styled.div`
   height: 100vh;
