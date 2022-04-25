@@ -69,7 +69,7 @@ internal class AuthUserHandler : IRequestHandler<AuthUserCommand, Result<AuthRes
         }
 
         var tokenExpiresAt = DateTime.UtcNow.AddHours(24);
-        var token = this.CreateToken(user.Id, user.Email, user.Role, tokenExpiresAt);
+        var token = this.CreateToken(user.Id, user.Username, user.Email, user.Role, tokenExpiresAt);
 
         var session = new Session()
         {
@@ -88,7 +88,7 @@ internal class AuthUserHandler : IRequestHandler<AuthUserCommand, Result<AuthRes
         return Result<AuthResult>.Success(authResult);
     }
 
-    private string CreateToken(string userId, string email, string role, DateTime expiresAt)
+    private string CreateToken(string userId, string username, string email, string role, DateTime expiresAt)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var tokenKey = Encoding.ASCII.GetBytes(this.key);
@@ -97,6 +97,7 @@ internal class AuthUserHandler : IRequestHandler<AuthUserCommand, Result<AuthRes
             Subject = new ClaimsIdentity(new Claim[]
             {
                     new Claim(ClaimTypes.NameIdentifier, userId),
+                    new Claim(ClaimTypes.Name, username),
                     new Claim(ClaimTypes.Email, email),
                     new Claim(ClaimTypes.Role, role)
             }),
