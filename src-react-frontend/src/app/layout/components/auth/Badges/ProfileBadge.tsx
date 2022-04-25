@@ -23,12 +23,13 @@ export default function ProfileBadge() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-
   return (
     <Dropdown
       overlay={<DropdownMenu t={t} navigate={navigate} dispatch={dispatch} />}
       placement="bottomLeft"
       trigger={['click']}
+      destroyPopupOnHide
+      className="profile-dropdown"
     >
       <Space>
         {user?.username}

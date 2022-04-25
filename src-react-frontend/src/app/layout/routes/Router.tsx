@@ -1,3 +1,4 @@
+import Challenges from 'app/pages/Challenges';
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { PATH_CHALLENGES, PATH_GAMES, PATH_IDE, PATH_PROFILES } from './paths';
@@ -17,7 +18,7 @@ export default function Router() {
         </Route>
       </Route>
       <Route path={PATH_CHALLENGES.root}>
-        <Route index element={<p>challenges</p>} />
+        <Route index element={<Challenges />} />
       </Route>
       <Route path={PATH_GAMES.root}>
         <Route index element={<p>games</p>} />

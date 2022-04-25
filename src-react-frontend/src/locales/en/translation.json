@@ -49,5 +49,14 @@
       "message": "If you don't want to lose this account, claim this account by adding an email!",
       "claimButton": "Claim"
     }
+  },
+  "Challenges": {
+    "Search": {
+      "Form": {
+        "searchInput": "Input name, description..",
+        "difficulty": "Difficulty:",
+        "tags": "Tags:"
+      }
+    }
   }
 }

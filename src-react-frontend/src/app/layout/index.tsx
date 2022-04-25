@@ -4,10 +4,19 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Router from './routes/Router';
 import { menuRoutes } from './routes/menuRoutes';
 import AuthBadges from './components/auth/Badges';
+import HeaderAlerts from './components/auth/HeaderAlerts';
+import { useSelector } from 'react-redux';
+import { selectUser } from 'app/auth/selectors';
+import { Role } from 'app/api/types/auth';
+import { Alert, Button, Space } from 'antd';
+import { translations } from 'locales/translations';
+import { useTranslation } from 'react-i18next';
 
 export default function AppLayout() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const user = useSelector(selectUser);
+  const { t } = useTranslation();
 
   return (
     <ProLayout
@@ -27,10 +36,12 @@ export default function AppLayout() {
       menuItemRender={(item: MenuDataItem, dom) => (
         <Link to={item.path!}>{dom}</Link>
       )}
-      headerContentRender={() => <p>bla bla</p>}
       rightContentRender={() => <AuthBadges />}
     >
-      <Router />
+      <Space direction="vertical" size="small" style={{ display: 'flex' }}>
+        <HeaderAlerts />
+        <Router />
+      </Space>
     </ProLayout>
   );
 }

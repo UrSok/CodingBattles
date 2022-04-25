@@ -3,3 +3,16 @@
 @import '~@ant-design/pro-list/dist/list.less';
 @import './theme.less';
 
+.profile-dropdown {
+  padding: 8px;
+  &:hover {
+    cursor: pointer;
+    background-color: @primary-color;
+  }
+  :active {
+    background-color: @primary-color;
+    .profile-dropdown {
+      background-color: @primary-color;
+    }
+  }
+}

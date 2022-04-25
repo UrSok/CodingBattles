@@ -4,6 +4,8 @@
 
 import { configureStore, StoreEnhancer } from '@reduxjs/toolkit';
 import { authApi } from 'app/api/auth';
+import { challengeApi } from 'app/api/challenge';
+import { challengeTagApi } from 'app/api/challengeTag';
 import { createInjectorsEnhancer } from 'redux-injectors';
 import createSagaMiddleware from 'redux-saga';
 
@@ -14,7 +16,11 @@ export function configureAppStore() {
   const sagaMiddleware = createSagaMiddleware(reduxSagaMonitorOptions);
   const { run: runSaga } = sagaMiddleware;
 
-  const apiMiddlewares = [authApi.middleware];
+  const apiMiddlewares = [
+    authApi.middleware,
+    challengeTagApi.middleware,
+    challengeApi.middleware,
+  ];
   // Create the store with saga middleware
   const middlewares = [sagaMiddleware];
 
