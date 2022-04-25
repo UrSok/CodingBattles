@@ -1,10 +1,13 @@
 import { BaseQueryFn } from '@reduxjs/toolkit/query';
 import { AxiosRequestConfig, AxiosError } from 'axios';
+import { Result, ResultValue } from '../types';
 import axiosInstance from './axios';
 
 export const axiosBaseQuery =
   (
-    { baseUrl }: { baseUrl: string } = { baseUrl: '' },
+    { baseUrl }: { baseUrl: string } = {
+      baseUrl: process.env.REACT_APP_API_URL,
+    },
   ): BaseQueryFn<
     {
       url: string;

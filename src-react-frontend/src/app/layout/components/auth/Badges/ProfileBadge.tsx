@@ -12,18 +12,26 @@ import { translations } from 'locales/translations';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { MenuClickEventHandler } from 'rc-menu/lib/interface';
 import { PATH_PROFILES } from 'app/layout/routes/paths';
+import { useDispatch, useSelector } from 'react-redux';
+import { AnyAction, Dispatch } from '@reduxjs/toolkit';
+import { selectUser } from 'app/auth/selectors';
+import { authActions } from 'app/auth';
 
 export default function ProfileBadge() {
+  const user = useSelector(selectUser);
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+
   return (
     <Dropdown
-      overlay={<DropdownMenu t={t} navigate={navigate} />}
+      overlay={<DropdownMenu t={t} navigate={navigate} dispatch={dispatch} />}
       placement="bottomLeft"
       trigger={['click']}
     >
       <Space>
-        {/*user?.username*/}
+        {user?.username}
         <Avatar shape="square" size="default" icon={<UserOutlined />} />
         <DownOutlined />
       </Space>
@@ -34,6 +42,7 @@ export default function ProfileBadge() {
 type DropdownMenuProps = {
   t: TFunction<'translation'>;
   navigate: NavigateFunction;
+  dispatch: Dispatch<AnyAction>;
 };
 
 enum MenuKey {
@@ -42,7 +51,7 @@ enum MenuKey {
   SignOut = 'sign-out',
 }
 
-const DropdownMenu = ({ t, navigate }: DropdownMenuProps) => {
+const DropdownMenu = ({ t, navigate, dispatch }: DropdownMenuProps) => {
   const menuItems: MenuProps['items'] = [
     {
       key: MenuKey.MyProfile,
@@ -70,7 +79,7 @@ const DropdownMenu = ({ t, navigate }: DropdownMenuProps) => {
         navigate(PATH_PROFILES.ME.settings);
         break;
       case MenuKey.SignOut:
-        console.log('log out time');
+        dispatch(authActions.signOut());
         break;
       default:
         throw new Error('Unkown menu key');

@@ -1,6 +1,14 @@
 {
   "ok": "Ok",
   "cancel": "Cancel",
+  "loadingProbably": "Loading, probably..",
+  "ProfileBadge": {
+    "Dropdown": {
+      "myProfile": "My Profile",
+      "settings": "Settings",
+      "singOut": "Sign Out"
+    }
+  },
   "AuthBadge": {
     "signUpButton": "Sign Up",
     "signInButton": "Sign In",
@@ -15,7 +23,7 @@
       "validationPasswordRequired": "Password is required"
     },
     "SignUpForm": {
-      "title": "Sing Up",
+      "title": "Sign Up",
       "email": "Email",
       "username": "Username",
       "password": "Password",
@@ -25,14 +33,11 @@
       "validationEmailNotUnique": "Email already claimed",
       "validationUsernameRequired": "Username is required",
       "validationPasswordRequired": "Password is required",
-      "validationPasswordDontMatch": "Password don't match"
-    }
-  },
-  "ProfileBadge": {
-    "Dropdown": {
-      "myProfile": "My Profile",
-      "settings": "Settings",
-      "singOut": "Sign Out"
+      "validationPasswordDontMatch": "Password don't match",
+      "Notification": {
+        "message": "Sign up successful!",
+        "description": "A mail confirmation was sent to the indicated email!"
+      }
     }
   },
   "Alerts": {

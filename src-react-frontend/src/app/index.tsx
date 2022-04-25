@@ -8,6 +8,10 @@ import styled from 'styled-components';
 
 import './styles/index.less';
 import AppLayout from './layout';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectAuth } from './auth/selectors';
+import { useAuthSlice } from './auth';
+import { useEffect } from 'react';
 
 const CenteredNoLayout = styled.div`
   height: 100vh;
@@ -19,7 +23,15 @@ const CenteredNoLayout = styled.div`
 
 export function App() {
   const { i18n } = useTranslation();
-  const isAuthInitialized: boolean = true;
+
+  const { actions } = useAuthSlice();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(actions.initialize());
+  }, []);
+
+  const { isInitialized } = useSelector(selectAuth);
 
   return (
     <BrowserRouter>
@@ -33,7 +45,7 @@ export function App() {
           content="A platform for challenging others in a coding battle."
         />
       </Helmet>
-      {isAuthInitialized ? (
+      {isInitialized ? (
         <AppLayout />
       ) : (
         <CenteredNoLayout>

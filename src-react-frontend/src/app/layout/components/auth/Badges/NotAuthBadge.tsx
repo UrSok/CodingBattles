@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { LoginOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { translations } from 'locales/translations';
+import SignUpForm from '../Forms/SignUpForm';
+import SignInForm from '../Forms/SignInForm';
 
 export default function NotAuthBadge(props) {
   const [signUpVisible, setSignUpVisible] = useState(false);
@@ -48,7 +50,7 @@ export default function NotAuthBadge(props) {
         destroyOnClose
         {...props}
       >
-        <p>Sign Up</p>
+        <SignUpForm />
       </Modal>
       <Modal
         title={t(translations.AuthBadge.SignInForm.title)}
@@ -60,7 +62,7 @@ export default function NotAuthBadge(props) {
         destroyOnClose
         {...props}
       >
-        <p>Sign In</p>
+       <SignInForm />
       </Modal>
     </>
   );

@@ -3,6 +3,7 @@
  */
 
 import { combineReducers } from '@reduxjs/toolkit';
+import { authApi } from 'app/api/auth';
 
 import { InjectedReducersType } from 'utils/types/injector-typings';
 
@@ -15,6 +16,7 @@ export function createReducer(injectedReducers: InjectedReducersType = {}) {
     return state => state;
   } else {
     return combineReducers({
+      [authApi.reducerPath]: authApi.reducer,
       ...injectedReducers,
     });
   }
