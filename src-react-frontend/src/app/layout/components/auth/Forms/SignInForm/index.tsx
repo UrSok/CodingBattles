@@ -19,7 +19,6 @@ export default function SignInForm() {
   };
 
   //TODO: Fix someday sign in about appearing as clickable even when validation failed
-
   const [, forceUpdate] = useState({});
   useEffect(() => {
     forceUpdate({});
@@ -102,7 +101,7 @@ export default function SignInForm() {
             size="large"
             loading={isLoading}
             disabled={
-              !form.isFieldsTouched(['email', 'password']) ||
+              !form.isFieldsTouched(['email', 'password'], true) ||
               !!form
                 .getFieldsError(['email', 'password'])
                 .filter(({ errors }) => errors.length).length

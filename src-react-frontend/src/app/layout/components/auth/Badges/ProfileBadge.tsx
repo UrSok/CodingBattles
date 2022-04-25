@@ -79,6 +79,7 @@ const DropdownMenu = ({ t, navigate, dispatch }: DropdownMenuProps) => {
         navigate(PATH_PROFILES.ME.settings);
         break;
       case MenuKey.SignOut:
+        navigate('/');
         dispatch(authActions.signOut());
         break;
       default:

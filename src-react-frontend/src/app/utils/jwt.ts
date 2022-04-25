@@ -15,7 +15,7 @@ enum localStorageKey {
 
 const getTokenPayload = (accessToken: string): DecodedJwtToken => {
   const decoded = jwtDecode<DecodedJwtToken>(accessToken);
-  console.log(decoded);
+  //console.log(decoded);
 
   return decoded;
 };
