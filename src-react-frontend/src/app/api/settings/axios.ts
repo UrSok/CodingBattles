@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
-  //validateStatus: status => status >= 200 && status < 400,
+  validateStatus: status => status >= 200 && status <= 400,
 });
 
 axiosInstance.interceptors.response.use(

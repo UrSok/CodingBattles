@@ -3,7 +3,6 @@ import { useInjectReducer } from 'redux-injectors';
 import { axiosBaseQuery } from './settings';
 import { AuthUserWithToken, SignInModel, SignUpModel } from './types/auth';
 import { ResultValue } from './types';
-import { signUpFormActions } from 'app/layout/components/auth/Forms/SignUpForm/slice';
 import { authActions } from 'app/auth';
 
 export const authApi = createApi({
@@ -37,15 +36,6 @@ export const authApi = createApi({
         url: `isUniqueEmail/${email}`,
         method: 'GET',
       }),
-      async onQueryStarted(email, { dispatch, queryFulfilled }) {
-        dispatch(signUpFormActions.setNullUniqueEmail());
-        const { data } = await queryFulfilled;
-        if (data.value === true) {
-          dispatch(signUpFormActions.setUniqueEmail());
-        } else if (data.value === false) {
-          dispatch(signUpFormActions.setNotUniqueEmail());
-        }
-      },
     }),
   }),
 });

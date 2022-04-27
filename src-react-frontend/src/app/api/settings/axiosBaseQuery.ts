@@ -1,4 +1,5 @@
 import { BaseQueryFn } from '@reduxjs/toolkit/query';
+import { layoutActions } from 'app/layout/slice';
 import { AxiosRequestConfig, AxiosError } from 'axios';
 import { Result, ResultValue } from '../types';
 import axiosInstance from './axios';
@@ -18,7 +19,7 @@ export const axiosBaseQuery =
     unknown,
     unknown
   > =>
-  async ({ url, method, data, params }) => {
+  async ({ url, method, data, params }, api) => {
     try {
       const result = await axiosInstance({
         url: baseUrl + url,
@@ -29,6 +30,8 @@ export const axiosBaseQuery =
       return { data: result.data };
     } catch (axiosError) {
       let err = axiosError as AxiosError;
+      //TODO: Handle 401 some day.
+      api.dispatch(layoutActions.showUnkownException());
       return {
         error: {
           status: err.response?.status,

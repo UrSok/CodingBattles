@@ -2,6 +2,50 @@
   "ok": "Ok",
   "cancel": "Cancel",
   "loadingProbably": "Loading, probably..",
+  "SignOutNotification": {
+    "message": "Sign out successful!",
+    "description": "Sad seeing you go. :c Hope to see you soon back!"
+  },
+  "UnkownErrorNotification": {
+    "message": "Something unexpected happened!",
+    "description": "An unhandled error was just thrown. No worries, we will fix it someday.. I hope."
+  },
+  "SignInModalForm": {
+    "signInButton": "Sign In",
+    "title": "Sing In",
+    "email": "Email",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password",
+    "validationInvalidEmail": "Invalid email",
+    "validationEmailRequired": "Email is required",
+    "validationPasswordRequired": "Password is required",
+    "SuccessNotification": {
+      "message": "Sign in successful!",
+      "description": "Enjoy the full power of the platform!"
+    },
+    "InvalidLoginAlert": {
+      "message": "Invalid email or password!"
+    }
+  },
+  "SignUpModalForm": {
+    "signUpButton": "Sign Up",
+    "title": "Sign Up",
+    "email": "Email",
+    "username": "Username",
+    "password": "Password",
+    "passwordConfimation": "Confirm password",
+    "validationInvalidEmail": "Email is invalid",
+    "validationEmailRequired": "Email is required",
+    "validationEmailNotUnique": "Email already claimed",
+    "validationUsernameRequired": "Username is required",
+    "validationPasswordRequired": "Password is required",
+    "validationPasswordDontMatch": "Password don't match",
+    "SuccessNotification": {
+      "message": "Sign up successful!",
+      "description": "A mail confirmation was sent to the indicated email!"
+    }
+  },
   "ProfileBadge": {
     "Dropdown": {
       "myProfile": "My Profile",

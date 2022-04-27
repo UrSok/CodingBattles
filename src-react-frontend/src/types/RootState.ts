@@ -1,7 +1,7 @@
 import { AuthState } from 'app/auth/types';
-import { SignUpFormState } from 'app/layout/components/auth/Forms/SignUpForm/slice/types';
+import { LayoutState } from 'app/layout/slice/types';
 
 export interface RootState {
-  signUpForm?: SignUpFormState;
+  layout?: LayoutState;
   auth?: AuthState;
 }
