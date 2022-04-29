@@ -29,7 +29,7 @@ public class Challenge : EntityWithId
 
     public List<Feedback> Feedbacks { get; set; }
 
-    public int Difficulty { get; set; }
+    public float Difficulty { get; set; }
 
     public string CreatedByUserId { get; set; }
 

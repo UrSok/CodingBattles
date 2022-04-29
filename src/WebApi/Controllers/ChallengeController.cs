@@ -21,7 +21,7 @@ public class ChallengeController : BaseController
 
     [AllowAnonymous]
     [HttpPost]
-    public async Task<IActionResult> Get(ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> Get([FromBody] ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken)
     {
         var result = await this.challengeManager.Get(challengeSearchModel, cancellationToken);
         return this.Process(result);

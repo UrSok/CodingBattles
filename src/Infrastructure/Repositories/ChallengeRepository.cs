@@ -43,17 +43,29 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
             filters.Add(textFilters);
         }
 
+        var minFilter = Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty >= 1);
+        var maxFilter = Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty <= 5);
+        var includeNoDifficultyFilter = Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty == 0);
+
         if (challengeSearchModel.MinimumDifficulty is not null)
         {
-            filters.Add(
-                Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty >= challengeSearchModel.MinimumDifficulty));
+            minFilter = Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty >= challengeSearchModel.MinimumDifficulty);
         }
 
         if (challengeSearchModel.MaximumDifficulty is not null)
         {
-            filters.Add(
-                Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty <= challengeSearchModel.MaximumDifficulty));
+            maxFilter = Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty <= challengeSearchModel.MaximumDifficulty);
         }
+
+        var minMaxFilter = Builders<ChallengeDocument>.Filter.And(minFilter, maxFilter);
+        var difficultiesFilter = Builders<ChallengeDocument>.Filter.Or(minMaxFilter, includeNoDifficultyFilter);
+
+        if (!challengeSearchModel.IncludeNoDifficulty)
+        {
+            difficultiesFilter = Builders<ChallengeDocument>.Filter.Or(minMaxFilter);
+        }
+
+        filters.Add(difficultiesFilter);
 
         if (challengeSearchModel.TagIds.Any())
         {

@@ -22,4 +22,5 @@ export type ChallengeSearchRequest = {
   tagIds?: string[];
   minimumDifficulty?: number;
   maximumDifficulty?: number;
+  includeNoDifficulty?: boolean;
 };

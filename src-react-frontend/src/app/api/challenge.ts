@@ -12,12 +12,11 @@ export const challengeApi = createApi({
     baseUrl: 'v1/challenge/',
   }),
   endpoints: build => ({
-    getChallenges: build.mutation<
+    getChallenges: build.query<
       ResultValue<Paginated<ChallengeSearchResultItem>>,
       ChallengeSearchRequest
     >({
-      query: (request: ChallengeSearchRequest) => ({
-        url: '',
+      query: (request: ChallengeSearchRequest) => ({ 
         method: 'POST',
         data: request,
       }),

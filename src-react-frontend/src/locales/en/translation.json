@@ -99,6 +99,7 @@
       "Form": {
         "searchInput": "Input name, description..",
         "difficulty": "Difficulty:",
+        "includeNoDifficulty": "Include no difficulty",
         "tags": "Tags:"
       }
     }
