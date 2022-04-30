@@ -1,6 +1,8 @@
 # Coding Battles
 A platform for challenging others in a coding battle.
 
+TODO: Find how does the certificates are generated..
+
 # Configurations
 ## Settings file
 *Database:*
