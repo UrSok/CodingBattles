@@ -1,15 +1,10 @@
-import {
-  LockOutlined,
-  LoginOutlined,
-  MailOutlined,
-  PlusOutlined,
-} from '@ant-design/icons';
+import { LockOutlined, LoginOutlined, MailOutlined } from '@ant-design/icons';
 import ProForm, {
   ModalForm,
   ProFormCheckbox,
   ProFormText,
 } from '@ant-design/pro-form';
-import { Alert, Form, notification, Space } from 'antd';
+import { Alert, Button, Form, notification } from 'antd';
 import { authApi } from 'app/api/auth';
 import { SignInModel } from 'app/api/types/auth';
 import { EMAIL_REGEX } from 'app/utils/constants';
@@ -17,6 +12,7 @@ import { translations } from 'locales/translations';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldData } from 'rc-field-form/es/interface';
+import styled from 'styled-components';
 
 export default function SingInModalForm(props) {
   const [form] = Form.useForm();
@@ -38,7 +34,7 @@ export default function SingInModalForm(props) {
         duration: 5,
       });
     }
-  }
+  };
 
   const validateFields = (
     _changedFields: FieldData[],
@@ -57,7 +53,6 @@ export default function SingInModalForm(props) {
 
   return (
     <ModalForm<SignInModel>
-      {...props}
       form={form}
       initialValues={{
         remember: true,
@@ -88,7 +83,7 @@ export default function SingInModalForm(props) {
         />
       ) : null}
 
-      <ProForm.Group {...props}>
+      <ProForm.Group>
         <ProFormText
           width="lg"
           name="email"
@@ -96,7 +91,6 @@ export default function SingInModalForm(props) {
             prefix: <MailOutlined />,
           }}
           placeholder={t(translations.SignInModalForm.email)}
-          //hasFeedback
           rules={[
             {
               required: true,
@@ -110,7 +104,7 @@ export default function SingInModalForm(props) {
         />
       </ProForm.Group>
 
-      <ProForm.Group {...props}>
+      <ProForm.Group>
         <ProFormText.Password
           width="lg"
           name="password"
@@ -128,15 +122,22 @@ export default function SingInModalForm(props) {
           ]}
         />
       </ProForm.Group>
-
-      <ProForm.Group {...props}>
-        <ProForm.Item name="remember" valuePropName="checked" noStyle>
-          <ProFormCheckbox width="sm" noStyle>
+      <ProForm.Item style={{ margin: 0 }}>
+        <FixAlignment>
+          <ProFormCheckbox noStyle name="remember">
             {t(translations.SignInModalForm.rememberMe)}
           </ProFormCheckbox>
-        </ProForm.Item>
-        <a href="">{t(translations.SignInModalForm.forgotPassword)}</a>
-      </ProForm.Group>
+          <Button type="link" style={{ padding: 0 }}>
+            {t(translations.SignInModalForm.forgotPassword)}
+          </Button>
+        </FixAlignment>
+      </ProForm.Item>
     </ModalForm>
   );
 }
+
+const FixAlignment = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;

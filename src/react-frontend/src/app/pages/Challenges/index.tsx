@@ -50,7 +50,6 @@ export default function Challenges() {
   const [includeNoDifficulty, setIncludeNoDifficulty] = useState(true);
   const tagIds: string[] = useWatch('tags', form);
 
-
   useEffect(() => {
     const searchQuery: ChallengeSearchRequest = {
       text: search,
@@ -67,6 +66,7 @@ export default function Challenges() {
     }
 
     triggerGetChallenges(searchQuery);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, difficulty, includeNoDifficulty, tagIds]);
 
   return (

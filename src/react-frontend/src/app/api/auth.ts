@@ -8,7 +8,7 @@ import { authActions } from 'app/auth';
 export const authApi = createApi({
   reducerPath: 'authApi',
   baseQuery: axiosBaseQuery({
-    baseUrl: 'v1/user/',
+    baseUrl: '/v1/user/',
   }),
   endpoints: build => ({
     signUp: build.mutation<ResultValue<boolean>, SignUpModel>({

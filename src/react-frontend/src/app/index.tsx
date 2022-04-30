@@ -29,6 +29,7 @@ export function App() {
 
   useEffect(() => {
     dispatch(actions.initialize());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { isInitialized } = useSelector(selectAuth);

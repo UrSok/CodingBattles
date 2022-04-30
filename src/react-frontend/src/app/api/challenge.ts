@@ -9,14 +9,14 @@ import {
 export const challengeApi = createApi({
   reducerPath: 'challengeApi',
   baseQuery: axiosBaseQuery({
-    baseUrl: 'v1/challenge/',
+    baseUrl: '/v1/challenge/',
   }),
   endpoints: build => ({
     getChallenges: build.query<
       ResultValue<Paginated<ChallengeSearchResultItem>>,
       ChallengeSearchRequest
     >({
-      query: (request: ChallengeSearchRequest) => ({ 
+      query: (request: ChallengeSearchRequest) => ({
         method: 'POST',
         data: request,
       }),
