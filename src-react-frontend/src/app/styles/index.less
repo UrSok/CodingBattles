@@ -24,3 +24,21 @@
     }
   }
 }
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: @primary-color;
+  border-radius: 25px;
+  &:hover {
+    background: @primary-color-hover;
+  }
+}
