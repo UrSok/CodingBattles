@@ -18,7 +18,7 @@ internal class TagRepository : BaseRepository, ITagRepository
     public TagRepository(IMongoDbContext mongoDbContext, IMapper mapper) : base(mapper)
     {
         this.tags = mongoDbContext.Tags;
-        this.InsertTagsIfNoneExists();
+        Task.Run(this.InsertTagsIfNoneExists);
     }
 
     #region TagsSetup

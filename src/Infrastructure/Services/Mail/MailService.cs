@@ -23,8 +23,7 @@ internal class MailService : IMailService
     {
         this.mailTemplateRepository = mailTemplateRepository;
         this.mailOptions = mailOptions;
-        var insert = this.InsertDefaultMailTemplates();
-        Task.WaitAll(new Task[] { insert });
+        Task.Run(this.InsertDefaultMailTemplates);
 
         this.gmailService = new GmailService(mailOptions);
     }
