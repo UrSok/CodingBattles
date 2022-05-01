@@ -98,9 +98,10 @@
     "Search": {
       "Form": {
         "searchInput": "Input name, description..",
-        "difficulty": "Difficulty:",
+        "difficulty": "Difficulty",
         "includeNoDifficulty": "Include no difficulty",
-        "tags": "Tags:"
+        "tags": "Tags",
+        "sortBy": "Sort By"
       }
     }
   }

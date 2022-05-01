@@ -29,6 +29,13 @@ import { selectUser } from 'app/auth/selectors';
 import { Role } from 'app/api/types/auth';
 import { useWatch } from 'antd/lib/form/Form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
+import ProForm, {
+  ProFormCheckbox,
+  ProFormDatePicker,
+  ProFormSlider,
+  ProFormText,
+  QueryFilter,
+} from '@ant-design/pro-form';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -56,7 +63,7 @@ export default function Challenges() {
       tagIds: tagIds,
       includeNoDifficulty: includeNoDifficulty,
     };
-    console.log(difficulty);
+
     if (difficulty !== undefined) {
       searchQuery.minimumDifficulty = difficulty[0];
       searchQuery.maximumDifficulty = difficulty[1];
@@ -78,7 +85,7 @@ export default function Challenges() {
     >
       <ProCard ghost gutter={16}>
         <ProCard colSpan="30%" bordered>
-          <Form
+          <ProForm
             layout="vertical"
             form={form}
             initialValues={{
@@ -87,6 +94,7 @@ export default function Challenges() {
               includeNoDifficulty: true,
               tagIds: [],
             }}
+            submitter={false}
           >
             <Form.Item name="search">
               <Search
@@ -96,7 +104,42 @@ export default function Challenges() {
                 allowClear
               />
             </Form.Item>
+
             <Form.Item
+              name="sortBy"
+              label={t(translations.Challenges.Search.Form.sortBy)}
+            >
+              <Select
+                style={{ width: '100%' }}
+                placeholder={t(translations.Challenges.Search.Form.sortBy)}
+                defaultActiveFirstOption
+                options={[
+                  {
+                    label: 'Name',
+                    value: 'name',
+                  },
+                  {
+                    label: 'Difficulty',
+                    value: 'difficulty',
+                  },
+                ]}
+              />
+            </Form.Item>
+
+            <Form.Item name="tags">
+              <Select
+                mode="multiple"
+                style={{ width: '100%' }}
+                placeholder={t(translations.Challenges.Search.Form.tags)}
+                loading={isLoadingTags}
+                allowClear
+              >
+                {challengeTags?.value?.map(tag => (
+                  <Option key={tag.id}>{tag.name}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <ProForm.Item
               label={t(translations.Challenges.Search.Form.difficulty)}
               name="difficulty"
             >
@@ -119,7 +162,7 @@ export default function Challenges() {
                   setDifficulty(values)
                 }
               />
-            </Form.Item>
+            </ProForm.Item>
             <Form.Item>
               <Checkbox
                 defaultChecked
@@ -130,24 +173,7 @@ export default function Challenges() {
                 {t(translations.Challenges.Search.Form.includeNoDifficulty)}
               </Checkbox>
             </Form.Item>
-
-            <Form.Item
-              label={t(translations.Challenges.Search.Form.tags)}
-              name="tags"
-            >
-              <Select
-                mode="multiple"
-                style={{ width: '100%' }}
-                placeholder="Tags"
-                loading={isLoadingTags}
-                allowClear
-              >
-                {challengeTags?.value?.map(tag => (
-                  <Option key={tag.id}>{tag.name}</Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Form>
+          </ProForm>
         </ProCard>
         <ProCard
           bordered

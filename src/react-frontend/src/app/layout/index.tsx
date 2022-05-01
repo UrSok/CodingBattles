@@ -20,6 +20,7 @@ import SingUpModalForm from './components/auth/Forms/SignUpModalForm';
 import { translations } from 'locales/translations';
 import { selectLayout } from './slice/selectors';
 import { useLayoutSlice } from './slice';
+import { Role } from 'app/api/types/auth';
 
 export default function AppLayout() {
   const { pathname } = useLocation();
@@ -92,6 +93,17 @@ export default function AppLayout() {
       fixSiderbar
       onMenuHeaderClick={() => navigate('/')}
       menuDataRender={(menuData: MenuDataItem[]): MenuDataItem[] => {
+        // TODO: REFACTOR THIS LOGIC AS IT DOESN'T WORK AS EXPECTED
+        if (!isAuthenticated) {
+          return menuData.filter(x => x.access === 'any');
+        }
+
+        if (user?.role === Role.Admin) return menuData;
+
+        if (user?.role !== Role.Member) {
+          menuData = menuData.filter(x => x.access !== Role.Member);
+        }
+
         return menuData;
       }}
       menuItemRender={(item: MenuDataItem, dom) => (

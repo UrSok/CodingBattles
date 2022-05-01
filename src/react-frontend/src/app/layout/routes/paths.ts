@@ -27,6 +27,7 @@ export const PATH_PROFILES = {
 
 export const PATH_CHALLENGES = {
   root: ROOTS_CHALLENGES,
+  //myChallenges: combinePath(ROOTS_CHALLENGES, '/my'),
 };
 
 export const PATH_GAMES = {
