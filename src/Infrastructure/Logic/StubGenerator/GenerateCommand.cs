@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Domain.Enums;
 using Domain.Enums.Errors;
 using Domain.Models.Common;
 using Domain.Models.Results;
@@ -16,7 +17,7 @@ internal class GenerateCommandValidator : AbstractValidator<GenerateCommand>
     public GenerateCommandValidator()
     {
         this.RuleFor(x => x.Model.Language)
-            .IsInEnum().WithError(ValidationError.UnsupportedLanguage);
+            .NotEmpty().WithError(ValidationError.EmptyLanguage);
 
         this.RuleFor(x => x.Model.Input)
             .NotEmpty().WithError(ValidationError.EmptyStubGeneratorInput);
@@ -35,7 +36,9 @@ internal class GenerateHandler : IRequestHandler<GenerateCommand, Result<StubGen
 
     public Task<Result<StubGeneratorResult>> Handle(GenerateCommand request, CancellationToken cancellationToken)
     {
-        var stubGeneratorResult = StubGeneratorEntry.Generate((int)request.Model.Language, request.Model.Input);
+        Language.TryFromName(request.Model.Language, out Language language);
+
+        var stubGeneratorResult = StubGeneratorEntry.Generate(language, request.Model.Input);
 
         if (stubGeneratorResult is null)
         {

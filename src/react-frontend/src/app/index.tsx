@@ -12,6 +12,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectAuth } from './auth/selectors';
 import { useAuthSlice } from './auth';
 import { useEffect } from 'react';
+import { useMonaco } from '@monaco-editor/react';
+import { stubDefinitions, stubInputLangId } from '../config/monacoconfig';
 
 const CenteredNoLayout = styled.div`
   height: 100vh;
@@ -23,16 +25,23 @@ const CenteredNoLayout = styled.div`
 
 export function App() {
   const { i18n } = useTranslation();
-
+  const monaco = useMonaco();
   const { actions } = useAuthSlice();
   const dispatch = useDispatch();
+  const { isInitialized } = useSelector(selectAuth);
 
   useEffect(() => {
     dispatch(actions.initialize());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { isInitialized } = useSelector(selectAuth);
+  useEffect(() => {
+    monaco?.languages.register({ id: stubInputLangId });
+    monaco?.languages.setMonarchTokensProvider(
+      stubInputLangId,
+      stubDefinitions(),
+    );
+  }, [monaco]);
 
   return (
     <BrowserRouter>

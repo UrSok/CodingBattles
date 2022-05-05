@@ -36,12 +36,15 @@ import ProForm, {
   ProFormText,
   QueryFilter,
 } from '@ant-design/pro-form';
+import { useNavigate } from 'react-router-dom';
+import { PATH_CHALLENGES } from 'app/layout/routes/paths';
 
 const { Search } = Input;
 const { Option } = Select;
 
 export default function Challenges() {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
   const { data: challengeTags, isLoading: isLoadingTags } =
     challengeTagApi.useGetTagsQuery();
   const [
@@ -188,7 +191,11 @@ export default function Challenges() {
 
                 if (user?.role === Role.Member || user?.role === Role.Admin) {
                   actions.push(
-                    <Button key="3" type="primary">
+                    <Button
+                      key="create-challenge"
+                      type="primary"
+                      onClick={() => navigate(PATH_CHALLENGES.save)}
+                    >
                       Create
                     </Button>,
                   );

@@ -27,6 +27,7 @@ export const PATH_PROFILES = {
 
 export const PATH_CHALLENGES = {
   root: ROOTS_CHALLENGES,
+  save: combinePath(ROOTS_CHALLENGES, '/save'),
   //myChallenges: combinePath(ROOTS_CHALLENGES, '/my'),
 };
 

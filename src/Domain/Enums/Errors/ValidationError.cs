@@ -59,6 +59,9 @@ public sealed class ValidationError : Error
     public static readonly ValidationError EmptyEmail =
         new(nameof(EmptyEmail), 10018);
 
+    public static readonly ValidationError EmptyLanguage =
+        new(nameof(EmptyLanguage), 10019);
+
     public ValidationError(string name, int value) : base(name, value)
     {
     }

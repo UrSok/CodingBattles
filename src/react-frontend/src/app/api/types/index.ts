@@ -1,3 +1,7 @@
+export enum ErrorCode {
+  StubGeneratorError = 'StubGeneratorError',
+}
+
 export type Error = {
   name: string;
   value: number;

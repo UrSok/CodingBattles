@@ -6,6 +6,7 @@ import { combineReducers } from '@reduxjs/toolkit';
 import { authApi } from 'app/api/auth';
 import { challengeApi } from 'app/api/challenge';
 import { challengeTagApi } from 'app/api/challengeTag';
+import { stubGeneratorApi } from 'app/api/stubGenerator';
 
 import { InjectedReducersType } from 'utils/types/injector-typings';
 
@@ -21,6 +22,7 @@ export function createReducer(injectedReducers: InjectedReducersType = {}) {
       [authApi.reducerPath]: authApi.reducer,
       [challengeTagApi.reducerPath]: challengeTagApi.reducer,
       [challengeApi.reducerPath]: challengeApi.reducer,
+      [stubGeneratorApi.reducerPath]: stubGeneratorApi.reducer,
       ...injectedReducers,
     });
   }

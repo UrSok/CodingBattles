@@ -1,15 +1,24 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { useInjectReducer } from 'redux-injectors';
 import { axiosBaseQuery } from './settings';
+import { ResultValue } from './types';
+import { StubGeneratorModel, StubGeneratorResult } from './types/stubGenerator';
 
-export const {{ camelCase apiName }}Api = createApi({
-  reducerPath: '{{ camelCase apiName }}Api',
+export const stubGeneratorApi = createApi({
+  reducerPath: 'stubGeneratorApi',
   baseQuery: axiosBaseQuery({
-    baseUrl: 'url',
+    baseUrl: '/v1/stubGenerator/',
   }),
   endpoints: build => ({
+    generateStub: build.query<
+      ResultValue<StubGeneratorResult>,
+      StubGeneratorModel
+    >({
+      query: (request: StubGeneratorModel) => ({
+        method: 'POST',
+        data: request,
+      }),
+    }),
   }),
-  
 });
 
 /**
