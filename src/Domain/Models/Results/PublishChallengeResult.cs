@@ -4,7 +4,7 @@ public class PublishChallengeResult
 {
     public string ChallengeId { get; set; }
    
-    //TODO: Solution Error
+    //TODO: Solution
 
     public StubGeneratorError Error { get; set; }
 }

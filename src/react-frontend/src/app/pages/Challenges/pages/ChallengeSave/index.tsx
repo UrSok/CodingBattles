@@ -3,12 +3,11 @@ import ProForm, {
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
-  StepsForm,
 } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
 import Title from 'antd/lib/typography/Title';
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { stubInputLangId } from 'config/monacoconfig';
 import LoadingSpinner from 'app/components/LoadingSpinner';
@@ -16,28 +15,37 @@ import { getLanguageKeyName, Language } from 'app/utils/types/globalTypes';
 import { useForm, useWatch } from 'antd/lib/form/Form';
 import { stubGeneratorApi } from 'app/api/stubGenerator';
 import ErrorAlert from './components/ErrorAlert';
-import { Button, Form, Space } from 'antd';
-import {
-  DeleteTwoTone,
-  MinusCircleOutlined,
-  PlusOutlined,
-} from '@ant-design/icons';
+import { Button, Checkbox, Form, Select, Space, Typography } from 'antd';
+import { DeleteTwoTone, PlusOutlined } from '@ant-design/icons';
 import { red } from '@ant-design/colors';
+import ChallengeDescription from 'app/layout/components/Challenges/ChallengeDescription';
+import MultiTagSelect from '../../components/MultiTagSelect';
+import { challengeApi } from 'app/api/challenge';
+import { TestPair } from 'app/api/types/challenge';
+import { PATH_CHALLENGES } from 'app/layout/routes/paths';
 
 export default function ChallengeSave() {
-  const { id } = useParams();
+  const { id: paramId } = useParams();
+  const navigate = useNavigate();
+  const [triggerSaveChallenge, { isLoading: isSaving, data: savingResult }] =
+    challengeApi.useSaveChallengeMutation();
   const [form] = useForm();
   const [
     triggerGenerateStub,
     { isLoading: isGeneratig, data: generateStubResult },
   ] = stubGeneratorApi.useLazyGenerateStubQuery();
-  const selectedStubLang: Language = useWatch('challenge-stub-language', form);
+  const selectedStubLang: Language = useWatch('challengeStubLanguage', form);
   const selectedSolutionLang: Language = useWatch(
-    'challenge-solution-language',
+    'challengeSolutionLanguage',
     form,
   );
   const stubInputRef = useRef<any>(null);
+  const solutionInputRef = useRef<any>(null);
   const [emptyStubInput, setEmptyStubInput] = useState(true);
+  const challengeMarkdownDescription = useWatch(
+    'challengeDescriptionMarkdown',
+    form,
+  );
 
   const triggerStubGeneration = (input: string | undefined) => {
     if (input?.length === 0 || !input) return;
@@ -55,6 +63,10 @@ export default function ChallengeSave() {
     stubInputRef.current = editor;
   };
 
+  const solutionInputMounted = (editor, _) => {
+    solutionInputRef.current = editor;
+  };
+
   useEffect(() => {
     if (stubInputRef !== null && stubInputRef.current !== null) {
       const input: string = stubInputRef.current.getValue();
@@ -68,6 +80,62 @@ export default function ChallengeSave() {
     triggerStubGeneration(input);
   };
 
+  const saveChallenge = async () => {
+    const challengeName = form.getFieldValue('challengeName');
+    const challengeDescriptionShort = form.getFieldValue(
+      'challengeDescriptionShort',
+    );
+    const challengeTags = form.getFieldValue('challengeTags');
+    const challengeDescriptionMarkdown = form.getFieldValue(
+      'challengeDescriptionMarkdown',
+    );
+    const challengeTests: any[] = form.getFieldValue('challengeTests');
+    const challengeSolutionLanguage = form.getFieldValue(
+      'challengeSolutionLanguage',
+    );
+
+    let testPairs: TestPair[] = challengeTests.map(
+      (test, index: number): TestPair => ({
+        title: test[`testName${index}`],
+        case: {
+          input: test[`testInput${index}`],
+          expectedOutput: test[`testExcepted${index}`],
+        },
+        validator: {
+          input: test[`validatorInput${index}`],
+          expectedOutput: test[`validatorExcepted${index}`],
+        },
+      }),
+    );
+
+    const stubInput = stubInputRef?.current?.getValue();
+    const solutionInput = solutionInputRef?.current?.getValue();
+
+    const result = await triggerSaveChallenge({
+      id: paramId,
+      model: {
+        name: challengeName,
+        descriptionShort: challengeDescriptionShort,
+        descriptionMarkdown: challengeDescriptionMarkdown,
+        tagIds: challengeTags,
+        tests: testPairs,
+        stubGeneratorInput: stubInput,
+        solution: {
+          language: challengeSolutionLanguage,
+          sourceCoude: solutionInput,
+        },
+      },
+    }).unwrap();
+
+    if (result?.value !== undefined) {
+      navigate(PATH_CHALLENGES.save + `/${result.value}`, { replace: true });
+    }
+  };
+
+  //TODO: THINK HOW TO USE THE USETIMEOUT HOOK
+  //const [abortAutoSave, setAbortTimeout] = useState(false);
+  //const [autoSave, setAutoSave] = useState(false);
+
   return (
     <PageContainer
       ghost
@@ -75,8 +143,15 @@ export default function ChallengeSave() {
         title: '',
       }}
       footer={[
-        <Button type="ghost">Save</Button>,
-        <Button type="primary">Publish</Button>,
+        /*<Checkbox onChange={e => setAutoSave(e.target.value)}>
+          Auto-save
+        </Checkbox>,*/
+        <Button type="ghost" onClick={saveChallenge} loading={isSaving}>
+          Save
+        </Button>,
+        <Button type="primary" loading={isSaving}>
+          Publish
+        </Button>,
       ]}
     >
       <ProForm form={form} submitter={false}>
@@ -88,28 +163,54 @@ export default function ChallengeSave() {
             </Title>
           }
         >
+          <ProCard style={{ marginRight: '3%' }}>
+            <ProFormText name="challengeName" placeholder="Title" />
+            <ProFormTextArea
+              name="challengeDescriptionShort"
+              placeholder="Challenge short description"
+              allowClear
+            />
+            <MultiTagSelect name="challengeTags" />
+          </ProCard>
+        </ProCard>
+
+        <ProCard
+          ghost
+          title={
+            <Title level={4} style={{ margin: 0 }}>
+              Descritpion
+            </Title>
+          }
+        >
           <ProCard>
-            <ProFormText name="challenge-name" placeholder="Title" />
-            <ProFormTextArea
-              name="challenge-task"
-              placeholder="Challenge goal description"
-              allowClear
-            />
-            <ProFormTextArea
-              name="challenge-input"
-              placeholder="Challenge input description"
-              allowClear
-            />
-            <ProFormTextArea
-              name="challenge-output"
-              placeholder="Challenge output description"
-              allowClear
-            />
-            <ProFormTextArea
-              name="challenge-constraints"
-              placeholder="Challenge input constraints"
-              allowClear
-            />
+            <ProCard ghost split="vertical">
+              <ProCard
+                ghost
+                style={{
+                  paddingRight: '5px',
+                }}
+              >
+                <ProFormTextArea
+                  label={<Typography.Text strong>Input</Typography.Text>}
+                  name="challengeDescriptionMarkdown"
+                  placeholder="Challenge description"
+                  fieldProps={{
+                    autoSize: { minRows: 2 },
+                  }}
+                />
+              </ProCard>
+              <ProCard
+                ghost
+                style={{
+                  paddingLeft: '5px',
+                }}
+              >
+                <Typography.Text strong>Preview</Typography.Text>
+                <ChallengeDescription
+                  descriptionMarkdown={challengeMarkdownDescription}
+                />
+              </ProCard>
+            </ProCard>
           </ProCard>
         </ProCard>
 
@@ -122,7 +223,9 @@ export default function ChallengeSave() {
           }
         >
           <ProCard>
-            <ProForm.Item label="Stub input:">
+            <ProForm.Item
+              label={<Typography.Text strong>Input</Typography.Text>}
+            >
               <Space
                 direction="vertical"
                 style={{
@@ -147,14 +250,16 @@ export default function ChallengeSave() {
               </Space>
             </ProForm.Item>
             <ProFormSelect
-              name="challenge-stub-language"
+              name="challengeStubLanguage"
               placeholder="Generation language"
               width="sm"
               allowClear={false}
               initialValue={getLanguageKeyName(Language.javascript)}
               valueEnum={Language}
             />
-            <ProForm.Item label="Result:">
+            <ProForm.Item
+              label={<Typography.Text strong>Result</Typography.Text>}
+            >
               <Editor
                 loading={<LoadingSpinner />}
                 height={300}
@@ -182,7 +287,7 @@ export default function ChallengeSave() {
             </Title>
           }
         >
-          <Form.List name="tests" initialValue={[{}, {}, {}, {}]}>
+          <Form.List name="challengeTests" initialValue={[{}, {}, {}, {}]}>
             {(fields, { add, remove }) => (
               <ProCard ghost split="horizontal" gutter={[16, 16]}>
                 {fields.map((field, index) => (
@@ -207,10 +312,10 @@ export default function ChallengeSave() {
                       ) : (
                         ''
                       )}
-                      <ProCard direction="column" ghost className="">
+                      <ProCard direction="column" ghost>
                         <ProCard split="horizontal" ghost>
                           <ProFormText
-                            name={[field.name, `test-name-${field.key}`]}
+                            name={[field.name, `testName${field.key}`]}
                             initialValue={`Test ${index + 1}`}
                             placeholder="Test name"
                             allowClear={false}
@@ -230,7 +335,7 @@ export default function ChallengeSave() {
                               }}
                             >
                               <ProFormTextArea
-                                name={[field.name, `test-input-${field.key}`]}
+                                name={[field.name, `testInput${field.key}`]}
                                 placeholder="Test input"
                                 allowClear
                                 rules={[
@@ -249,10 +354,7 @@ export default function ChallengeSave() {
                               }}
                             >
                               <ProFormTextArea
-                                name={[
-                                  field.name,
-                                  `test-excepted-${field.key}`,
-                                ]}
+                                name={[field.name, `testExcepted${field.key}`]}
                                 placeholder="Test excepted result"
                                 allowClear
                                 rules={[
@@ -266,18 +368,6 @@ export default function ChallengeSave() {
                           </ProCard>
                         </ProCard>
                         <ProCard split="horizontal" ghost>
-                          <ProFormText
-                            name={[field.name, `validator-name-${field.key}`]}
-                            initialValue={`Validator ${index + 1}`}
-                            placeholder="Validator name"
-                            allowClear={false}
-                            rules={[
-                              {
-                                required: true,
-                                message: 'Name is required',
-                              },
-                            ]}
-                          />
                           <ProCard ghost>
                             <ProCard
                               ghost
@@ -289,7 +379,7 @@ export default function ChallengeSave() {
                               <ProFormTextArea
                                 name={[
                                   field.name,
-                                  `validator-input-${field.key}`,
+                                  `validatorInput${field.key}`,
                                 ]}
                                 placeholder="Validator input"
                                 allowClear
@@ -311,7 +401,7 @@ export default function ChallengeSave() {
                               <ProFormTextArea
                                 name={[
                                   field.name,
-                                  `validator-excepted-${field.key}`,
+                                  `validatorExcepted${field.key}`,
                                 ]}
                                 placeholder="Validator excepted result"
                                 allowClear
@@ -361,7 +451,7 @@ export default function ChallengeSave() {
               }}
             >
               <ProFormSelect
-                name="challenge-solution-language"
+                name="challengeSolutionLanguage"
                 placeholder="Solution language"
                 width="sm"
                 allowClear={false}
@@ -375,9 +465,7 @@ export default function ChallengeSave() {
               height={300}
               language={selectedSolutionLang}
               className="bordered-editor"
-
-              //onChange={stubInputChanged}
-              //onMount={stubInputMounted}
+              onMount={solutionInputMounted}
             />
           </ProCard>
         </ProCard>

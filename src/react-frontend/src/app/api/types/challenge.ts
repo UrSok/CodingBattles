@@ -8,7 +8,7 @@ export type ChallengeTag = {
 export type ChallengeSearchResultItem = {
   id: string;
   name: string;
-  task: string;
+  descriptionShort: string;
   difficulty: number;
   tags: ChallengeTag[];
 };
@@ -23,4 +23,35 @@ export type ChallengeSearchRequest = {
   minimumDifficulty?: number;
   maximumDifficulty?: number;
   includeNoDifficulty?: boolean;
+};
+
+export type TestCase = {
+  input: string;
+  expectedOutput: string;
+};
+
+export type TestPair = {
+  title: string;
+  case?: TestCase;
+  validator?: TestCase;
+};
+
+export type Solution = {
+  language: string;
+  sourceCoude?: string;
+};
+
+type ChallengeSaveModel = {
+  name: string;
+  descriptionShort: string;
+  descriptionMarkdown: string;
+  stubGeneratorInput: string;
+  tests: TestPair[];
+  solution: Solution;
+  tagIds: string[];
+};
+
+export type ChallengeSaveModelWithId = {
+  id?: string;
+  model?: ChallengeSaveModel;
 };

@@ -37,7 +37,7 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
                     Builders<ChallengeDocument>.Filter.Regex(x
                     => x.Name, new MongoDB.Bson.BsonRegularExpression(challengeSearchModel.Text, "i")),
                     Builders<ChallengeDocument>.Filter.Regex(x
-                    => x.Task, new MongoDB.Bson.BsonRegularExpression(challengeSearchModel.Text, "i"))
+                    => x.DescriptionShort, new MongoDB.Bson.BsonRegularExpression(challengeSearchModel.Text, "i"))
                 );
 
             filters.Add(textFilters);
@@ -111,10 +111,8 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
         var filter = Builders<ChallengeDocument>.Filter.Eq(x => x.Id, challenge.Id);
         var update = Builders<ChallengeDocument>.Update
             .Set(x => x.Name, challenge.Name)
-            .Set(x => x.Task, challenge.Task)
-            .Set(x => x.InputDescription, challenge.InputDescription)
-            .Set(x => x.OutputDescription, challenge.OutputDescription)
-            .Set(x => x.Constraints, challenge.Constraints)
+            .Set(x => x.DescriptionShort, challenge.DescriptionShort)
+            .Set(x => x.DescriptionMarkdown, challenge.DescriptionMarkdown)
             .Set(x => x.StubGeneratorInput, challenge.StubGeneratorInput)
             .Set(x => x.Tests, challengeDocument.Tests)
             .Set(x => x.Solution, challengeDocument.Solution)

@@ -3,7 +3,7 @@ using MongoDB.Driver;
 
 namespace Infrastructure.Utils;
 
-//TODO: Fix the sorting problem someday.. : https://stackoverflow.com/questions/56815949/mongodb-c-sharp-case-insensitive-sort-and-index
+//TODO: improve sorting problem someday.. : https://stackoverflow.com/questions/56815949/mongodb-c-sharp-case-insensitive-sort-and-index
 public static class MongoCollectionQueryByPageExtensions
 {
     public static async Task<(int totalPages, int totalPageItems, IReadOnlyList<TDocument> data)> AggregateByPage<TDocument>(

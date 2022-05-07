@@ -98,24 +98,14 @@ internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand
             return Result.Failure(ValidationError.EmptyChallengeName);
         }
 
-        if (string.IsNullOrWhiteSpace(challenge.Task))
+        if (string.IsNullOrWhiteSpace(challenge.DescriptionShort))
         {
-            return Result.Failure(ValidationError.NotEnoughChallengeTask);
+            return Result.Failure(ValidationError.ChallengeEmptyDescriptionShort);
         }
 
-        if (string.IsNullOrWhiteSpace(challenge.InputDescription))
+        if (string.IsNullOrWhiteSpace(challenge.DescriptionMarkdown))
         {
-            return Result.Failure(ValidationError.EmptyInputDescription);
-        }
-
-        if (string.IsNullOrWhiteSpace(challenge.OutputDescription))
-        {
-            return Result.Failure(ValidationError.EmptyChallengeOutputDescription);
-        }
-
-        if (string.IsNullOrWhiteSpace(challenge.Constraints))
-        {
-            return Result.Failure(ValidationError.EmptyChallengeConstraints);
+            return Result.Failure(ValidationError.ChallengeEmptyDescriptionShortMarkdown);
         }
 
         if (string.IsNullOrWhiteSpace(challenge.StubGeneratorInput))

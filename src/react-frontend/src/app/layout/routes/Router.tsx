@@ -1,4 +1,4 @@
-import Challenges from 'app/pages/Challenges/index';
+import ChallengeSearch from 'app/pages/Challenges/pages/ChallengeSearch/index';
 import ChallengeSave from 'app/pages/Challenges/pages/ChallengeSave';
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
@@ -19,7 +19,7 @@ export default function Router() {
         </Route>
       </Route>
       <Route path={PATH_CHALLENGES.root}>
-        <Route index element={<Challenges />} />
+        <Route index element={<ChallengeSearch />} />
         <Route path={PATH_CHALLENGES.save}>
           <Route index element={<ChallengeSave />} />
           <Route path=":id" element={<ChallengeSave />} />

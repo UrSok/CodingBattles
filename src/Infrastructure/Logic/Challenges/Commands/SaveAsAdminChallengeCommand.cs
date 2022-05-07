@@ -11,6 +11,8 @@ using MediatR;
 
 namespace Infrastructure.Logic.Challenges.Commands;
 
+//TODO: UPDATE IT TO JUST UNPUBLISH, NO EDIT!
+
 internal record SaveAsAdminChallengeCommand(string ChallengeId, ChallengeSaveModel Model) : IRequest<Result>;
 
 internal class SaveAsAdminChallengeCommandValidator : AbstractValidator<SaveAsAdminChallengeCommand>

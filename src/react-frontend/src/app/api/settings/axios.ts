@@ -7,7 +7,13 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.response.use(
-  response => response,
+  response => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(response.data);
+    }
+
+    return response;
+  },
   error => {
     if (process.env.NODE_ENV === 'development') {
       console.log(error);

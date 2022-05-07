@@ -52,7 +52,7 @@ export default function AppLayout() {
         ),
         duration: 10,
       });
-      dispatch(layoutActions.resetUnkownException());
+      //dispatch(layoutActions.resetUnkownException());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showUnkownError]);

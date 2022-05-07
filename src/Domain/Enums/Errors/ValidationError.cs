@@ -38,11 +38,11 @@ public sealed class ValidationError : Error
     public static readonly ValidationError NotEnoughChallengeTask =
         new(nameof(NotEnoughChallengeTask), 10011);
 
-    public static readonly ValidationError EmptyInputDescription =
-        new(nameof(EmptyInputDescription), 10012);
+    public static readonly ValidationError ChallengeEmptyDescriptionShort =
+        new(nameof(ChallengeEmptyDescriptionShort), 10012);
 
-    public static readonly ValidationError EmptyChallengeOutputDescription =
-        new(nameof(EmptyChallengeOutputDescription), 10013);
+    public static readonly ValidationError ChallengeEmptyDescriptionShortMarkdown =
+        new(nameof(ChallengeEmptyDescriptionShortMarkdown), 10013);
 
     public static readonly ValidationError EmptyChallengeConstraints =
         new(nameof(EmptyChallengeConstraints), 10014);

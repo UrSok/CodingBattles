@@ -10,17 +10,11 @@ internal class ChallengeDocument : MongoDocumentWithId
     [BsonElement("Name")]
     public string Name { get; set; }
 
-    [BsonElement("Task")]
-    public string Task { get; set; }
+    [BsonElement("DescriptionShort")]
+    public string DescriptionShort { get; set; }
 
-    [BsonElement("InputDescription")]
-    public string InputDescription { get; set; }
-
-    [BsonElement("OutputDescription")]
-    public string OutputDescription { get; set; }
-
-    [BsonElement("Constraints")]
-    public string Constraints { get; set; }
+    [BsonElement("DescriptionMarkdown")]
+    public string DescriptionMarkdown { get; set; }
 
     [BsonElement("StubGeneratorInput")]
     public string StubGeneratorInput { get; set; }
@@ -54,7 +48,4 @@ internal class ChallengeDocument : MongoDocumentWithId
     [BsonElement("LastModifiedOn")]
     [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
     public DateTime LastModifiedOn { get; set; }
-
-    //[BsonElement("ValidationFlag")]
-    //public int ValidationFlag { get; set; } = ChallengeValidation.None;
 }
