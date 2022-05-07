@@ -108,7 +108,7 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
     {
         var challengeDocument = this.mapper.Map<ChallengeDocument>(challenge);
 
-        var filter = Builders<ChallengeDocument>.Filter.Eq(x => x.Id, challenge.Id);
+         var filter = Builders<ChallengeDocument>.Filter.Eq(x => x.Id, challenge.Id);
         var update = Builders<ChallengeDocument>.Update
             .Set(x => x.Name, challenge.Name)
             .Set(x => x.DescriptionShort, challenge.DescriptionShort)

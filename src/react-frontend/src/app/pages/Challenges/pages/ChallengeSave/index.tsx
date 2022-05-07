@@ -29,6 +29,8 @@ export default function ChallengeSave() {
   const navigate = useNavigate();
   const [triggerSaveChallenge, { isLoading: isSaving, data: savingResult }] =
     challengeApi.useSaveChallengeMutation();
+    const [triggerGetChallenge] =
+      challengeApi.useLazyGetChallengeQuery();
   const [form] = useForm();
   const [
     triggerGenerateStub,
@@ -127,10 +129,16 @@ export default function ChallengeSave() {
       },
     }).unwrap();
 
-    if (result?.value !== undefined) {
+    if (result?.value !== undefined && result.value !== 'null') {
       navigate(PATH_CHALLENGES.save + `/${result.value}`, { replace: true });
     }
   };
+
+  useEffect(() => {
+    if (paramId) {
+      triggerGetChallenge(paramId);
+    }
+  }, []);
 
   //TODO: THINK HOW TO USE THE USETIMEOUT HOOK
   //const [abortAutoSave, setAbortTimeout] = useState(false);

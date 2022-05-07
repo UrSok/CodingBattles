@@ -2,6 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { axiosBaseQuery } from './settings';
 import { Paginated, ResultValue } from './types';
 import {
+  Challenge,
   ChallengeSaveModelWithId,
   ChallengeSearchRequest,
   ChallengeSearchResultItem,
@@ -12,6 +13,7 @@ export const challengeApi = createApi({
   baseQuery: axiosBaseQuery({
     baseUrl: '/v1/challenge/',
   }),
+  tagTypes: ['Challenges'],
   endpoints: build => ({
     getChallenges: build.query<
       ResultValue<Paginated<ChallengeSearchResultItem>>,
@@ -21,7 +23,16 @@ export const challengeApi = createApi({
         method: 'POST',
         data: request,
       }),
+      providesTags: ['Challenges'],
     }),
+
+    getChallenge: build.query<ResultValue<Challenge>, string>({
+      query: (id: string) => ({
+        url: id,
+        method: 'GET',
+      }),
+    }),
+
     saveChallenge: build.mutation<
       ResultValue<string>,
       ChallengeSaveModelWithId
@@ -31,6 +42,7 @@ export const challengeApi = createApi({
         method: 'POST',
         data: request.model,
       }),
+      invalidatesTags: ['Challenges'],
     }),
   }),
 });

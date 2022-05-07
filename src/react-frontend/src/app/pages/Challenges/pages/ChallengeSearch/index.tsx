@@ -201,10 +201,15 @@ export default function ChallengeSearch() {
                 subTitle: {
                   dataIndex: 'tags',
                   render: (_, row: ChallengeSearchResultItem) => (
-                    <Space>
-                      {row.tags?.map(tag => (
-                        <Tag key={tag.id}>{tag.name}</Tag>
-                      ))}
+                    <Space size={0} wrap>
+                      {row.tagIds?.map(tagId => {
+                        const tag = challengeTags?.value?.find(
+                          x => x.id === tagId,
+                        );
+                        if (tag) {
+                          return <Tag key={tagId}>{tag.name}</Tag>;
+                        }
+                      })}
                     </Space>
                   ),
                 },
@@ -217,7 +222,17 @@ export default function ChallengeSearch() {
                   ),
                 },
                 actions: {
-                  render: () => [<p>c</p>, <p>c2</p>, <p>c3</p>],
+                  render: (_, row: ChallengeSearchResultItem) => [
+                    <Button
+                      onClick={() =>
+                        navigate(PATH_CHALLENGES.save + `/${row.id}`)
+                      }
+                    >
+                      Edit
+                    </Button>,
+                    <p>c2</p>,
+                    <p>c3</p>,
+                  ],
                 },
               }}
             />

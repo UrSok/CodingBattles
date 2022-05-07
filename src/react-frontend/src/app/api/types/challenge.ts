@@ -10,7 +10,7 @@ export type ChallengeSearchResultItem = {
   name: string;
   descriptionShort: string;
   difficulty: number;
-  tags: ChallengeTag[];
+  tagIds: string[];
 };
 
 export type ChallengeSearchRequest = {
@@ -55,3 +55,36 @@ export type ChallengeSaveModelWithId = {
   id?: string;
   model?: ChallengeSaveModel;
 };
+
+export enum ChallengeStatus {
+  Draft = 1,
+  Published = 2,
+  Unpublished = 3,
+}
+
+export type Feedback = {
+  id: string;
+  userId: string;
+  difficulty: number;
+  fun: number;
+  testCasesRelevancy: number;
+  text: string;
+  hasIssues: boolean;
+};
+
+export type Challenge = {
+  id: string;
+  name: string;
+  descriptionShort: string;
+  descriptionMarkdown: string;
+  stubGeneratorInput: string;
+  status: ChallengeStatus;
+  statusReason: string;
+  tests: TestPair[];
+  solution: Solution;
+  tagIds: string[];
+  feedbacks: Feedback[];
+  difficulty: number;
+  createdByUserId: string;
+  lastModifiedOn: Date;
+}

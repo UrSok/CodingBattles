@@ -8,5 +8,5 @@ public class ChallengeSearchResultItem
     public string Name { get; set; }
     public string DescriptionShort { get; set; }
     public double Difficulty { get; set; }
-    public IEnumerable<TagEntity> Tags { get; set; }
+    public List<string> TagIds { get; set; }
 }

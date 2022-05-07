@@ -1,4 +1,5 @@
 ﻿using Application.Managers;
+using Domain.Entities.Challenges;
 using Domain.Models.Challenges;
 using Domain.Models.Common;
 using Domain.Models.Results;
@@ -17,6 +18,12 @@ public class ChallengeManager : BaseManager, IChallengeManager
     public async Task<Result<PaginatedModel<ChallengeSearchResultItem>>> Get(ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken)
     {
         var query = new GetChallengesQuery(challengeSearchModel);
+        return await this.SendCommand(query, cancellationToken);
+    }
+
+    public async Task<Result<Challenge>> Get(string challengeId, CancellationToken cancellationToken)
+    {
+        var query = new GetChallengeQuery(challengeId);
         return await this.SendCommand(query, cancellationToken);
     }
 

@@ -1,4 +1,5 @@
-﻿using Domain.Models.Challenges;
+﻿using Domain.Entities.Challenges;
+using Domain.Models.Challenges;
 using Domain.Models.Common;
 using Domain.Models.Results;
 
@@ -10,4 +11,5 @@ public interface IChallengeManager
     Task<Result> SaveAsAdmin(string challengeId, ChallengeSaveModel challengeSaveModel, CancellationToken cancellationToken);
     Task<Result<PaginatedModel<ChallengeSearchResultItem>>> Get(ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken);
     Task<Result<PublishChallengeResult>> Publish(string jwtToken, string challengeId, CancellationToken cancellationToken);
+    Task<Result<Challenge>> Get(string challengeId, CancellationToken cancellationToken);
 }

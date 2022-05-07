@@ -27,13 +27,13 @@ public class ChallengeController : BaseController
         return this.Process(result);
     }
 
-    // TODO: GetDetails -> guest+
-    // id from rom route
-    [Authorize(Roles = AuthorizeConsts.All)]
+
+    [AllowAnonymous]
     [HttpGet("{challengeId}")]
-    public async Task<IActionResult> GetDetails(CancellationToken cancellationToken)
+    public async Task<IActionResult> Get([FromRoute] string challengeId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await this.challengeManager.Get(challengeId, cancellationToken);
+        return this.Process(result);
     }
 
     [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
@@ -52,6 +52,7 @@ public class ChallengeController : BaseController
         return this.Process(response);
     }
 
+    //TODO: UPDATE TO JUST UNPUBLISH AND REASON
     [Authorize(Roles = Role.Admin)]
     [HttpPost("saveAsAdmin/{challengeId}")]
     public async Task<IActionResult> SaveAsAdmin([FromRoute] string challengeId, [FromBody] ChallengeSaveModel challengeSaveModel, CancellationToken cancellationToken)
