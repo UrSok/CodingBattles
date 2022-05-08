@@ -10,8 +10,6 @@ export const stubLangDefinitions: languages.IMonarchLanguage = {
   variableName: /(_|[a-z])+[[:alnum:]]*/,
   tokenizer: {
     root: [
-      //[//, ],
-      //identifiers and keywords
       [
         /[ ]*[a-z]*/,
         {
@@ -44,8 +42,8 @@ export const stubLangDefinitions: languages.IMonarchLanguage = {
       // TODO: FIX THE: v:intsalut:int someday
     ],
     inputloopKeyword: [
-      [/\s(_|[a-z])+[a-z0-9_$]*\s/, 'annotation', '@variables'],
-      [/\s[0-9]+\s/, 'number', '@variables'],
+      [/\s(_|[a-z])+[a-z0-9_$]*/, 'annotation', '@variables'],
+      [/\s[0-9]+/, 'number', '@variables'],
       [/.*$/, 'invalid', '@popall'],
       ['', 'identifier', '@popall'],
     ],
