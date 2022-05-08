@@ -1,11 +1,11 @@
 /* eslint-disable no-useless-escape */
-import { languages } from 'monaco-editor';
+import { languages, Range } from 'monaco-editor';
 
 export const stubInputLang = 'stubinputlang';
 
 export const stubLangDefinitions: languages.IMonarchLanguage = {
   keywords: ['input', 'inputloop', 'output'],
-  numberTypes: /(int|float|bool)/,//['int', 'float', 'bool'],
+  numberTypes: /(int|float|bool)/, //['int', 'float', 'bool'],
   stringTypes: /(word|string)\.\d+/,
   variableName: /(_|[a-z])+[[:alnum:]]*/,
   tokenizer: {
@@ -24,7 +24,7 @@ export const stubLangDefinitions: languages.IMonarchLanguage = {
               },
             },
             '@default': 'invalid',
-          }
+          },
         },
       ],
     ],
@@ -50,5 +50,34 @@ export const stubLangDefinitions: languages.IMonarchLanguage = {
       ['', 'identifier', '@popall'],
     ],
     outputKeyword: [[/\s.*/, 'string.body', '@popall']],
+  },
+};
+
+export const stubLangCompletion: languages.CompletionItemProvider = {
+  provideCompletionItems: (
+    model,
+    position,
+    context,
+    _,
+  ): languages.ProviderResult<languages.CompletionList> => {
+    const word = model.getWordUntilPosition(position);
+
+    const range = new Range(
+      position.lineNumber,
+      word.word ? word?.startColumn : word?.startColumn - 1,
+      position.lineNumber,
+      position.column, // insert into current position
+    );
+
+    var suggestions: languages.CompletionItem[] = [
+      {
+        label: 'input',
+        kind: languages.CompletionItemKind.TypeParameter,
+        insertText: 'input',
+        insertTextRules: languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        range: range,
+      },
+    ];
+    return { suggestions: suggestions };
   },
 };
