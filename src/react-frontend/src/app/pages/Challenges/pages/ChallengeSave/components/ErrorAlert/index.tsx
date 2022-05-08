@@ -1,8 +1,9 @@
-import { Alert, Typography } from 'antd';
-import { StubGeneratorError } from 'app/api/types/stubGenerator';
 import React from 'react';
+import Text from 'antd/lib/typography/Text';
+import { Alert } from 'antd';
 
-const { Text } = Typography;
+import { StubGeneratorError } from 'app/api/types/stubGenerator';
+
 
 interface ErrorAlertProps {
   error: StubGeneratorError;
@@ -11,7 +12,7 @@ interface ErrorAlertProps {
 export default function ErrorAlert(props: ErrorAlertProps) {
   const StubInputDetails = (): React.ReactNode => {
     switch (props.error.validationCode) {
-      // statement
+      // STATEMENT
       case 'KeywordInvalid':
         return (
           <>
@@ -59,7 +60,7 @@ export default function ErrorAlert(props: ErrorAlertProps) {
           </>
         );
 
-      // variable
+      // VARIABLE
       case 'NameInvalid':
         return (
           <>
@@ -117,7 +118,7 @@ export default function ErrorAlert(props: ErrorAlertProps) {
           </>
         );
 
-      // final
+      // FINAL
       case 'LoopVariableNotDeclared':
         return (
           <>

@@ -1,19 +1,21 @@
-import { ProFormSelect } from '@ant-design/pro-form';
-import { FormInstance, Select } from 'antd';
-import { challengeTagApi } from 'app/api/challengeTag';
-import { ChallengeTag } from 'app/api/types/challenge';
-import { translations } from 'locales/translations';
 import React from 'react';
+import { ProFormSelect } from '@ant-design/pro-form';
 import { useTranslation } from 'react-i18next';
 
-type MultiTagSelectProp = {
-  name: string;
-}
+import { translations } from 'locales/translations';
 
-export default function MultiTagSelect(props: MultiTagSelectProp) {
+import { ChallengeTag } from 'app/api/types/challenge';
+import { challengeTagApi } from 'app/api/challengeTag';
+
+type MultiTagSelectProps = {
+  name: string;
+};
+
+export default function MultiTagSelect(props: MultiTagSelectProps) {
+  const { t } = useTranslation();
+
   const { data: challengeTags, isLoading: isLoadingTags } =
     challengeTagApi.useGetTagsQuery();
-  const { t } = useTranslation();
 
   return (
     <ProFormSelect

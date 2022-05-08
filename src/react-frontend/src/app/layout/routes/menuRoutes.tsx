@@ -4,8 +4,10 @@ import {
   PlayCircleOutlined,
   FolderOutlined,
 } from '@ant-design/icons';
-import { MenuDataItem } from '@ant-design/pro-layout';
+
 import { PATH_CHALLENGES, PATH_GAMES, PATH_IDE } from './paths';
+
+import { MenuDataItem } from '@ant-design/pro-layout';
 
 export const menuRoutes: MenuDataItem[] = [
   {

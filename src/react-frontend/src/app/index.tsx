@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useMonaco } from '@monaco-editor/react';
+import { notification } from 'antd';
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
@@ -7,19 +8,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import styled from 'styled-components';
 
-import {
-  stubInputLang,
-  stubLangCompletion,
-  stubLangDefinitions,
-} from '../config/monaco';
-import { useAuthSlice } from './slices/auth';
+import { stubInputLang, stubLangDefinitions } from '../config/monaco';
 import { selectAuth } from './slices/auth/selectors';
+import { selectLayout } from './slices/layout/selectors';
+import { useAuthSlice } from './slices/auth';
+import { useLayoutSlice } from './slices/layout';
+import { translations } from 'locales/translations';
+
 import LoadingSpinner from './components/LoadingSpinner';
 import Layout from './layout';
-import { selectLayout } from './slices/layout/selectors';
-import { useLayoutSlice } from './slices/layout';
-import { notification } from 'antd';
-import { translations } from 'locales/translations';
 
 import './styles/index.less';
 
@@ -53,14 +50,14 @@ export default function App() {
         stubInputLang,
         stubLangDefinitions,
       );
-      // TODO: ADD LANGUAGE PROVIDER SOMEDAY
-      /*monaco.languages.registerCompletionItemProvider(
+    }
+    // TODO: ADD LANGUAGE PROVIDER SOMEDAY
+    /*monaco.languages.registerCompletionItemProvider(
         stubInputLang,
         stubLangCompletion,
       );*/
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [monaco]);
 
   useEffect(() => {
     if (showUnkownError) {

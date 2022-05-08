@@ -25,7 +25,7 @@ axiosInstance.interceptors.response.use(
       console.log(error);
     }
 
-    if (error.includes('Network Error')) {
+    if (error?.message?.includes('Network Error')) {
       return Promise.reject(ApiException.ServerUnreachable);
     }
 

@@ -1,12 +1,14 @@
 export const ChallengeSaveFields = {
-  name: 'challengeName',
+  name: 'name',
   descriptionShort: 'descriptionShort',
-  challengeTags: 'challengeTags',
+  tags: 'tags',
   descriptionMarkdown: 'descriptionMarkdown',
-  challengeTests: 'challengeTests',
+  tests: 'tests',
   testName: 'testName',
   testInput: 'testInput',
   testExcepted: 'testExcepted',
   validatorInput: 'validatorInput',
   validatorExcepted: 'validatorExcepted',
-}
+  stubLanguage: 'stubLanguage',
+  solutionLanguage: 'solutionLanguage',
+};

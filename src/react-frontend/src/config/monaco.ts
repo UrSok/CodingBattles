@@ -25,6 +25,7 @@ export const stubLangDefinitions: languages.IMonarchLanguage = {
           },
         },
       ],
+      [/.*/, 'invalid'],
     ],
     variables: [
       [/\s/, 'identifier', '@variable'],

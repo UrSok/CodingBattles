@@ -5,6 +5,7 @@ namespace Domain.Models.Results;
 public class ChallengeSearchResultItem
 {
     public string Id { get; set; }
+    public string CreatedByUserId { get; set; }
     public string Name { get; set; }
     public string DescriptionShort { get; set; }
     public double Difficulty { get; set; }

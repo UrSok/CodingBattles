@@ -1,118 +1,172 @@
+import { red } from '@ant-design/colors';
+import { DeleteTwoTone, PlusOutlined } from '@ant-design/icons';
 import ProCard from '@ant-design/pro-card';
-import ProForm, {
-  ProFormSelect,
-  ProFormText,
-  ProFormTextArea,
-} from '@ant-design/pro-form';
+import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
-import Title from 'antd/lib/typography/Title';
+import { Button, Form, Space, Typography } from 'antd';
+import { useForm, useWatch } from 'antd/lib/form/Form';
+import { challengeApi } from 'app/api/challenge';
+import { stubGeneratorApi } from 'app/api/stubGenerator';
+import { Challenge, TestPair } from 'app/api/types/challenge';
+import CodeEditor from 'app/components/CodeEditor';
+import LanguageSelect from 'app/components/Fields/LanguageSelect';
+import ChallengeDescription from 'app/components/ChallengeDescription';
+import { PATH_CHALLENGES } from 'app/layout/routes/paths';
+import { Language } from 'app/types/global';
+import { stubInputLang } from 'config/monaco';
+import monaco from 'monaco-editor';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Editor from '@monaco-editor/react';
-import { stubInputLang } from 'config/monaco';
-import LoadingSpinner from 'app/components/LoadingSpinner';
-import { Language } from 'app/types/global';
-import { useForm, useWatch } from 'antd/lib/form/Form';
-import { stubGeneratorApi } from 'app/api/stubGenerator';
-import ErrorAlert from './components/ErrorAlert';
-import { Button, Checkbox, Form, Select, Space, Typography } from 'antd';
-import { DeleteTwoTone, PlusOutlined } from '@ant-design/icons';
-import { red } from '@ant-design/colors';
-import ChallengeDescription from 'app/layout/components/Challenges/ChallengeDescription';
 import MultiTagSelect from '../../components/MultiTagSelect';
-import { challengeApi } from 'app/api/challenge';
-import { TestPair } from 'app/api/types/challenge';
-import { PATH_CHALLENGES } from 'app/layout/routes/paths';
-import { getLanguageKeyName } from 'app/utils/enumHelpers';
+import ErrorAlert from './components/ErrorAlert';
+import FormCardSection from './components/FormCardSection';
+import { ChallengeSaveFields } from './utils/ChallengeSaveFields';
 
 export default function ChallengeSave() {
   const { id: paramId } = useParams();
+
   const navigate = useNavigate();
+  const [form] = useForm();
+
+  const [saveButtonsDisabled, setSaveButtonsDisabled] = useState(false);
+
+  const [triggerGenerateStub, { data: generateStubResult }] =
+    stubGeneratorApi.useLazyGenerateStubQuery();
+  const [triggerGetChallenge] = challengeApi.useLazyGetChallengeQuery();
   const [triggerSaveChallenge, { isLoading: isSaving, data: savingResult }] =
     challengeApi.useSaveChallengeMutation();
-    const [triggerGetChallenge] =
-      challengeApi.useLazyGetChallengeQuery();
-  const [form] = useForm();
-  const [
-    triggerGenerateStub,
-    { isLoading: isGeneratig, data: generateStubResult },
-  ] = stubGeneratorApi.useLazyGenerateStubQuery();
-  const selectedStubLang: Language = useWatch('challengeStubLanguage', form);
-  const selectedSolutionLang: Language = useWatch(
-    'challengeSolutionLanguage',
-    form,
-  );
-  const stubInputRef = useRef<any>(null);
-  const solutionInputRef = useRef<any>(null);
+
   const [emptyStubInput, setEmptyStubInput] = useState(true);
+
+  const selectedStubLang: Language = useWatch(
+    ChallengeSaveFields.stubLanguage,
+    form,
+  );
+  const selectedSolutionLang: Language = useWatch(
+    ChallengeSaveFields.solutionLanguage,
+    form,
+  );
   const challengeMarkdownDescription = useWatch(
-    'challengeDescriptionMarkdown',
+    ChallengeSaveFields.descriptionMarkdown,
     form,
   );
 
-  const triggerStubGeneration = (input: string | undefined) => {
-    if (input?.length === 0 || !input) return;
-    /*triggerGenerateStub(
-      {
-        language: selectedStubLang,
-        input: input,
-      },
-      true,
-    );*/
-  };
-
-  const stubInputMounted = (editor, _) => {
-    stubInputRef.current = editor;
-  };
-
-  const solutionInputMounted = (editor, _) => {
-    solutionInputRef.current = editor;
-  };
+  const stubInputEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null);
+  const solutionInputEditorRef =
+    useRef<monaco.editor.IStandaloneCodeEditor>(null);
 
   useEffect(() => {
-    if (stubInputRef !== null && stubInputRef.current !== null) {
-      const input: string = stubInputRef.current.getValue();
+    const getChallengeAsync = async () => {
+      if (paramId) {
+        return await triggerGetChallenge(paramId).unwrap();
+      }
+    };
+    getChallengeAsync().then(result => {
+      if (!result || !result.isSuccess || !result.value) return;
+      setSaveButtonsDisabled(true);
+      const {
+        name,
+        descriptionShort,
+        descriptionMarkdown,
+        tagIds,
+        stubGeneratorInput,
+        tests,
+        solution,
+      } = result.value;
+
+      const testPairs = tests.map((value, index) => {
+        return {
+          [`${ChallengeSaveFields.testName}${index}`]: value.title,
+          [`${ChallengeSaveFields.testInput}${index}`]: value.case?.input,
+          [`${ChallengeSaveFields.testExcepted}${index}`]:
+            value.case?.expectedOutput,
+          [`${ChallengeSaveFields.validatorInput}${index}`]:
+            value.validator?.input,
+          [`${ChallengeSaveFields.validatorExcepted}${index}`]:
+            value.validator?.expectedOutput,
+        };
+      });
+
+      form.setFieldsValue({
+        [`${ChallengeSaveFields.name}`]: name,
+        [`${ChallengeSaveFields.descriptionShort}`]: descriptionShort,
+        [`${ChallengeSaveFields.descriptionMarkdown}`]: descriptionMarkdown,
+        [`${ChallengeSaveFields.tags}`]: tagIds,
+        [`${ChallengeSaveFields.tests}`]: testPairs,
+        [`${ChallengeSaveFields.solutionLanguage}`]: solution.language,
+      });
+
+      stubInputEditorRef.current?.setValue(stubGeneratorInput);
+      solutionInputEditorRef.current?.setValue(solution.sourceCode ?? '');
+    });
+  }, []);
+
+  useEffect(() => {
+    if (stubInputEditorRef !== null && stubInputEditorRef.current !== null) {
+      const input: string = stubInputEditorRef.current.getValue();
       triggerStubGeneration(input);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedStubLang]);
 
-  const stubInputChanged = (input: string | undefined, ev) => {
-    setEmptyStubInput(!input || input?.length === 0);
-    //console.log(input);
-    triggerStubGeneration(input);
+  const triggerStubGeneration = async (input: string | undefined) => {
+    if (input?.length === 0 || !input) return;
+    await triggerGenerateStub(
+      {
+        language: selectedStubLang,
+        input: input,
+      },
+      true,
+    );
+  };
+
+  const stubInputChanged = async (
+    value: string | undefined,
+    ev: monaco.editor.IModelContentChangedEvent,
+  ) => {
+    setEmptyStubInput(!value || value?.length === 0);
+    triggerStubGeneration(value);
+    setSaveButtonsDisabled(false);
+  };
+
+  const solutionInputChanged = (
+    value: string | undefined,
+    ev: monaco.editor.IModelContentChangedEvent,
+  ) => {
+    setSaveButtonsDisabled(false);
   };
 
   const saveChallenge = async () => {
-    const challengeName = form.getFieldValue('challengeName');
+    const challengeName = form.getFieldValue(ChallengeSaveFields.name);
     const challengeDescriptionShort = form.getFieldValue(
-      'challengeDescriptionShort',
+      ChallengeSaveFields.descriptionShort,
     );
-    const challengeTags = form.getFieldValue('challengeTags');
+    const challengeTags = form.getFieldValue(ChallengeSaveFields.tags);
     const challengeDescriptionMarkdown = form.getFieldValue(
-      'challengeDescriptionMarkdown',
+      ChallengeSaveFields.descriptionMarkdown,
     );
-    const challengeTests: any[] = form.getFieldValue('challengeTests');
-    const challengeSolutionLanguage = form.getFieldValue(
-      'challengeSolutionLanguage',
+    const challengeTests: any[] = form.getFieldValue(ChallengeSaveFields.tests);
+    const challengeSolutionLang = form.getFieldValue(
+      ChallengeSaveFields.solutionLanguage,
     );
 
     let testPairs: TestPair[] = challengeTests.map(
       (test, index: number): TestPair => ({
-        title: test[`testName${index}`],
+        title: test[`${ChallengeSaveFields.testName}${index}`],
         case: {
-          input: test[`testInput${index}`],
-          expectedOutput: test[`testExcepted${index}`],
+          input: test[`${ChallengeSaveFields.testInput}${index}`],
+          expectedOutput: test[`${ChallengeSaveFields.testExcepted}${index}`],
         },
         validator: {
-          input: test[`validatorInput${index}`],
-          expectedOutput: test[`validatorExcepted${index}`],
+          input: test[`${ChallengeSaveFields.validatorInput}${index}`],
+          expectedOutput:
+            test[`${ChallengeSaveFields.validatorExcepted}${index}`],
         },
       }),
     );
 
-    const stubInput = stubInputRef?.current?.getValue();
-    const solutionInput = solutionInputRef?.current?.getValue();
+    const stubInput = stubInputEditorRef?.current?.getValue() ?? '';
+    const solutionInput = solutionInputEditorRef?.current?.getValue();
 
     const result = await triggerSaveChallenge({
       id: paramId,
@@ -124,22 +178,19 @@ export default function ChallengeSave() {
         tests: testPairs,
         stubGeneratorInput: stubInput,
         solution: {
-          language: challengeSolutionLanguage,
-          sourceCoude: solutionInput,
+          language: challengeSolutionLang,
+          sourceCode: solutionInput,
         },
       },
     }).unwrap();
 
     if (result?.value !== undefined && result.value !== 'null') {
-      navigate(PATH_CHALLENGES.save + `/${result.value}`, { replace: true });
+      setSaveButtonsDisabled(true);
+      if (!paramId) {
+        navigate(PATH_CHALLENGES.save + `/${result.value}`, { replace: true });
+      }
     }
   };
-
-  useEffect(() => {
-    if (paramId) {
-      triggerGetChallenge(paramId);
-    }
-  }, []);
 
   //TODO: THINK HOW TO USE THE USETIMEOUT HOOK
   //const [abortAutoSave, setAbortTimeout] = useState(false);
@@ -155,148 +206,95 @@ export default function ChallengeSave() {
         /*<Checkbox onChange={e => setAutoSave(e.target.value)}>
           Auto-save
         </Checkbox>,*/
-        <Button type="ghost" onClick={saveChallenge} loading={isSaving}>
+        <Button
+          type="ghost"
+          onClick={saveChallenge}
+          loading={isSaving}
+          disabled={saveButtonsDisabled}
+        >
           Save
         </Button>,
-        <Button type="primary" loading={isSaving}>
+        <Button
+          type="primary"
+          loading={isSaving}
+          disabled={saveButtonsDisabled}
+        >
           Publish
         </Button>,
       ]}
     >
       <ProForm form={form} submitter={false}>
-        <ProCard
-          ghost
-          title={
-            <Title level={4} style={{ margin: 0 }}>
-              General Information
-            </Title>
-          }
-        >
-          <ProCard style={{ marginRight: '3%' }}>
-            <ProFormText name="challengeName" placeholder="Title" />
-            <ProFormTextArea
-              name="challengeDescriptionShort"
-              placeholder="Challenge short description"
-              allowClear
+        <FormCardSection title="General Information">
+          <ProFormText name={ChallengeSaveFields.name} placeholder="Title" />
+          <ProFormTextArea
+            name={ChallengeSaveFields.descriptionShort}
+            placeholder="Challenge short description"
+          />
+          <MultiTagSelect name={ChallengeSaveFields.tags} />
+        </FormCardSection>
+
+        <FormCardSection title="Description">
+          <ProFormTextArea
+            name={ChallengeSaveFields.descriptionMarkdown}
+            placeholder="Challenge description"
+            fieldProps={{
+              autoSize: { minRows: 2 },
+            }}
+          />
+          <Typography.Text strong>Preview</Typography.Text>
+          <ChallengeDescription
+            descriptionMarkdown={challengeMarkdownDescription}
+          />
+        </FormCardSection>
+
+        <FormCardSection title="Stub Generator">
+          <Space
+            direction="vertical"
+            style={{
+              width: '100%',
+            }}
+          >
+            <CodeEditor
+              editorRef={stubInputEditorRef}
+              language={stubInputLang}
+              onModelChange={stubInputChanged}
             />
-            <MultiTagSelect name="challengeTags" />
-          </ProCard>
-        </ProCard>
 
-        <ProCard
-          ghost
-          title={
-            <Title level={4} style={{ margin: 0 }}>
-              Descritpion
-            </Title>
-          }
-        >
-          <ProCard>
-            <ProCard ghost split="vertical">
-              <ProCard
-                ghost
-                style={{
-                  paddingRight: '5px',
-                }}
-              >
-                <ProFormTextArea
-                  label={<Typography.Text strong>Input</Typography.Text>}
-                  name="challengeDescriptionMarkdown"
-                  placeholder="Challenge description"
-                  fieldProps={{
-                    autoSize: { minRows: 2 },
-                  }}
-                />
-              </ProCard>
-              <ProCard
-                ghost
-                style={{
-                  paddingLeft: '5px',
-                }}
-              >
-                <Typography.Text strong>Preview</Typography.Text>
-                <ChallengeDescription
-                  descriptionMarkdown={challengeMarkdownDescription}
-                />
-              </ProCard>
-            </ProCard>
-          </ProCard>
-        </ProCard>
+            {!emptyStubInput &&
+            !generateStubResult?.isSuccess &&
+            generateStubResult?.value?.error ? (
+              <ErrorAlert error={generateStubResult!.value?.error!} />
+            ) : (
+              ''
+            )}
+          </Space>
+          <Typography.Text strong>Result</Typography.Text>
+          <LanguageSelect
+            antdFieldName={ChallengeSaveFields.stubLanguage}
+            placeholder="Generation language"
+            width="sm"
+            defaultLanguage={Language.javascript}
+            style={{
+              marginBottom: '5px',
+            }}
+          />
+          <CodeEditor
+            language={selectedStubLang}
+            defaultValue="// update the stub input to get a result"
+            value={
+              generateStubResult?.isSuccess
+                ? generateStubResult?.value?.stub
+                : ''
+            }
+            readOnly
+          />
+        </FormCardSection>
 
-        <ProCard
-          ghost
-          title={
-            <Title level={4} style={{ margin: 0 }}>
-              Stub
-            </Title>
-          }
-        >
-          <ProCard>
-            <ProForm.Item
-              label={<Typography.Text strong>Input</Typography.Text>}
-            >
-              <Space
-                direction="vertical"
-                style={{
-                  width: '100%',
-                }}
-              >
-                <Editor
-                  loading={<LoadingSpinner />}
-                  height={300}
-                  language={stubInputLang}
-                  className="bordered-editor"
-                  onChange={stubInputChanged}
-                  onMount={stubInputMounted}
-                />
-                {!emptyStubInput &&
-                !generateStubResult?.isSuccess &&
-                generateStubResult?.value?.error ? (
-                  <ErrorAlert error={generateStubResult!.value?.error!} />
-                ) : (
-                  ''
-                )}
-              </Space>
-            </ProForm.Item>
-            <ProFormSelect
-              name="challengeStubLanguage"
-              placeholder="Generation language"
-              width="sm"
-              allowClear={false}
-              initialValue={getLanguageKeyName(Language.javascript)}
-              valueEnum={Language}
-            />
-            <ProForm.Item
-              label={<Typography.Text strong>Result</Typography.Text>}
-            >
-              <Editor
-                loading={<LoadingSpinner />}
-                height={300}
-                language={selectedStubLang}
-                defaultValue="// update the stub input to get a result"
-                value={
-                  generateStubResult?.isSuccess
-                    ? generateStubResult?.value?.stub
-                    : ''
-                }
-                options={{
-                  readOnly: true,
-                }}
-                className="bordered-editor"
-              />
-            </ProForm.Item>
-          </ProCard>
-        </ProCard>
-
-        <ProCard
-          ghost
-          title={
-            <Title level={4} style={{ margin: 0 }}>
-              Tests
-            </Title>
-          }
-        >
-          <Form.List name="challengeTests" initialValue={[{}, {}, {}, {}]}>
+        <FormCardSection title="Tests" ghost>
+          <Form.List
+            name={ChallengeSaveFields.tests}
+            initialValue={[{}, {}, {}, {}]}
+          >
             {(fields, { add, remove }) => (
               <ProCard ghost split="horizontal" gutter={[16, 16]}>
                 {fields.map((field, index) => (
@@ -324,7 +322,10 @@ export default function ChallengeSave() {
                       <ProCard direction="column" ghost>
                         <ProCard split="horizontal" ghost>
                           <ProFormText
-                            name={[field.name, `testName${field.key}`]}
+                            name={[
+                              field.name,
+                              `${ChallengeSaveFields.testName}${field.key}`,
+                            ]}
                             initialValue={`Test ${index + 1}`}
                             placeholder="Test name"
                             allowClear={false}
@@ -344,7 +345,10 @@ export default function ChallengeSave() {
                               }}
                             >
                               <ProFormTextArea
-                                name={[field.name, `testInput${field.key}`]}
+                                name={[
+                                  field.name,
+                                  `${ChallengeSaveFields.testInput}${field.key}`,
+                                ]}
                                 placeholder="Test input"
                                 allowClear
                                 rules={[
@@ -363,7 +367,10 @@ export default function ChallengeSave() {
                               }}
                             >
                               <ProFormTextArea
-                                name={[field.name, `testExcepted${field.key}`]}
+                                name={[
+                                  field.name,
+                                  `${ChallengeSaveFields.testExcepted}${field.key}`,
+                                ]}
                                 placeholder="Test excepted result"
                                 allowClear
                                 rules={[
@@ -388,7 +395,7 @@ export default function ChallengeSave() {
                               <ProFormTextArea
                                 name={[
                                   field.name,
-                                  `validatorInput${field.key}`,
+                                  `${ChallengeSaveFields.validatorInput}${field.key}`,
                                 ]}
                                 placeholder="Validator input"
                                 allowClear
@@ -410,7 +417,7 @@ export default function ChallengeSave() {
                               <ProFormTextArea
                                 name={[
                                   field.name,
-                                  `validatorExcepted${field.key}`,
+                                  `${ChallengeSaveFields.validatorExcepted}${field.key}`,
                                 ]}
                                 placeholder="Validator excepted result"
                                 allowClear
@@ -441,43 +448,28 @@ export default function ChallengeSave() {
               </ProCard>
             )}
           </Form.List>
-        </ProCard>
+        </FormCardSection>
 
-        <ProCard
-          ghost
-          title={
-            <Title level={4} style={{ margin: 0 }}>
-              Solution
-            </Title>
-          }
-        >
-          <ProCard>
-            <Space
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'baseline',
-              }}
-            >
-              <ProFormSelect
-                name="challengeSolutionLanguage"
-                placeholder="Solution language"
-                width="sm"
-                allowClear={false}
-                initialValue={getLanguageKeyName(Language.javascript)}
-                valueEnum={Language}
-              />
-              <Button type="primary">Test Solution</Button>
-            </Space>
-            <Editor
-              loading={<LoadingSpinner />}
-              height={300}
-              language={selectedSolutionLang}
-              className="bordered-editor"
-              onMount={solutionInputMounted}
+        <FormCardSection title="Solution">
+          <Space
+            style={{
+              marginBottom: '5px',
+            }}
+          >
+            <LanguageSelect
+              antdFieldName={ChallengeSaveFields.solutionLanguage}
+              placeholder="Solution language"
+              width="sm"
+              defaultLanguage={Language.javascript}
             />
-          </ProCard>
-        </ProCard>
+            <Button type="primary">Test Solution</Button>
+          </Space>
+          <CodeEditor
+            editorRef={solutionInputEditorRef}
+            language={selectedSolutionLang}
+            onModelChange={solutionInputChanged}
+          />
+        </FormCardSection>
       </ProForm>
     </PageContainer>
   );

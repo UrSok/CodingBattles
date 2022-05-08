@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { blue } from '@ant-design/colors';
 import {
   LockOutlined,
@@ -7,20 +8,22 @@ import {
 } from '@ant-design/icons';
 import ProForm, { ModalForm, ProFormText } from '@ant-design/pro-form';
 import { Form, notification } from 'antd';
-import { authApi } from 'app/api/auth';
-import { SignUpModel } from 'app/api/types/auth';
-import { EMAIL_REGEX } from 'app/utils/constants';
-import { translations } from 'locales/translations';
-import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldData } from 'rc-field-form/es/interface';
 
-export default function SingUpModalForm(props) {
+
+import { SignUpModel } from 'app/api/types/auth';
+import { translations } from 'locales/translations';
+import { EMAIL_REGEX } from 'app/utils/constants';
+import { authApi } from 'app/api/auth';
+
+export default function SingUpModalForm() {
   const [form] = Form.useForm();
   const { t } = useTranslation();
+  const [submitDisabled, setSubmitDisabled] = useState(true);
+
   const [triggerSignUp] = authApi.useSignUpMutation();
   const [triggerIsUniqueEmail] = authApi.useLazyIsUniqueEmailQuery();
-  const [submitDisabled, setSubmitDisabled] = useState(true);
 
   const checkEmail = async (emailField: FieldData) => {
     if (
@@ -130,7 +133,6 @@ export default function SingUpModalForm(props) {
 
   return (
     <ModalForm<SignUpModel>
-      {...props}
       form={form}
       title={t(translations.SignUpModalForm.title)}
       modalProps={{
@@ -148,10 +150,10 @@ export default function SingUpModalForm(props) {
           disabled: submitDisabled,
         },
       }}
-      onFinish={onSubmit}
       onFieldsChange={fieldsChanged}
+      onFinish={onSubmit}
     >
-      <ProForm.Group {...props}>
+      <ProForm.Group>
         <ProFormText
           width="lg"
           name="email"
@@ -172,7 +174,7 @@ export default function SingUpModalForm(props) {
           ]}
         />
       </ProForm.Group>
-      <ProForm.Group {...props}>
+      <ProForm.Group>
         <ProFormText
           width="lg"
           name="username"
@@ -191,7 +193,7 @@ export default function SingUpModalForm(props) {
         />
       </ProForm.Group>
 
-      <ProForm.Group {...props}>
+      <ProForm.Group>
         <ProFormText.Password
           width="lg"
           name="password"
@@ -210,7 +212,7 @@ export default function SingUpModalForm(props) {
         />
       </ProForm.Group>
 
-      <ProForm.Group {...props}>
+      <ProForm.Group>
         <ProFormText.Password
           width="lg"
           name="confirmPassword"

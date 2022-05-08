@@ -1,8 +1,10 @@
-import ChallengeSearch from 'app/pages/Challenges/pages/ChallengeSearch/index';
-import ChallengeSave from 'app/pages/Challenges/pages/ChallengeSave';
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
+
 import { PATH_CHALLENGES, PATH_GAMES, PATH_IDE, PATH_PROFILES } from './paths';
+
+import ChallengeSearch from 'app/pages/Challenges/pages/ChallengeSearch/index';
+import ChallengeSave from 'app/pages/Challenges/pages/ChallengeSave';
 
 export default function Router() {
   return (

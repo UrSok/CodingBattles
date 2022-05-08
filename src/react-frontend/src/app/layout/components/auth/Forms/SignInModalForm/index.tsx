@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+
 import { LockOutlined, LoginOutlined, MailOutlined } from '@ant-design/icons';
 import ProForm, {
   ModalForm,
@@ -5,20 +7,22 @@ import ProForm, {
   ProFormText,
 } from '@ant-design/pro-form';
 import { Alert, Button, Form, notification } from 'antd';
-import { authApi } from 'app/api/auth';
-import { SignInModel } from 'app/api/types/auth';
-import { EMAIL_REGEX } from 'app/utils/constants';
-import { translations } from 'locales/translations';
-import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FieldData } from 'rc-field-form/es/interface';
 import styled from 'styled-components';
 
-export default function SingInModalForm(props) {
+import { SignInModel } from 'app/api/types/auth';
+import { translations } from 'locales/translations';
+import { EMAIL_REGEX } from 'app/utils/constants';
+import { authApi } from 'app/api/auth';
+
+export default function SingInModalForm() {
   const [form] = Form.useForm();
   const { t } = useTranslation();
-  const [triggerSignIn, { data }] = authApi.useSignInMutation();
+
   const [submitDisabled, setSubmitDisabled] = useState(true);
+
+  const [triggerSignIn, { data }] = authApi.useSignInMutation();
 
   const onSubmit = async (values: SignInModel) => {
     const result = await triggerSignIn(values).unwrap();

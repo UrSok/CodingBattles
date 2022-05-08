@@ -1,7 +1,6 @@
-import { Avatar, Typography } from 'antd';
-import { PATH_PROFILES } from 'app/layout/routes/paths';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Avatar, Typography } from 'antd';
 import {
   red,
   volcano,
@@ -16,6 +15,8 @@ import {
   magenta,
   grey,
 } from '@ant-design/colors';
+
+import { PATH_PROFILES } from 'app/layout/routes/paths';
 
 const colorsDictionary: Record<string, typeof red> = {
   ABC: red,

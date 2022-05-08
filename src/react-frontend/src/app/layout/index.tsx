@@ -17,7 +17,7 @@ import { PATH_PROFILES } from './routes/paths';
 import Router from './routes/Router';
 
 import SingUpModalForm from './components/auth/Forms/SignUpModalForm';
-import HeaderAlerts from './components/auth/HeaderAlerts';
+import HeaderAlerts from './components/HeaderAlerts';
 import MenuUserBadge from './components/auth/MenuUserBadge';
 import SingInModalForm from './components/auth/Forms/SignInModalForm';
 

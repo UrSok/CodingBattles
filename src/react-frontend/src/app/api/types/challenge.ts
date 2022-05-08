@@ -5,14 +5,6 @@ export type ChallengeTag = {
   name: string;
 };
 
-export type ChallengeSearchResultItem = {
-  id: string;
-  name: string;
-  descriptionShort: string;
-  difficulty: number;
-  tagIds: string[];
-};
-
 export type ChallengeSearchRequest = {
   page?: number;
   pageSize?: number;
@@ -23,6 +15,15 @@ export type ChallengeSearchRequest = {
   minimumDifficulty?: number;
   maximumDifficulty?: number;
   includeNoDifficulty?: boolean;
+};
+
+export type ChallengeSearchResultItem = {
+  id: string;
+  createdByUserId: string;
+  name: string;
+  descriptionShort: string;
+  difficulty: number;
+  tagIds: string[];
 };
 
 export type TestCase = {
@@ -38,7 +39,7 @@ export type TestPair = {
 
 export type Solution = {
   language: string;
-  sourceCoude?: string;
+  sourceCode?: string;
 };
 
 type ChallengeSaveModel = {
@@ -87,4 +88,4 @@ export type Challenge = {
   difficulty: number;
   createdByUserId: string;
   lastModifiedOn: Date;
-}
+};

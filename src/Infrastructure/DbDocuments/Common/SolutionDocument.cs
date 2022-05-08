@@ -4,9 +4,8 @@ namespace Infrastructure.DbDocuments.Common;
 
 internal class SolutionDocument : MongoDocumentWithId
 {
-    // language enum
-    // passed tests?
-    // 
+    [BsonElement("Language")]
+    public string Language { get; set; }
 
     [BsonElement("SourceCode")]
     public string SourceCode { get; set; }
