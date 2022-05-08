@@ -1,19 +1,27 @@
 import * as React from 'react';
+import { useMonaco } from '@monaco-editor/react';
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { BrowserRouter } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
-import LoadingSpinner from './components/LoadingSpinner';
+import { useDispatch, useSelector } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 import styled from 'styled-components';
 
+import {
+  stubInputLang,
+  stubLangCompletion,
+  stubLangDefinitions,
+} from '../config/monaco';
+import { useAuthSlice } from './slices/auth';
+import { selectAuth } from './slices/auth/selectors';
+import LoadingSpinner from './components/LoadingSpinner';
+import Layout from './layout';
+import { selectLayout } from './slices/layout/selectors';
+import { useLayoutSlice } from './slices/layout';
+import { notification } from 'antd';
+import { translations } from 'locales/translations';
+
 import './styles/index.less';
-import AppLayout from './layout';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectAuth } from './auth/selectors';
-import { useAuthSlice } from './auth';
-import { useEffect } from 'react';
-import { useMonaco } from '@monaco-editor/react';
-import { stubDefinitions, stubInputLangId } from '../config/monacoconfig';
 
 const CenteredNoLayout = styled.div`
   height: 100vh;
@@ -23,25 +31,50 @@ const CenteredNoLayout = styled.div`
   align-content: center;
 `;
 
-export function App() {
-  const { i18n } = useTranslation();
+export default function App() {
+  const { i18n, t } = useTranslation();
   const monaco = useMonaco();
-  const { actions } = useAuthSlice();
   const dispatch = useDispatch();
+
+  const { actions: authActions } = useAuthSlice();
+  const { actions: layoutActions } = useLayoutSlice();
   const { isInitialized } = useSelector(selectAuth);
+  const { showUnkownError } = useSelector(selectLayout);
 
   useEffect(() => {
-    dispatch(actions.initialize());
+    dispatch(authActions.initialize());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    monaco?.languages.register({ id: stubInputLangId });
-    monaco?.languages.setMonarchTokensProvider(
-      stubInputLangId,
-      stubDefinitions(),
-    );
-  }, [monaco]);
+    if (monaco) {
+      monaco.languages.register({ id: stubInputLang });
+      monaco.languages.setMonarchTokensProvider(
+        stubInputLang,
+        stubLangDefinitions,
+      );
+      // TODO: ADD LANGUAGE PROVIDER SOMEDAY
+      /*monaco.languages.registerCompletionItemProvider(
+        stubInputLang,
+        stubLangCompletion,
+      );*/
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (showUnkownError) {
+      notification['error']({
+        message: t(translations.UnkownErrorNotification.message),
+        description: (
+          <p>{t(translations.UnkownErrorNotification.description)}</p>
+        ),
+        duration: 10,
+      });
+      dispatch(layoutActions.resetUnkownException());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showUnkownError]);
 
   return (
     <BrowserRouter>
@@ -56,7 +89,7 @@ export function App() {
         />
       </Helmet>
       {isInitialized ? (
-        <AppLayout />
+        <Layout />
       ) : (
         <CenteredNoLayout>
           <LoadingSpinner />

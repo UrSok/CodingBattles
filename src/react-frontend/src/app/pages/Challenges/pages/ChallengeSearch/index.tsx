@@ -24,7 +24,7 @@ import {
 } from 'app/api/types/challenge';
 
 import { useSelector } from 'react-redux';
-import { selectUser } from 'app/auth/selectors';
+import { selectUser } from 'app/slices/auth/selectors';
 import { Role } from 'app/api/types/auth';
 import { useWatch } from 'antd/lib/form/Form';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';

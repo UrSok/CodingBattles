@@ -1,9 +1,9 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { useInjectReducer } from 'redux-injectors';
-import { axiosBaseQuery } from './settings';
-import { AuthUserWithToken, SignInModel, SignUpModel } from './types/auth';
+
+import { authActions } from 'app/slices/auth';
+import { axiosBaseQuery } from './config';
 import { ResultValue } from './types';
-import { authActions } from 'app/auth';
+import { AuthUserWithToken, SignInModel, SignUpModel } from './types/auth';
 
 export const authApi = createApi({
   reducerPath: 'authApi',
@@ -18,6 +18,7 @@ export const authApi = createApi({
         data: signUpRequest,
       }),
     }),
+
     signIn: build.mutation<ResultValue<AuthUserWithToken>, SignInModel>({
       query: signInRequest => ({
         url: 'auth',
@@ -31,6 +32,7 @@ export const authApi = createApi({
         }
       },
     }),
+
     isUniqueEmail: build.query<ResultValue<boolean>, string>({
       query: email => ({
         url: `isUniqueEmail/${email}`,
@@ -39,34 +41,3 @@ export const authApi = createApi({
     }),
   }),
 });
-
-export const useAuthApi = () => {
-  useInjectReducer({
-    key: authApi.reducerPath,
-    reducer: authApi.reducer,
-  });
-  return authApi;
-};
-
-/**
- * Example Mutation Usage:
- *
- * searchChallenges: build.mutation<
- *     ResultWithValue<Paginated<ChallengeSearchResultItem>>,
- *     ChallengeSearchRequest
- *   >({
- *     query: (request: ChallengeSearchRequest) => ({
- *       url: '',
- *       method: 'POST',
- *       data: request,
- *     }),
- *   }),
- */
-
-/**
- * Example Query Usage:
- *
- * getTags: build.query<ResultWithValue<ChallengeTag[]>, void>({
- *     query: () => ({ url: '', method: 'GET' }),
- *   }),
- */

@@ -1,24 +1,24 @@
 import { PayloadAction } from '@reduxjs/toolkit';
+import { put, takeLatest } from 'redux-saga/effects';
+
 import { AuthUserWithToken, Role } from 'app/api/types/auth';
 import {
   getTokenFromLocalStorage,
   getTokenPayload,
-  initSession,
   isTokenValid,
   setSession,
 } from 'app/utils/jwt';
-import { put, takeLatest } from 'redux-saga/effects';
-import { authActions as actions, authActions } from '.';
+import { authActions } from '.';
 
 function* initialize() {
   const accessToken = getTokenFromLocalStorage();
   if (accessToken == null || !isTokenValid(accessToken)) {
     yield put(authActions.setNotAuthenticated());
-    initSession(null);
+    setSession(null);
     return;
   }
 
-  initSession(accessToken);
+  setSession(accessToken);
   const userData = getTokenPayload(accessToken);
   yield put(
     authActions.setAuthenticated({
@@ -42,7 +42,7 @@ function* singOut() {
 }
 
 export function* authSaga() {
-  yield takeLatest(actions.initialize.type, initialize);
-  yield takeLatest(actions.signIn.type, singIn);
-  yield takeLatest(actions.signOut.type, singOut);
+  yield takeLatest(authActions.initialize.type, initialize);
+  yield takeLatest(authActions.signIn.type, singIn);
+  yield takeLatest(authActions.signOut.type, singOut);
 }

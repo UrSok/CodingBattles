@@ -1,6 +1,6 @@
 import { Alert, Button } from 'antd';
 import { Role } from 'app/api/types/auth';
-import { selectAuth } from 'app/auth/selectors';
+import { selectAuth } from 'app/slices/auth/selectors';
 import { translations } from 'locales/translations';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';

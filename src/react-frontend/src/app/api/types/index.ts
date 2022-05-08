@@ -18,12 +18,6 @@ export type ResultValue<T> = {
   value?: T;
 };
 
-export enum ApiException {
-  Status500 = '500',
-  Unknown = 'Unknown',
-  ServerUnreachable = 'Unreacheble',
-}
-
 export enum OrderStyle {
   None = 0,
   Ascend = 1,

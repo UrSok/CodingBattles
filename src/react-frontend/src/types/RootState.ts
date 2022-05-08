@@ -1,5 +1,5 @@
-import { AuthState } from 'app/auth/types';
-import { LayoutState } from 'app/layout/slice/types';
+import { AuthState } from 'app/slices/auth/types';
+import { LayoutState } from 'app/slices/layout/types';
 
 export interface RootState {
   layout?: LayoutState;

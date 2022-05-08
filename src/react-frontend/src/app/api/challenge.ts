@@ -1,11 +1,12 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { axiosBaseQuery } from './settings';
+
+import { axiosBaseQuery } from './config';
 import { Paginated, ResultValue } from './types';
 import {
   Challenge,
   ChallengeSaveModelWithId,
   ChallengeSearchRequest,
-  ChallengeSearchResultItem,
+  ChallengeSearchResultItem
 } from './types/challenge';
 
 export const challengeApi = createApi({
@@ -46,26 +47,3 @@ export const challengeApi = createApi({
     }),
   }),
 });
-
-/**
- * Example Mutation Usage:
- *
- * searchChallenges: build.mutation<
- *     ResultWithValue<Paginated<ChallengeSearchResultItem>>,
- *     ChallengeSearchRequest
- *   >({
- *     query: (request: ChallengeSearchRequest) => ({
- *       url: '',
- *       method: 'POST',
- *       data: request,
- *     }),
- *   }),
- */
-
-/**
- * Example Query Usage:
- *
- * getTags: build.query<ResultWithValue<ChallengeTag[]>, void>({
- *     query: () => ({ url: '', method: 'GET' }),
- *   }),
- */

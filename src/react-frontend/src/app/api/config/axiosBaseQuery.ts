@@ -1,6 +1,7 @@
 import { BaseQueryFn } from '@reduxjs/toolkit/query';
-import { layoutActions } from 'app/layout/slice';
-import { AxiosRequestConfig, AxiosError } from 'axios';
+import { AxiosError, AxiosRequestConfig } from 'axios';
+
+import { layoutActions } from 'app/slices/layout';
 import axiosInstance from './axios';
 
 export const axiosBaseQuery =

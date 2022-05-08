@@ -1,7 +1,9 @@
 import { PayloadAction } from '@reduxjs/toolkit';
-import { AuthUser, AuthUserWithToken, Role } from 'app/api/types/auth';
 import { createSlice } from 'utils/@reduxjs/toolkit';
+
 import { useInjectReducer, useInjectSaga } from 'utils/redux-injectors';
+
+import { AuthUser, AuthUserWithToken, Role } from 'app/api/types/auth';
 import { authSaga } from './saga';
 import { AuthState } from './types';
 
@@ -45,15 +47,3 @@ export const useAuthSlice = () => {
   useInjectSaga({ key: slice.name, saga: authSaga });
   return { actions: slice.actions };
 };
-
-/**
- * Example Usage:
- *
- * export function MyComponentNeedingThisSlice() {
- *  const { actions } = useAuthSlice();
- *
- *  const onButtonClick = (evt) => {
- *    dispatch(actions.someAction());
- *   };
- * }
- */

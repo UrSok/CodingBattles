@@ -12,4 +12,4 @@ export type StubGeneratorError = {
 export type StubGeneratorResult = {
   stub: string;
   error?: StubGeneratorError;
-}
+};

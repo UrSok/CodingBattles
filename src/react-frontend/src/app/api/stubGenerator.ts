@@ -1,5 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { axiosBaseQuery } from './settings';
+
+import { axiosBaseQuery } from './config';
 import { ResultValue } from './types';
 import { StubGeneratorModel, StubGeneratorResult } from './types/stubGenerator';
 
@@ -20,26 +21,3 @@ export const stubGeneratorApi = createApi({
     }),
   }),
 });
-
-/**
- * Example Mutation Usage:
- *
- * searchChallenges: build.mutation<
- *     ResultWithValue<Paginated<ChallengeSearchResultItem>>,
- *     ChallengeSearchRequest
- *   >({
- *     query: (request: ChallengeSearchRequest) => ({
- *       url: '',
- *       method: 'POST',
- *       data: request,
- *     }),
- *   }),
- */
-
-/**
- * Example Query Usage:
- *
- * getTags: build.query<ResultWithValue<ChallengeTag[]>, void>({
- *     query: () => ({ url: '', method: 'GET' }),
- *   }),
- */

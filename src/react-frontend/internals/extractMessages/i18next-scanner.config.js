@@ -19,7 +19,7 @@ module.exports = {
       list: ['t'],
       extensions: [''], // We dont want this extension because we manually check on transform function below
     },
-    lngs: ['en', 'de'],
+    lngs: ['en'],
     defaultLng: 'en',
     defaultNs: 'translation',
     resource: {

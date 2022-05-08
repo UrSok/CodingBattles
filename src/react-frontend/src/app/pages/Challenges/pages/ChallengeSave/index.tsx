@@ -9,9 +9,9 @@ import Title from 'antd/lib/typography/Title';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { stubInputLangId } from 'config/monacoconfig';
+import { stubInputLang } from 'config/monaco';
 import LoadingSpinner from 'app/components/LoadingSpinner';
-import { getLanguageKeyName, Language } from 'app/utils/types/globalTypes';
+import { Language } from 'app/types/global';
 import { useForm, useWatch } from 'antd/lib/form/Form';
 import { stubGeneratorApi } from 'app/api/stubGenerator';
 import ErrorAlert from './components/ErrorAlert';
@@ -23,6 +23,7 @@ import MultiTagSelect from '../../components/MultiTagSelect';
 import { challengeApi } from 'app/api/challenge';
 import { TestPair } from 'app/api/types/challenge';
 import { PATH_CHALLENGES } from 'app/layout/routes/paths';
+import { getLanguageKeyName } from 'app/utils/enumHelpers';
 
 export default function ChallengeSave() {
   const { id: paramId } = useParams();
@@ -51,14 +52,13 @@ export default function ChallengeSave() {
 
   const triggerStubGeneration = (input: string | undefined) => {
     if (input?.length === 0 || !input) return;
-
-    triggerGenerateStub(
+    /*triggerGenerateStub(
       {
         language: selectedStubLang,
         input: input,
       },
       true,
-    );
+    );*/
   };
 
   const stubInputMounted = (editor, _) => {
@@ -79,6 +79,7 @@ export default function ChallengeSave() {
 
   const stubInputChanged = (input: string | undefined, ev) => {
     setEmptyStubInput(!input || input?.length === 0);
+    //console.log(input);
     triggerStubGeneration(input);
   };
 
@@ -243,7 +244,7 @@ export default function ChallengeSave() {
                 <Editor
                   loading={<LoadingSpinner />}
                   height={300}
-                  language={stubInputLangId}
+                  language={stubInputLang}
                   className="bordered-editor"
                   onChange={stubInputChanged}
                   onMount={stubInputMounted}
