@@ -101,7 +101,9 @@
         "difficulty": "Difficulty",
         "includeNoDifficulty": "Include no difficulty",
         "tags": "Tags",
-        "sortBy": "Sort By"
+        "sortBy": "Sort By",
+        "sortOrder": "Sort Order",
+        "sort": "Sort"
       }
     }
   }

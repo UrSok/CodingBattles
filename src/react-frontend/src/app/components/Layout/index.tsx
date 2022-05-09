@@ -12,14 +12,14 @@ import { Role } from 'app/api/types/auth';
 import { useAuthSlice } from 'app/slices/auth';
 import { selectAuth } from 'app/slices/auth/selectors';
 
-import { menuRoutes } from './routes/menuRoutes';
-import { PATH_PROFILES } from './routes/paths';
-import Router from './routes/Router';
+import { menuRoutes } from '../../routes/menuRoutes';
+import { PATH_PROFILES } from '../../routes/paths';
+import Router from '../../routes/Router';
 
-import SingUpModalForm from './components/auth/Forms/SignUpModalForm';
-import HeaderAlerts from './components/HeaderAlerts';
-import MenuUserBadge from './components/auth/MenuUserBadge';
-import SingInModalForm from './components/auth/Forms/SignInModalForm';
+import SingUpModalForm from '../Auth/Forms/SignUpModalForm';
+import HeaderAlerts from '../HeaderAlerts';
+import MenuUserBadge from '../Auth/MenuUserBadge';
+import SingInModalForm from '../Auth/Forms/SignInModalForm';
 
 export default function Layout() {
   const { pathname } = useLocation();

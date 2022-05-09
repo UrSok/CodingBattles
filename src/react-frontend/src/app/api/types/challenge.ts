@@ -5,6 +5,11 @@ export type ChallengeTag = {
   name: string;
 };
 
+export enum SortBy {
+  Name = 'Name',
+  Difficulty = 'Difficulty',
+};
+
 export type ChallengeSearchRequest = {
   page?: number;
   pageSize?: number;

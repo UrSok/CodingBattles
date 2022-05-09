@@ -8,10 +8,10 @@ import { useForm, useWatch } from 'antd/lib/form/Form';
 import { challengeApi } from 'app/api/challenge';
 import { stubGeneratorApi } from 'app/api/stubGenerator';
 import { Challenge, TestPair } from 'app/api/types/challenge';
-import CodeEditor from 'app/components/CodeEditor';
-import LanguageSelect from 'app/components/Fields/LanguageSelect';
+import CodeEditor from 'app/components/Input/CodeEditor';
+import LanguageSelect from 'app/components/Input/LanguageSelect';
 import ChallengeDescription from 'app/components/ChallengeDescription';
-import { PATH_CHALLENGES } from 'app/layout/routes/paths';
+import { PATH_CHALLENGES } from 'app/routes/paths';
 import { Language } from 'app/types/global';
 import { stubInputLang } from 'config/monaco';
 import monaco from 'monaco-editor';
@@ -20,7 +20,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import MultiTagSelect from '../../components/MultiTagSelect';
 import ErrorAlert from './components/ErrorAlert';
 import FormCardSection from './components/FormCardSection';
-import { ChallengeSaveFields } from './utils/ChallengeSaveFields';
+import { ChallengeSaveFields } from './types/ChallengeSaveFields';
 
 export default function ChallengeSave() {
   const { id: paramId } = useParams();

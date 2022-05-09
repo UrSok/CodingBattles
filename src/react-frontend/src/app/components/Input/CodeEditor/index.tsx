@@ -2,7 +2,7 @@ import Editor, { Monaco, OnChange } from '@monaco-editor/react';
 import monaco from 'monaco-editor';
 import React, { MutableRefObject } from 'react';
 
-import LoadingSpinner from '../LoadingSpinner';
+import LoadingSpinner from '../../LoadingSpinner';
 
 type CodeEditorProps = {
   editorRef?: MutableRefObject<monaco.editor.IStandaloneCodeEditor | null>;

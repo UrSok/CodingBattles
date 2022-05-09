@@ -16,7 +16,7 @@ import { useLayoutSlice } from './slices/layout';
 import { translations } from 'locales/translations';
 
 import LoadingSpinner from './components/LoadingSpinner';
-import Layout from './layout';
+import Layout from './components/Layout';
 
 import './styles/index.less';
 

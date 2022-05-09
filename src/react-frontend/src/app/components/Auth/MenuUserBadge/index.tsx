@@ -16,7 +16,7 @@ import {
   grey,
 } from '@ant-design/colors';
 
-import { PATH_PROFILES } from 'app/layout/routes/paths';
+import { PATH_PROFILES } from 'app/routes/paths';
 
 const colorsDictionary: Record<string, typeof red> = {
   ABC: red,

@@ -2,17 +2,15 @@ import * as React from 'react';
 import { challengeApi } from 'app/api/challenge';
 import { challengeTagApi } from 'app/api/challengeTag';
 import { useEffect, useState } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
 import {
   Button,
-  Checkbox,
   Form,
   Input,
-  Select,
+  Rate,
   Skeleton,
-  Slider,
   Space,
   Tag,
+  Typography,
 } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { translations } from 'locales/translations';
@@ -21,49 +19,66 @@ import ProList from '@ant-design/pro-list';
 import {
   ChallengeSearchRequest,
   ChallengeSearchResultItem,
+  ChallengeTag,
+  SortBy,
 } from 'app/api/types/challenge';
 
 import { useSelector } from 'react-redux';
-import { selectUser } from 'app/slices/auth/selectors';
+import { selectAuth } from 'app/slices/auth/selectors';
 import { Role } from 'app/api/types/auth';
 import { useWatch } from 'antd/lib/form/Form';
-import { CheckboxChangeEvent } from 'antd/lib/checkbox';
-import ProForm from '@ant-design/pro-form';
+import ProForm, {
+  ProFormCheckbox,
+  ProFormRate,
+  ProFormSelect,
+  ProFormSlider,
+} from '@ant-design/pro-form';
 import { useNavigate } from 'react-router-dom';
-import { PATH_CHALLENGES } from 'app/layout/routes/paths';
+import { PATH_CHALLENGES } from 'app/routes/paths';
 import MultiTagSelect from '../../components/MultiTagSelect';
-
-const { Search } = Input;
-const { Option } = Select;
+import Page from 'app/components/Layout/Page';
+import { ChallengeSearchFields } from './types';
+import { OrderStyle } from 'app/api/types';
+import { EditFilled, PlusOutlined } from '@ant-design/icons';
 
 export default function ChallengeSearch() {
-  const [form] = Form.useForm();
   const navigate = useNavigate();
-  const { data: challengeTags, isLoading: isLoadingTags } =
-    challengeTagApi.useGetTagsQuery();
-  const [
-    triggerGetChallenges,
-    { data: challenges, isLoading: isLoadingChalleges },
-  ] = challengeApi.useLazyGetChallengesQuery();
-
-  const user = useSelector(selectUser);
+  const [form] = Form.useForm();
   const { t } = useTranslation();
 
-  const search: string = useWatch('search', form);
-  const [difficulty, setDifficulty] = useState([1, 5]);
-  const [includeNoDifficulty, setIncludeNoDifficulty] = useState(true);
-  const tagIds: string[] = useWatch('tags', form);
+  const { data: challengeTags, isLoading: isLoadingTags } =
+    challengeTagApi.useGetTagsQuery();
+
+  const [
+    triggerGetChallenges,
+    { data: challenges, isLoading: isLoadingChallenges },
+  ] = challengeApi.useLazyGetChallengesQuery();
+
+  const { user, isAuthenticated } = useSelector(selectAuth);
+
+  const [difficultyRange, setDifficultyRange] = useState([1, 5]);
+
+  const search: string = useWatch(ChallengeSearchFields.searchText, form);
+  const sortBy: SortBy = useWatch(ChallengeSearchFields.sortBy, form);
+  const sortOrder: OrderStyle = useWatch(ChallengeSearchFields.sortOrder, form);
+  const tagIds: string[] = useWatch(ChallengeSearchFields.tags, form);
+  const includeNoDifficulty = useWatch(
+    ChallengeSearchFields.includeNoDifficulty,
+    form,
+  );
 
   useEffect(() => {
     const searchQuery: ChallengeSearchRequest = {
       text: search,
+      sortBy: sortBy,
+      orderStyle: sortOrder,
       tagIds: tagIds,
       includeNoDifficulty: includeNoDifficulty,
     };
 
-    if (difficulty !== undefined) {
-      searchQuery.minimumDifficulty = difficulty[0];
-      searchQuery.maximumDifficulty = difficulty[1];
+    if (difficultyRange !== undefined) {
+      searchQuery.minimumDifficulty = difficultyRange[0];
+      searchQuery.maximumDifficulty = difficultyRange[1];
     } else {
       searchQuery.minimumDifficulty = 0;
       searchQuery.maximumDifficulty = 5;
@@ -71,114 +86,135 @@ export default function ChallengeSearch() {
 
     triggerGetChallenges(searchQuery);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, difficulty, includeNoDifficulty, tagIds]);
+  }, [search, sortBy, sortOrder, tagIds, includeNoDifficulty, difficultyRange]);
+
+  const difficultySliderChanged = (values: [number, number]) => {
+    setDifficultyRange(values);
+  };
 
   return (
-    <PageContainer
-      ghost
-      header={{
-        title: '',
-      }}
-    >
+    <Page ghost>
       <ProCard ghost gutter={16}>
-        <ProCard colSpan="30%" bordered>
+        <ProCard colSpan="30%" ghost>
           <ProForm
             layout="vertical"
             form={form}
             initialValues={{
-              search: undefined,
-              difficulty: [1, 5],
-              includeNoDifficulty: true,
-              tagIds: [],
+              [`${ChallengeSearchFields.searchText}`]: undefined,
+              [`${ChallengeSearchFields.sortBy}`]: SortBy.Name,
+              [`${ChallengeSearchFields.sortOrder}`]: OrderStyle.None,
+              [`${ChallengeSearchFields.tags}`]: [],
+              [`${ChallengeSearchFields.difficulty}`]: [1, 5],
+              [`${ChallengeSearchFields.includeNoDifficulty}`]: true,
             }}
             submitter={false}
           >
-            <Form.Item name="search">
-              <Search
-                placeholder={t(translations.Challenges.Search.Form.searchInput)}
-                loading={isLoadingChalleges}
-                enterButton
-                allowClear
-              />
-            </Form.Item>
+            <ProCard ghost split="horizontal" gutter={[16, 16]}>
+              <ProCard title="General">
+                <Form.Item name={ChallengeSearchFields.searchText}>
+                  <Input.Search
+                    placeholder={t(
+                      translations.Challenges.Search.Form.searchInput,
+                    )}
+                    loading={isLoadingChallenges}
+                    enterButton
+                    allowClear
+                  />
+                </Form.Item>
 
-            <Form.Item
-              name="sortBy"
-              label={t(translations.Challenges.Search.Form.sortBy)}
-            >
-              <Select
-                style={{ width: '100%' }}
-                placeholder={t(translations.Challenges.Search.Form.sortBy)}
-                defaultActiveFirstOption
-                options={[
-                  {
-                    label: 'Name',
-                    value: 'name',
-                  },
-                  {
-                    label: 'Difficulty',
-                    value: 'difficulty',
-                  },
-                ]}
-              />
-            </Form.Item>
-            <MultiTagSelect name="challengeTags" />
-            <ProForm.Item
-              label={t(translations.Challenges.Search.Form.difficulty)}
-              name="difficulty"
-            >
-              <Slider
-                range={{
-                  draggableTrack: true,
-                }}
-                min={1}
-                max={5}
-                step={0.1}
-                defaultValue={[1, 5]}
-                marks={{
-                  1: 1,
-                  2: 2,
-                  3: 3,
-                  4: 4,
-                  5: 5,
-                }}
-                onAfterChange={(values: [number, number]) =>
-                  setDifficulty(values)
-                }
-              />
-            </ProForm.Item>
-            <Form.Item>
-              <Checkbox
-                defaultChecked
-                onChange={(e: CheckboxChangeEvent) =>
-                  setIncludeNoDifficulty(!includeNoDifficulty)
-                }
-              >
-                {t(translations.Challenges.Search.Form.includeNoDifficulty)}
-              </Checkbox>
-            </Form.Item>
+                <ProFormSelect
+                  name={ChallengeSearchFields.sortBy}
+                  label={t(translations.Challenges.Search.Form.sortBy)}
+                  placeholder={t(translations.Challenges.Search.Form.sortBy)}
+                  valueEnum={SortBy}
+                  allowClear={false}
+                />
+
+                <ProFormSelect
+                  name={ChallengeSearchFields.sortOrder}
+                  label={t(translations.Challenges.Search.Form.sortOrder)}
+                  placeholder={t(translations.Challenges.Search.Form.sortOrder)}
+                  options={[
+                    {
+                      label: 'None',
+                      value: OrderStyle.None,
+                    },
+                    {
+                      label: 'Ascend',
+                      value: OrderStyle.Ascend,
+                    },
+                    {
+                      label: 'Descend',
+                      value: OrderStyle.Descend,
+                    },
+                  ]}
+                  allowClear={false}
+                />
+              </ProCard>
+
+              <ProCard title="Details">
+                <MultiTagSelect
+                  name={ChallengeSearchFields.tags}
+                  loading={isLoadingTags}
+                  tags={challengeTags?.value}
+                />
+
+                <Typography.Text>
+                  {t(translations.Challenges.Search.Form.difficulty)}
+                </Typography.Text>
+
+                <ProFormSlider
+                  name={ChallengeSearchFields.difficulty}
+                  style={{
+                    width: '100%',
+                    marginBottom: 0,
+                  }}
+                  min={1}
+                  max={5}
+                  step={0.1}
+                  marks={{
+                    1: 1,
+                    2: 2,
+                    3: 3,
+                    4: 4,
+                    5: 5,
+                  }}
+                  fieldProps={{
+                    range: {
+                      draggableTrack: true,
+                    },
+                    onAfterChange: difficultySliderChanged,
+                  }}
+                />
+
+                <ProFormCheckbox
+                  name={ChallengeSearchFields.includeNoDifficulty}
+                >
+                  {t(translations.Challenges.Search.Form.includeNoDifficulty)}
+                </ProFormCheckbox>
+              </ProCard>
+            </ProCard>
           </ProForm>
         </ProCard>
+
         <ProCard
           bordered
           bodyStyle={{
             padding: 15,
           }}
         >
-          <Skeleton loading={isLoadingChalleges} active>
-            <ProList<any>
+          <Skeleton loading={isLoadingChallenges} active>
+            <ProList<ChallengeSearchResultItem>
               toolBarRender={() => {
                 const actions: React.ReactNode[] = [];
 
                 if (user?.role === Role.Member || user?.role === Role.Admin) {
                   actions.push(
                     <Button
-                      key="create-challenge"
                       type="primary"
                       onClick={() => navigate(PATH_CHALLENGES.save)}
-                    >
-                      Create
-                    </Button>,
+                      icon={<PlusOutlined />}
+                    />,
                   );
                 }
 
@@ -193,52 +229,85 @@ export default function ChallengeSearch() {
               metas={{
                 title: {
                   dataIndex: 'name',
-                  title: 'Name',
                 },
-                description: {
+                content: {
                   dataIndex: 'descriptionShort',
                 },
                 subTitle: {
-                  dataIndex: 'tags',
-                  render: (_, row: ChallengeSearchResultItem) => (
+                  render: (_, entity) => (
                     <Space size={0} wrap>
-                      {row.tagIds?.map(tagId => {
+                      {entity.tagIds?.map(tagId => {
                         const tag = challengeTags?.value?.find(
                           x => x.id === tagId,
                         );
                         if (tag) {
-                          return <Tag key={tagId}>{tag.name}</Tag>;
+                          return (
+                            <Tag
+                              key={tagId}
+                              onClick={() => {
+                                const selectedTags: string[] =
+                                  form.getFieldValue(
+                                    ChallengeSearchFields.tags,
+                                  );
+                                if (selectedTags.includes(tagId))  return;
+
+                                form.setFieldsValue({
+                                  [`${ChallengeSearchFields.tags}`]: [
+                                    ...selectedTags,
+                                    tagId,
+                                  ],
+                                });
+                              }}
+                            >
+                              {tag.name}
+                            </Tag>
+                          );
                         }
+
+                        return null;
                       })}
                     </Space>
                   ),
                 },
-                extra: {
-                  dataIndex: 'difficulty',
-                  render: (_, row: ChallengeSearchResultItem) => (
-                    <Space>
-                      Difficulty: {row.difficulty > 0 ? row.difficulty : '???'}
-                    </Space>
+                description: {
+                  render: (_, entity) => (
+                    <>
+                      <Typography.Text>Difficulty:</Typography.Text>{' '}
+                      {entity.difficulty > 0 ? (
+                        <Rate disabled value={entity.difficulty} allowHalf />
+                      ) : (
+                        '???'
+                      )}
+                    </>
                   ),
                 },
-                actions: {
-                  render: (_, row: ChallengeSearchResultItem) => [
-                    <Button
-                      onClick={() =>
-                        navigate(PATH_CHALLENGES.save + `/${row.id}`)
-                      }
-                    >
-                      Edit
-                    </Button>,
-                    <p>c2</p>,
-                    <p>c3</p>,
-                  ],
+                extra: {
+                  render: (_, entity) => {
+                    const actions: React.ReactNode[] = [];
+
+                    if (
+                      user?.role === Role.Admin ||
+                      entity.createdByUserId === user?.id
+                    ) {
+                      actions.push(
+                        <Button
+                          type="dashed"
+                          onClick={() =>
+                            navigate(PATH_CHALLENGES.save + `/${entity.id}`)
+                          }
+                          icon={<EditFilled />}
+                        />,
+                      );
+                    }
+
+                    return actions;
+                  },
                 },
               }}
             />
           </Skeleton>
         </ProCard>
       </ProCard>
-    </PageContainer>
+    </Page>
   );
 }
