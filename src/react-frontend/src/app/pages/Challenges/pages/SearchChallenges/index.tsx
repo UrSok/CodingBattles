@@ -53,7 +53,7 @@ export default function SearchChallenges() {
     { data: challenges, isLoading: isLoadingChallenges },
   ] = challengeApi.useLazyGetChallengesQuery();
 
-  const { user, isAuthenticated } = useSelector(selectAuth);
+  const { user } = useSelector(selectAuth);
 
   const [difficultyRange, setDifficultyRange] = useState([1, 5]);
 

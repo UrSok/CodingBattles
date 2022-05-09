@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-escape */
 import { languages, Range } from 'monaco-editor';
 
 export const stubInputLanguage = 'stubinputlang';

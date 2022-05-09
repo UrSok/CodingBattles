@@ -18,15 +18,9 @@ import { translations } from 'locales/translations';
 import LoadingSpinner from './components/LoadingSpinner';
 import Layout from './components/Layout';
 
-import './styles/index.less';
+import { useEffectOnce } from 'usehooks-ts';
 
-const CenteredNoLayout = styled.div`
-  height: 100vh;
-  flex-direction: row-reverse;
-  display: flex;
-  justify-content: center;
-  align-content: center;
-`;
+import './styles/index.less';
 
 export default function App() {
   const { i18n, t } = useTranslation();
@@ -38,10 +32,10 @@ export default function App() {
   const { isInitialized } = useSelector(selectAuth);
   const { showUnkownError } = useSelector(selectLayout);
 
-  useEffect(() => {
+  useEffectOnce(() => {
     dispatch(authActions.initialize());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   useEffect(() => {
     if (monaco) {
@@ -85,13 +79,7 @@ export default function App() {
           content="A platform for challenging others in a coding battle."
         />
       </Helmet>
-      {isInitialized ? (
-        <Layout />
-      ) : (
-        <CenteredNoLayout>
-          <LoadingSpinner />
-        </CenteredNoLayout>
-      )}
+      {isInitialized ? <Layout /> : <LoadingSpinner centered />}
     </BrowserRouter>
   );
 }

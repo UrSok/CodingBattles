@@ -69,10 +69,6 @@ export default function Layout() {
       location={{
         pathname: pathname,
       }}
-      /*menu={{
-        hideMenuWhenCollapsed: true,
-        type: 'group',
-      }}*/
       fixSiderbar
       onMenuHeaderClick={() => navigate('/')}
       menuDataRender={(menuData: MenuDataItem[]): MenuDataItem[] => {
