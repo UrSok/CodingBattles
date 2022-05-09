@@ -38,11 +38,10 @@ export default function CodeEditor(props: CodeEditorProps) {
     <Editor
       className="bordered-editor"
       loading={<LoadingSpinner />}
-      theme="vs-dark"
       height={height ?? 300}
       language={language}
       defaultValue={defaultValue}
-      value={value}
+      value={value ?? ''}
       options={{
         readOnly: readOnly,
       }}

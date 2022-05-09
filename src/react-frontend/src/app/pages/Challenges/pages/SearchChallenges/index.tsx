@@ -29,7 +29,6 @@ import { Role } from 'app/api/types/auth';
 import { useWatch } from 'antd/lib/form/Form';
 import ProForm, {
   ProFormCheckbox,
-  ProFormRate,
   ProFormSelect,
   ProFormSlider,
 } from '@ant-design/pro-form';
@@ -41,7 +40,7 @@ import { ChallengeSearchFields } from './types';
 import { OrderStyle } from 'app/api/types';
 import { EditFilled, PlusOutlined } from '@ant-design/icons';
 
-export default function ChallengeSearch() {
+export default function SearchChallenges() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const { t } = useTranslation();
@@ -221,7 +220,7 @@ export default function ChallengeSearch() {
                 return actions;
               }}
               ghost
-              rowKey="id"
+              rowKey={(entity,_) => entity.id}
               headerTitle="Challenges"
               itemLayout="vertical"
               split
@@ -285,10 +284,7 @@ export default function ChallengeSearch() {
                   render: (_, entity) => {
                     const actions: React.ReactNode[] = [];
 
-                    if (
-                      user?.role === Role.Admin ||
-                      entity.createdByUserId === user?.id
-                    ) {
+                    if (entity.createdByUserId === user?.id) {
                       actions.push(
                         <Button
                           type="dashed"

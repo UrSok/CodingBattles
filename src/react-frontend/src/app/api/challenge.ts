@@ -6,7 +6,7 @@ import {
   Challenge,
   ChallengeSaveModelWithId,
   ChallengeSearchRequest,
-  ChallengeSearchResultItem
+  ChallengeSearchResultItem,
 } from './types/challenge';
 
 export const challengeApi = createApi({
@@ -14,7 +14,7 @@ export const challengeApi = createApi({
   baseQuery: axiosBaseQuery({
     baseUrl: '/v1/challenge/',
   }),
-  tagTypes: ['Challenges'],
+  tagTypes: ['Challenge'],
   endpoints: build => ({
     getChallenges: build.query<
       ResultValue<Paginated<ChallengeSearchResultItem>>,
@@ -24,7 +24,16 @@ export const challengeApi = createApi({
         method: 'POST',
         data: request,
       }),
-      providesTags: ['Challenges'],
+      providesTags: (result, error, arg) =>
+        result && result.value
+          ? [
+              ...result?.value?.items?.map(({ id }) => ({
+                type: 'Challenge' as const,
+                id,
+              })),
+              'Challenge',
+            ]
+          : ['Challenge'],
     }),
 
     getChallenge: build.query<ResultValue<Challenge>, string>({
@@ -32,6 +41,10 @@ export const challengeApi = createApi({
         url: id,
         method: 'GET',
       }),
+      providesTags: (result, error, arg) =>
+        result && result.value
+          ? [{ type: 'Challenge', id: result.value.id }]
+          : ['Challenge'],
     }),
 
     saveChallenge: build.mutation<
@@ -39,11 +52,13 @@ export const challengeApi = createApi({
       ChallengeSaveModelWithId
     >({
       query: (request: ChallengeSaveModelWithId) => ({
-        url: request.id ? `save/${request.id}` : 'save', //'save/' + request.id,// ? request.id : '',
+        url: request.id ? `save/${request.id}` : 'save',
         method: 'POST',
         data: request.model,
       }),
-      invalidatesTags: ['Challenges'],
+      invalidatesTags: (result, error, arg) => [
+        { type: 'Challenge', id: arg.id },
+      ],
     }),
   }),
 });

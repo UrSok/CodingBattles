@@ -8,11 +8,13 @@ type PageProps = {
   ghost?: boolean;
   title?: string;
   loading?: boolean;
+  extra?: React.ReactNode;
+  footer?: React.ReactNode[];
   children: React.ReactNode;
 };
 
 export default function Page(props: PageProps) {
-  const { title, ghost, children, loading } = props;
+  const { title, ghost, loading, extra, footer, children } = props;
 
   return (
     <PageContainer
@@ -21,6 +23,8 @@ export default function Page(props: PageProps) {
       header={{
         title: title,
       }}
+      footer={footer}
+      extra={extra}
     >
       {children}
     </PageContainer>

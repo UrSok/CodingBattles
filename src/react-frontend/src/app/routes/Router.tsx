@@ -3,8 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 
 import { PATH_CHALLENGES, PATH_GAMES, PATH_IDE, PATH_PROFILES } from './paths';
 
-import ChallengeSearch from 'app/pages/Challenges/pages/ChallengeSearch/index';
-import ChallengeSave from 'app/pages/Challenges/pages/ChallengeSave';
+import ChallengePage from 'app/pages/Challenges';
 
 export default function Router() {
   return (
@@ -21,10 +20,11 @@ export default function Router() {
         </Route>
       </Route>
       <Route path={PATH_CHALLENGES.root}>
-        <Route index element={<ChallengeSearch />} />
+        <Route index element={<ChallengePage.Search />} />
+        <Route path=":id" element={<p>id</p>} />
         <Route path={PATH_CHALLENGES.save}>
-          <Route index element={<ChallengeSave />} />
-          <Route path=":id" element={<ChallengeSave />} />
+          <Route index element={<ChallengePage.Save />} />
+          <Route path=":id" element={<ChallengePage.Save />} />
         </Route>
       </Route>
       <Route path={PATH_GAMES.root}>

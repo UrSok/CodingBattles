@@ -34,6 +34,12 @@ internal class GetChallengeHandler : IRequestHandler<GetChallengeQuery, Result<C
 
     public async Task<Result<Challenge>> Handle(GetChallengeQuery request, CancellationToken cancellationToken)
     {
+
+        if (!MongoDB.Bson.ObjectId.TryParse(request.Id, out _))
+        {
+            return Result<Challenge>.Failure(ValidationError.InvalidId);
+        }
+
         var challenge = await this.challengeRepository.Get(request.Id, cancellationToken);
 
         if (challenge is null)

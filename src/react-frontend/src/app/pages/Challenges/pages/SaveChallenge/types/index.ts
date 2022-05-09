@@ -1,7 +1,7 @@
-export const ChallengeSaveFields = {
+export const SaveFields = {
   name: 'name',
-  descriptionShort: 'descriptionShort',
   tags: 'tags',
+  descriptionShort: 'descriptionShort',
   descriptionMarkdown: 'descriptionMarkdown',
   tests: 'tests',
   testName: 'testName',

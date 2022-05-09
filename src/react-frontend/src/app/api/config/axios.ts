@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 export enum ApiException {
-  ServerUnreachable = 0,
-  Unknown = 1,
-  Status500 = 500,
-  Unauthorized = 401,
+  ServerUnreachable = '0',
+  Unknown = '1',
+  Status500 = '500',
+  Unauthorized = '401',
 }
 
 const axiosInstance = axios.create({

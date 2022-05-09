@@ -13,11 +13,12 @@ import { RequestOptionsType } from '@ant-design/pro-utils';
 type MultiTagSelectProps = {
   name: string;
   loading?: boolean;
+  readOnly?: boolean;
   tags?: ChallengeTag[];
 };
 
 export default function MultiTagSelect(props: MultiTagSelectProps) {
-  const { name, loading: loadingOutsideTags, tags } = props;
+  const { name, loading: loadingOutsideTags, readOnly, tags } = props;
 
   const { t } = useTranslation();
 
@@ -28,6 +29,7 @@ export default function MultiTagSelect(props: MultiTagSelectProps) {
     style: { width: '100%' },
     placeholder: t(translations.Challenges.Search.Form.tags),
     allowClear: true,
+    readonly: readOnly,
   };
 
   const mapTags = (

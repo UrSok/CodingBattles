@@ -1,5 +1,7 @@
 export enum ErrorCode {
   StubGeneratorError = 'StubGeneratorError',
+  InvalidId = 'InvalidId',
+  ChallengeNotFound = 'ChallengeNotFound',
 }
 
 export type Error = {

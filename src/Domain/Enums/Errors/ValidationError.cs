@@ -62,6 +62,9 @@ public sealed class ValidationError : Error
     public static readonly ValidationError EmptyLanguage =
         new(nameof(EmptyLanguage), 10019);
 
+    public static readonly ValidationError InvalidId =
+        new(nameof(InvalidId), 10020);
+
     public ValidationError(string name, int value) : base(name, value)
     {
     }

@@ -120,7 +120,7 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
             .Set(x => x.TagIds, challenge.TagIds);
 
         var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
-        return result.ModifiedCount == 1;
+        return result.ModifiedCount == 1 || result.MatchedCount == 1;
     }
 
     public async Task<bool> Publish(Challenge challenge, CancellationToken cancellationToken)

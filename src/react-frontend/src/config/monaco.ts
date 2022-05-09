@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-escape */
 import { languages, Range } from 'monaco-editor';
 
-export const stubInputLang = 'stubinputlang';
+export const stubInputLanguage = 'stubinputlang';
 
 export const stubLangDefinitions: languages.IMonarchLanguage = {
   keywords: ['input', 'inputloop', 'output'],

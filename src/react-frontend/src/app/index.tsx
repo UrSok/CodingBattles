@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { stubInputLang, stubLangDefinitions } from '../config/monaco';
+import { stubInputLanguage, stubLangDefinitions } from '../config/monaco';
 import { selectAuth } from './slices/auth/selectors';
 import { selectLayout } from './slices/layout/selectors';
 import { useAuthSlice } from './slices/auth';
@@ -45,9 +45,9 @@ export default function App() {
 
   useEffect(() => {
     if (monaco) {
-      monaco.languages.register({ id: stubInputLang });
+      monaco.languages.register({ id: stubInputLanguage });
       monaco.languages.setMonarchTokensProvider(
-        stubInputLang,
+        stubInputLanguage,
         stubLangDefinitions,
       );
     }
