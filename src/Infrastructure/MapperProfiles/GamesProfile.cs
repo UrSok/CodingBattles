@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Domain.Models.Games;
+using Domain.Models.Results;
 using Infrastructure.Services.Compiler.Models;
 
 namespace Infrastructure.MapperProfiles;
@@ -8,6 +8,6 @@ public class GamesProfile : Profile
 {
     public GamesProfile()
     {
-        this.CreateMap<PaizaJobDetails, RunResult>().ReverseMap();
+        this.CreateMap<PaizaJobDetails, TestResult>().ReverseMap();
     }
 }

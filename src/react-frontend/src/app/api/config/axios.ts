@@ -15,14 +15,14 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use(
   response => {
     if (process.env.NODE_ENV === 'development') {
-      console.log(response.data);
+      console.log('AXIOS response', response.data);
     }
 
     return response;
   },
   error => {
     if (process.env.NODE_ENV === 'development') {
-      console.log(error);
+      console.log('AXIOS error', error);
     }
 
     if (error?.message?.includes('Network Error')) {

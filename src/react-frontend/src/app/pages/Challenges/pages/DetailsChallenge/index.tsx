@@ -35,21 +35,60 @@ export default function DetailsChallenge() {
   }
 
   if (data?.value) {
-    const {
-      tagIds,
-      descriptionMarkdown,
-      stubGeneratorInput,
-      tests,
-      createdByUserId,
-      feedbacks,
-    } = data.value;
+    const { tagIds, descriptionMarkdown, tests, createdByUserId, feedbacks } =
+      data.value;
 
     pageContent = (
       <>
         <ProCard direction="column" ghost gutter={[16, 16]}>
           <ProCard gutter={16} ghost>
-            <ProCard title="Description" colSpan={16}>
-              <ChallengeDescription value={descriptionMarkdown} />
+            <ProCard colSpan={16} ghost direction="column" gutter={[16, 16]}>
+              <ProCard title="Description">
+                <ChallengeDescription value={descriptionMarkdown} />
+              </ProCard>
+
+              <ProCard title="Tests">
+                <ProCard ghost split="horizontal" gutter={[16, 16]}>
+                  {tests.map((test, index) => (
+                    <ProCard key={index} split="horizontal" ghost>
+                      <ProCard
+                        direction="row"
+                        gutter={[8, 0]}
+                        ghost
+                        title={test?.title}
+                      >
+                        <ProCard ghost>
+                          <Typography.Text strong>Input:</Typography.Text>
+                          <Typography.Paragraph>
+                            <pre>{test.case?.input}</pre>
+                          </Typography.Paragraph>
+                        </ProCard>
+                        <ProCard ghost>
+                          <Typography.Text strong>
+                            Expected Output:
+                          </Typography.Text>
+                          <Typography.Paragraph>
+                            <pre>{test.case?.expectedOutput}</pre>
+                          </Typography.Paragraph>
+                        </ProCard>
+                      </ProCard>
+                    </ProCard>
+                  ))}
+                </ProCard>
+              </ProCard>
+
+              <ProCard title="Feedbacks">
+                <ProList<Feedback>
+                  ghost
+                  rowKey={entity => entity.userId}
+                  dataSource={feedbacks}
+                  split
+                  itemLayout="vertical"
+                  locale={{
+                    emptyText: <NoData />,
+                  }}
+                />
+              </ProCard>
             </ProCard>
             <ProCard colSpan={8} ghost direction="column" gutter={[16, 16]}>
               <ProCard title="Created by">{createdByUserId}</ProCard>
@@ -61,53 +100,6 @@ export default function DetailsChallenge() {
                   <div>{feedbacks.length}</div>
                 )}
               </ProCard>
-            </ProCard>
-          </ProCard>
-
-          <ProCard gutter={16} ghost>
-            <ProCard title="Tests" colSpan={16}>
-              <ProCard ghost split="horizontal" gutter={[16, 16]}>
-                {tests.map((test, index) => (
-                  <ProCard key={index} split="horizontal" ghost>
-                    <ProCard
-                      direction="row"
-                      gutter={[8, 0]}
-                      ghost
-                      title={test?.title}
-                    >
-                      <ProCard ghost>
-                        <Typography.Text strong>Input:</Typography.Text>
-                        <Typography.Paragraph>
-                          <pre>{test.case?.input}</pre>
-                        </Typography.Paragraph>
-                      </ProCard>
-                      <ProCard ghost>
-                        <Typography.Text strong>
-                          Expected Output:
-                        </Typography.Text>
-                        <Typography.Paragraph>
-                          <pre>{test.case?.expectedOutput}</pre>
-                        </Typography.Paragraph>
-                      </ProCard>
-                    </ProCard>
-                  </ProCard>
-                ))}
-              </ProCard>
-            </ProCard>
-          </ProCard>
-
-          <ProCard gutter={16} ghost>
-            <ProCard title="Feedbacks" colSpan={16} >
-              <ProList<Feedback> 
-                ghost
-                rowKey={(entity) => entity.userId}
-                dataSource={feedbacks}
-                split
-                itemLayout="vertical"
-                locale={{
-                  emptyText: <NoData />,
-                }}
-              />
             </ProCard>
           </ProCard>
         </ProCard>

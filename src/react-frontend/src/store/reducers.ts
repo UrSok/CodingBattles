@@ -1,18 +1,14 @@
-/**
- * Combine all reducers in this file and export the combined reducers.
- */
-
 import { combineReducers } from '@reduxjs/toolkit';
-import { authApi } from 'app/api/auth';
-import { challengeApi } from 'app/api/challenge';
-import { challengeTagApi } from 'app/api/challengeTag';
-import { stubGeneratorApi } from 'app/api/stubGenerator';
+import {
+  authApi,
+  challengeApi,
+  challengeTagApi,
+  gamesApi,
+  stubGeneratorApi,
+} from 'app/api';
 
 import { InjectedReducersType } from 'utils/types/injector-typings';
 
-/**
- * Merges the main reducer with the router state and dynamically injected reducers
- */
 export function createReducer(injectedReducers: InjectedReducersType = {}) {
   // Initially we don't have any injectedReducers, so returning identity function to avoid the error
   if (Object.keys(injectedReducers).length === 0) {
@@ -20,8 +16,9 @@ export function createReducer(injectedReducers: InjectedReducersType = {}) {
   } else {
     return combineReducers({
       [authApi.reducerPath]: authApi.reducer,
-      [challengeTagApi.reducerPath]: challengeTagApi.reducer,
       [challengeApi.reducerPath]: challengeApi.reducer,
+      [challengeTagApi.reducerPath]: challengeTagApi.reducer,
+      [gamesApi.reducerPath]: gamesApi.reducer,
       [stubGeneratorApi.reducerPath]: stubGeneratorApi.reducer,
       ...injectedReducers,
     });

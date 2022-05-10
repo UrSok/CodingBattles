@@ -1,9 +1,7 @@
-﻿namespace Domain.Models.Games;
+﻿namespace Domain.Models.Results;
 
-public class RunResult
+public class TestResult
 {
-    public string Id { get; set; }
-    public string Language { get; set; }
     public string Note { get; set; }
     public string Status { get; set; }
     public string BuildStdout { get; set; }

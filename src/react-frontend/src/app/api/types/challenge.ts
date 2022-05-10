@@ -8,7 +8,7 @@ export type ChallengeTag = {
 export enum SortBy {
   Name = 'Name',
   Difficulty = 'Difficulty',
-};
+}
 
 export type ChallengeSearchRequest = {
   page?: number;

@@ -1,6 +1,7 @@
 import Editor, { Monaco, OnChange } from '@monaco-editor/react';
 import monaco from 'monaco-editor';
 import React, { MutableRefObject } from 'react';
+import styled from 'styled-components';
 
 import LoadingSpinner from '../../LoadingSpinner';
 
@@ -35,18 +36,25 @@ export default function CodeEditor(props: CodeEditorProps) {
   };
 
   return (
-    <Editor
-      className="bordered-editor"
-      loading={<LoadingSpinner />}
-      height={height ?? 300}
-      language={language}
-      defaultValue={defaultValue}
-      value={value ?? ''}
-      options={{
-        readOnly: readOnly,
-      }}
-      onMount={onMount}
-      onChange={onModelChange}
-    />
+    <EditorWrapper>
+      <Editor
+        //className="bordered-editor"
+        loading={<LoadingSpinner />}
+        height={height ?? 300}
+        language={language}
+        defaultValue={defaultValue}
+        value={value ?? ''}
+        options={{
+          readOnly: readOnly,
+        }}
+        onMount={onMount}
+        onChange={onModelChange}
+      />
+    </EditorWrapper>
   );
 }
+
+const EditorWrapper = styled.div`
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+`;

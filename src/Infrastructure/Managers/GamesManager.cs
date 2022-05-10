@@ -12,7 +12,7 @@ public class GamesManager : BaseManager, IGamesManager
     {
     }
 
-    public Task<Result<RuntTestResult>> RunTest(RunTestModel model, CancellationToken cancellationToken)
+    public Task<Result<RunTestResult>> RunTest(RunTestRequest model, CancellationToken cancellationToken)
     {
         var command = new RunTestCommand(model);
         return this.SendCommand(command, cancellationToken);

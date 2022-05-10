@@ -5,6 +5,6 @@ namespace Application.Managers;
 
 public interface IGamesManager
 {
-    public Task<Result<RuntTestResult>> RunTest(RunTestModel model, CancellationToken cancellationToken);
+    public Task<Result<RunTestResult>> RunTest(RunTestRequest model, CancellationToken cancellationToken);
 }
 

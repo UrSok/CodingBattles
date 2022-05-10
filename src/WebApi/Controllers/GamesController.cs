@@ -18,7 +18,7 @@ public class GamesController : BaseController
     }
 
     [HttpPost("runTest")]
-    public async Task<IActionResult> RunTest([FromBody] RunTestModel runTestModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> RunTest([FromBody] RunTestRequest runTestModel, CancellationToken cancellationToken)
     {
         var result = await this.gamesManager.RunTest(runTestModel, cancellationToken);
         return this.Process(result);

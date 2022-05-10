@@ -25,6 +25,7 @@ import { useEffectOnce, useBoolean } from 'usehooks-ts';
 import StubGenerator from './components/StubGenerator';
 
 import { FieldData } from 'rc-field-form/es/interface';
+import { gamesApi } from 'app/api';
 
 type SaveFormProps = {
   challenge?: Challenge;
@@ -47,6 +48,9 @@ export default function SaveForm(props: SaveFormProps) {
   const markdownEditorRef = useRef<MarkdownEditorRef>(null);
   const stubEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const solutionEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null);
+
+  const [trigerTestSolution, { isLoading: isTesting, data: testResult }] =
+    gamesApi.useRunTestMutation();
 
   const [triggerSaveChallenge, { isLoading: isSaving, data: savingResult }] =
     challengeApi.useSaveChallengeMutation();
@@ -84,12 +88,11 @@ export default function SaveForm(props: SaveFormProps) {
 
     const testPairs = tests.map((value, index) => {
       return {
-        [`${SaveFields.testName}${index}`]: value.title,
-        [`${SaveFields.testInput}${index}`]: value.case?.input,
-        [`${SaveFields.testExcepted}${index}`]: value.case?.expectedOutput,
-        [`${SaveFields.validatorInput}${index}`]: value.validator?.input,
-        [`${SaveFields.validatorExcepted}${index}`]:
-          value.validator?.expectedOutput,
+        [`${SaveFields.testName}`]: value.title,
+        [`${SaveFields.testInput}`]: value.case?.input,
+        [`${SaveFields.testExcepted}`]: value.case?.expectedOutput,
+        [`${SaveFields.validatorInput}`]: value.validator?.input,
+        [`${SaveFields.validatorExcepted}`]: value.validator?.expectedOutput,
       };
     });
 
@@ -128,6 +131,22 @@ export default function SaveForm(props: SaveFormProps) {
     saveStateEnableDecorated();
   };
 
+  const handleFieldsChanged = (
+    changedFields: FieldData[],
+    allFields: FieldData[],
+  ) => {
+    if (changedFields.every(x => x.name.toString() === SaveFields.stubLanguage))
+      return;
+
+    saveStateEnableDecorated();
+  };
+
+  const handleOnTestSolutionClick = async () => {
+    const t = form.getFieldValue(`${SaveFields.tests}.0.${SaveFields.testName}`);
+    form.validateFields([SaveFields.testInput + `0`]);
+    console.log(t);
+  };
+
   const handleSaveChallenge = async () => {
     const challengeName = form.getFieldValue(SaveFields.name);
     const challengeDescriptionShort = form.getFieldValue(
@@ -138,14 +157,14 @@ export default function SaveForm(props: SaveFormProps) {
 
     const testPairs: TestPair[] = challengeTests.map(
       (test, index: number): TestPair => ({
-        title: test[`${SaveFields.testName}${index}`],
+        title: test[`${SaveFields.testName}`],
         case: {
-          input: test[`${SaveFields.testInput}${index}`],
-          expectedOutput: test[`${SaveFields.testExcepted}${index}`],
+          input: test[`${SaveFields.testInput}`],
+          expectedOutput: test[`${SaveFields.testExcepted}`],
         },
         validator: {
-          input: test[`${SaveFields.validatorInput}${index}`],
-          expectedOutput: test[`${SaveFields.validatorExcepted}${index}`],
+          input: test[`${SaveFields.validatorInput}`],
+          expectedOutput: test[`${SaveFields.validatorExcepted}`],
         },
       }),
     );
@@ -169,16 +188,6 @@ export default function SaveForm(props: SaveFormProps) {
         },
       },
     });
-  };
-
-  const handleFieldsChanged = (
-    changedFields: FieldData[],
-    allFields: FieldData[],
-  ) => {
-    if (changedFields.every(x => x.name.toString() === SaveFields.stubLanguage))
-      return;
-
-    saveStateEnableDecorated();
   };
 
   const handleOnPublish = async (values: any) => {
@@ -360,10 +369,7 @@ export default function SaveForm(props: SaveFormProps) {
                       <ProCard direction="column" ghost>
                         <ProCard split="horizontal" ghost>
                           <ProFormText
-                            name={[
-                              field.name,
-                              `${SaveFields.testName}${field.key}`,
-                            ]}
+                            name={[index, SaveFields.testName]}
                             initialValue={`Test ${index + 1}`}
                             placeholder="Test name"
                             allowClear={false}
@@ -383,10 +389,7 @@ export default function SaveForm(props: SaveFormProps) {
                               }}
                             >
                               <ProFormTextArea
-                                name={[
-                                  field.name,
-                                  `${SaveFields.testInput}${field.key}`,
-                                ]}
+                                name={[index, SaveFields.testInput]}
                                 placeholder="Test input"
                                 allowClear
                                 rules={[
@@ -405,10 +408,7 @@ export default function SaveForm(props: SaveFormProps) {
                               }}
                             >
                               <ProFormTextArea
-                                name={[
-                                  field.name,
-                                  `${SaveFields.testExcepted}${field.key}`,
-                                ]}
+                                name={[index, SaveFields.testExcepted]}
                                 placeholder="Test excepted result"
                                 allowClear
                                 rules={[
@@ -431,10 +431,7 @@ export default function SaveForm(props: SaveFormProps) {
                               }}
                             >
                               <ProFormTextArea
-                                name={[
-                                  field.name,
-                                  `${SaveFields.validatorInput}${field.key}`,
-                                ]}
+                                name={[index, SaveFields.validatorInput]}
                                 placeholder="Validator input"
                                 allowClear
                                 rules={[
@@ -453,10 +450,7 @@ export default function SaveForm(props: SaveFormProps) {
                               }}
                             >
                               <ProFormTextArea
-                                name={[
-                                  field.name,
-                                  `${SaveFields.validatorExcepted}${field.key}`,
-                                ]}
+                                name={[index, SaveFields.validatorExcepted]}
                                 placeholder="Validator excepted result"
                                 allowClear
                                 rules={[
@@ -510,7 +504,14 @@ export default function SaveForm(props: SaveFormProps) {
                 defaultLanguage={Language.javascript}
                 readOnly={statusIsNotDraft}
               />
-              <Button type="primary">Test Solution</Button>
+              <Button
+                type="primary"
+                onClick={handleOnTestSolutionClick}
+                loading={isTesting}
+                // TODO: Disabled button if needed
+              >
+                Test Solution
+              </Button>
             </Space>
             <CodeEditor
               editorRef={solutionEditorRef}
