@@ -14,11 +14,18 @@ type MultiTagSelectProps = {
   name: string;
   loading?: boolean;
   readOnly?: boolean;
+  requiredRule?: boolean;
   tags?: ChallengeTag[];
 };
 
 export default function MultiTagSelect(props: MultiTagSelectProps) {
-  const { name, loading: loadingOutsideTags, readOnly, tags } = props;
+  const {
+    name,
+    loading: loadingOutsideTags,
+    readOnly,
+    requiredRule,
+    tags,
+  } = props;
 
   const { t } = useTranslation();
 
@@ -30,6 +37,14 @@ export default function MultiTagSelect(props: MultiTagSelectProps) {
     placeholder: t(translations.Challenges.Search.Form.tags),
     allowClear: true,
     readonly: readOnly,
+    rules: requiredRule
+      ? [
+          {
+            required: true,
+            message: 'Tags are required',
+          },
+        ]
+      : [],
   };
 
   const mapTags = (

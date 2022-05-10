@@ -52,7 +52,6 @@ internal class SaveChallengeHandler : IRequestHandler<SaveChallengeCommand, Resu
             return Result<string>.Failure(ProcessingError.UserNotFound);
         }
 
-        challenge.Status = ChallengeStatus.Draft;
         challenge.LastModifiedOn = DateTime.Now;
 
         if (string.IsNullOrWhiteSpace(request.ChallengeId))

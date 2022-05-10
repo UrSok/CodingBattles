@@ -39,7 +39,7 @@ public class ChallengeManager : BaseManager, IChallengeManager
         return await this.SendCommand(command, cancellationToken);
     }
 
-    public async Task<Result<PublishChallengeResult>> Publish(string jwtToken, string challengeId, CancellationToken cancellationToken)
+    public async Task<Result<bool>> Publish(string jwtToken, string challengeId, CancellationToken cancellationToken)
     {
         var command = new PublishChallengeCommand(jwtToken, challengeId);
         return await this.SendCommand(command, cancellationToken);

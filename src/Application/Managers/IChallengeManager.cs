@@ -10,6 +10,6 @@ public interface IChallengeManager
     Task<Result<string>> Save(string jwtToken, string? challengeId, ChallengeSaveModel challengeSaveModel, CancellationToken cancellationToken);
     Task<Result> SaveAsAdmin(string challengeId, ChallengeSaveModel challengeSaveModel, CancellationToken cancellationToken);
     Task<Result<PaginatedModel<ChallengeSearchResultItem>>> Get(ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken);
-    Task<Result<PublishChallengeResult>> Publish(string jwtToken, string challengeId, CancellationToken cancellationToken);
+    Task<Result<bool>> Publish(string jwtToken, string challengeId, CancellationToken cancellationToken);
     Task<Result<Challenge>> Get(string challengeId, CancellationToken cancellationToken);
 }

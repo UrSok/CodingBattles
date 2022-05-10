@@ -10,7 +10,7 @@ using MediatR;
 using StubGenerator;
 
 namespace Infrastructure.Logic.Challenges.Commands;
-internal record PublishChallengeCommand(string JwtToken, string ChallengeId) : IRequest<Result<PublishChallengeResult>>;
+internal record PublishChallengeCommand(string JwtToken, string ChallengeId) : IRequest<Result<bool>>;
 
 internal class PublishChallengeCommandValidator : AbstractValidator<PublishChallengeCommand>
 {
@@ -24,7 +24,7 @@ internal class PublishChallengeCommandValidator : AbstractValidator<PublishChall
     }
 }
 
-internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand, Result<PublishChallengeResult>>
+internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand, Result<bool>>
 {
     private readonly IChallengeRepository challengeRepository;
     private readonly IUserRepository userRepository;
@@ -40,30 +40,30 @@ internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand
         this.mapper = mapper;
     }
 
-    public async Task<Result<PublishChallengeResult>> Handle(PublishChallengeCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> Handle(PublishChallengeCommand request, CancellationToken cancellationToken)
     {
 
         var user = await this.userRepository.GetByJwtToken(request.JwtToken, cancellationToken);
         if (user is null)
         {
-            return Result<PublishChallengeResult>.Failure(ProcessingError.UserNotFound);
+            return Result<bool>.Failure(ProcessingError.UserNotFound);
         }
 
         var challenge = await this.challengeRepository.Get(request.ChallengeId, cancellationToken);
         if (challenge is null)
         {
-            return Result<PublishChallengeResult>.Failure(ProcessingError.ChallengeNotFound);
+            return Result<bool>.Failure(ProcessingError.ChallengeNotFound);
         }
 
         if (challenge.CreatedByUserId != user.Id)
         {
-            return Result<PublishChallengeResult>.Failure(ProcessingError.CannotEditForeignRecord);
+            return Result<bool>.Failure(ProcessingError.CannotEditForeignRecord);
         }
 
-        var validationResult = this.Validate(challenge);
+        /*var validationResult = this.Validate(challenge);
         if (!validationResult.IsSuccess)
         {
-            return Result<PublishChallengeResult>.Failure(validationResult.Errors);
+            return Result<string>.Failure(validationResult.Errors);
         }
 
         var stubInputError = StubGeneratorEntry.Validate(challenge.StubGeneratorInput);
@@ -74,10 +74,10 @@ internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand
                 ChallengeId = challenge.Id,
                 Error = this.mapper.Map<StubGeneratorError>(stubInputError),
             };
-            return Result<PublishChallengeResult>.Failure(publishChangllengeResult, ProcessingError.StubInputError);
+            return Result<string>.Failure(publishChangllengeResult, ProcessingError.StubInputError);
         }
 
-        //TODO: Run TESTS
+        //TODO: Run TESTS*/
 
         challenge.Status = ChallengeStatus.Published;
         challenge.LastModifiedOn = DateTime.Now;
@@ -85,10 +85,10 @@ internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand
         var result = await this.challengeRepository.Publish(challenge, cancellationToken);
         if (!result)
         {
-            return Result<PublishChallengeResult>.Failure(Error.InternalServerError);
+            return Result<bool>.Failure(Error.InternalServerError);
         }
 
-        return Result<PublishChallengeResult>.Success(new PublishChallengeResult { ChallengeId = challenge.Id });
+        return Result<bool>.Success(true);
     }
 
     private Result Validate(Challenge challenge)

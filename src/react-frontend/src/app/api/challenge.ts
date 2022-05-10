@@ -60,5 +60,13 @@ export const challengeApi = createApi({
         { type: 'Challenge', id: arg.id },
       ],
     }),
+
+    publishChallenge: build.mutation<ResultValue<string>, string>({
+      query: (id: string) => ({
+        url: `publish/${id}`,
+        method: 'POST',
+      }),
+      invalidatesTags: (result, error, arg) => [{ type: 'Challenge', id: arg }],
+    }),
   }),
 });

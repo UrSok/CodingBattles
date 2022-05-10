@@ -131,6 +131,6 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
             .Set(x => x.LastModifiedOn, challenge.LastModifiedOn);
 
         var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
-        return result.ModifiedCount == 1;
+        return result.ModifiedCount == 1 || result.MatchedCount == 1;
     }
 }

@@ -1,6 +1,6 @@
 import ProForm, { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import { FooterToolbar } from '@ant-design/pro-layout';
-import { Alert, Button, Form, Space, Typography } from 'antd';
+import { Alert, Button, Form, notification, Space, Typography } from 'antd';
 import { useForm, useWatch } from 'antd/lib/form/Form';
 import { challengeApi } from 'app/api/challenge';
 import { Challenge, ChallengeStatus, TestPair } from 'app/api/types/challenge';
@@ -9,25 +9,22 @@ import LanguageSelect from 'app/components/Input/LanguageSelect';
 import MultiTagSelect from 'app/pages/Challenges/components/MultiTagSelect';
 import { PATH_CHALLENGES } from 'app/routes/paths';
 import { Language } from 'app/types/global';
-import { stubInputLanguage } from 'config/monaco';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SaveFields } from '../../types';
-import ErrorAlert from './components/ErrorAlert';
 import FormCardSection from './components/FormCardSection';
 import monaco from 'monaco-editor';
-import { stubGeneratorApi } from 'app/api/stubGenerator';
 import ProCard from '@ant-design/pro-card';
 import { DeleteTwoTone, PlusOutlined } from '@ant-design/icons';
 import { red } from '@ant-design/colors';
 import MarkdownDescriptionEditor, {
   MarkdownEditorRef,
 } from './components/MarkdownDescriptionEditor';
-import { skipToken } from '@reduxjs/toolkit/dist/query';
-import { getLanguageKeyName } from 'app/utils/enumHelpers';
-import { StubGeneratorModel } from 'app/api/types/stubGenerator';
 
-import { useEffectOnce } from 'usehooks-ts';
+import { useEffectOnce, useBoolean } from 'usehooks-ts';
+import StubGenerator from './components/StubGenerator';
+
+import { FieldData } from 'rc-field-form/es/interface';
 
 type SaveFormProps = {
   challenge?: Challenge;
@@ -42,7 +39,6 @@ export default function SaveForm(props: SaveFormProps) {
   const navigate = useNavigate();
   const [form] = useForm();
 
-  const stubLanguage: Language = useWatch(SaveFields.stubLanguage, form);
   const solutionLanguage: Language = useWatch(
     SaveFields.solutionLanguage,
     form,
@@ -52,38 +48,36 @@ export default function SaveForm(props: SaveFormProps) {
   const stubEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const solutionEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null);
 
-  const getStubQueryValue = (
-    language: Language,
-    generatorInput: string | undefined,
-  ): StubGeneratorModel | typeof skipToken => {
-    if (!generatorInput || generatorInput.length === 0) return skipToken;
-    return {
-      language: language,
-      input: generatorInput,
-    };
-  };
-
-  const { refetch, data: generateStubResult } =
-    stubGeneratorApi.useGenerateStubQuery(
-      getStubQueryValue(
-        stubLanguage ?? getLanguageKeyName(Language.javascript),
-        stubEditorRef?.current?.getValue() ??
-          initialChallenge?.stubGeneratorInput,
-      ),
-    );
   const [triggerSaveChallenge, { isLoading: isSaving, data: savingResult }] =
     challengeApi.useSaveChallengeMutation();
-  const [emptyStubInput, setEmptyStubInput] = useState(true);
-  const [saveButtonDisabled, setSaveButtonDisabled] = useState(false);
+
+  const {
+    value: saveState,
+    setFalse: saveStateDisable,
+    setTrue: saveStateEnable,
+  } = useBoolean(true);
+
+  const saveStateEnableDecorated = () => {
+    const nameFieldValue = form.getFieldValue([SaveFields.name]);
+    if (!nameFieldValue) {
+      saveStateDisable();
+      return;
+    }
+
+    saveStateEnable();
+  };
 
   useEffectOnce(() => {
+    saveStateDisable();
+
     if (!initialChallenge) return;
-    setSaveButtonDisabled(true);
+
     const {
       name,
-      descriptionShort,
-      stubGeneratorInput,
       tagIds,
+      descriptionShort,
+      descriptionMarkdown,
+      stubGeneratorInput,
       tests,
       solution,
     } = initialChallenge;
@@ -105,18 +99,11 @@ export default function SaveForm(props: SaveFormProps) {
       [`${SaveFields.name}`]: name,
       [`${SaveFields.descriptionShort}`]: descriptionShort,
       [`${SaveFields.tags}`]: tagIds,
+      [`${SaveFields.descriptionMarkdown}`]: descriptionMarkdown,
       [`${SaveFields.tests}`]: testPairs,
       [`${SaveFields.solutionLanguage}`]: solution.language,
     });
   });
-
-  useEffect(() => {
-    if (stubEditorRef?.current) {
-      const input: string = stubEditorRef.current.getValue();
-      triggerStubGeneration(input);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stubLanguage]);
 
   useEffect(() => {
     if (
@@ -124,34 +111,21 @@ export default function SaveForm(props: SaveFormProps) {
       savingResult.value !== undefined &&
       savingResult.value !== 'null'
     ) {
-      setSaveButtonDisabled(true);
+      saveStateDisable();
       if (!initialChallenge) {
         navigate(PATH_CHALLENGES.save + `/${savingResult.value}`, {
           replace: true,
         });
       }
     }
-  }, [savingResult, initialChallenge, navigate]);
-
-  const triggerStubGeneration = async (input: string | undefined) => {
-    if (input?.length === 0 || !input) return;
-    refetch();
-  };
-
-  const handleStubInputChanged = async (
-    value: string | undefined,
-    ev: monaco.editor.IModelContentChangedEvent,
-  ) => {
-    setEmptyStubInput(!value || value?.length === 0);
-    triggerStubGeneration(value);
-    setSaveButtonDisabled(false);
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savingResult]);
 
   const handleSolutionInputChanged = (
     value: string | undefined,
     ev: monaco.editor.IModelContentChangedEvent,
   ) => {
-    setSaveButtonDisabled(false);
+    saveStateEnableDecorated();
   };
 
   const handleSaveChallenge = async () => {
@@ -197,13 +171,35 @@ export default function SaveForm(props: SaveFormProps) {
     });
   };
 
+  const handleFieldsChanged = (
+    changedFields: FieldData[],
+    allFields: FieldData[],
+  ) => {
+    if (changedFields.every(x => x.name.toString() === SaveFields.stubLanguage))
+      return;
+
+    saveStateEnableDecorated();
+  };
+
+  const handleOnPublish = async (values: any) => {
+    form.validateFields([
+      SaveFields.name,
+      SaveFields.tags,
+      SaveFields.descriptionShort,
+      SaveFields.descriptionMarkdown,
+      SaveFields.stubGenerator,
+      SaveFields.tests,
+      SaveFields.solutionIsValid,
+    ]);
+  };
+
   return (
     <>
       {initialChallenge?.status === ChallengeStatus.Unpublished ? (
         <Alert
           showIcon
           type="warning"
-          message="Your challenge was unpublished!"
+          message="This challenge was unpublished!"
           description={
             <>
               <Typography.Text strong>Reason: </Typography.Text>
@@ -211,69 +207,128 @@ export default function SaveForm(props: SaveFormProps) {
             </>
           }
         />
-      ) : null}
+      ) : initialChallenge?.status === ChallengeStatus.Published ? (
+        <Alert
+          showIcon
+          type="success"
+          message="This challenge is already published!"
+          description="You won't be able to modify the tests, stub input or solution."
+        />
+      ) : (
+        <Alert
+          showIcon
+          closable
+          type="info"
+          message="Please ensure that everything is validated!"
+          description="You won't be able to modify the tests, stub input or solution after you publish the challenge."
+        />
+      )}
       <ProForm
         form={form}
         submitter={false}
-        onValuesChange={() => setSaveButtonDisabled(false)}
+        onFieldsChange={handleFieldsChanged}
+        onFinish={handleOnPublish}
+        scrollToFirstError
       >
         <FormCardSection title="General Information">
           <Typography.Text strong>Title</Typography.Text>
-          <ProFormText name={SaveFields.name} placeholder="Title" />
+          <ProFormText
+            name={SaveFields.name}
+            placeholder="Name"
+            rules={[
+              {
+                required: true,
+                message: 'Name is required',
+              },
+            ]}
+          />
           <Typography.Text strong>Tags</Typography.Text>
-          <MultiTagSelect name={SaveFields.tags} />
+          <MultiTagSelect name={SaveFields.tags} requiredRule />
           <Typography.Text strong>Short Description</Typography.Text>
           <ProFormTextArea
             name={SaveFields.descriptionShort}
             placeholder="Challenge short description"
+            rules={[
+              {
+                required: true,
+                message: 'Short description is required',
+              },
+            ]}
           />
           <Typography.Text strong>Description</Typography.Text>
-          <MarkdownDescriptionEditor
-            editorRef={markdownEditorRef}
-            initialValue={initialChallenge?.descriptionMarkdown}
-            inputChanged={() => setSaveButtonDisabled(false)}
-          />
+          <Form.Item
+            name={SaveFields.descriptionMarkdown}
+            rules={[
+              {
+                required: true,
+                message: 'Description is required',
+              },
+            ]}
+          >
+            <MarkdownDescriptionEditor
+              editorRef={markdownEditorRef}
+              initialValue={initialChallenge?.descriptionMarkdown}
+              inputChanged={(value: string | undefined) => {
+                saveStateEnableDecorated();
+                if (!value || value.length === 0) {
+                  form.setFields([
+                    {
+                      name: SaveFields.descriptionMarkdown,
+                      errors: ['Description is required'],
+                      value: undefined,
+                    },
+                  ]);
+                  return;
+                }
+
+                form.setFields([
+                  {
+                    name: SaveFields.descriptionMarkdown,
+                    errors: [],
+                    value: 'nice',
+                  },
+                ]);
+              }}
+            />
+          </Form.Item>
         </FormCardSection>
 
         <FormCardSection title="Stub Generator">
-          <Space
-            direction="vertical"
-            style={{
-              width: '100%',
-            }}
+          <Form.Item
+            name={SaveFields.stubGenerator}
+            rules={[
+              {
+                required: true,
+                message: 'A valid stub input is required',
+              },
+            ]}
           >
-            <CodeEditor
-              editorRef={stubEditorRef}
-              defaultValue={initialChallenge?.stubGeneratorInput}
-              language={stubInputLanguage}
-              readOnly={statusIsNotDraft}
-              onModelChange={handleStubInputChanged}
-            />
+            <StubGenerator
+              stubCodeEditorRef={stubEditorRef}
+              initialValue={initialChallenge?.stubGeneratorInput}
+              onStubInputChangedDecorator={() => saveStateEnableDecorated()}
+              onResultChanged={(stub, isValid) => {
+                if (!isValid) {
+                  form.setFields([
+                    {
+                      name: SaveFields.stubGenerator,
+                      errors: ['A valid stub input is required'],
+                      value: undefined,
+                    },
+                  ]);
+                  return;
+                }
 
-            {!emptyStubInput &&
-            generateStubResult &&
-            !generateStubResult.isSuccess &&
-            generateStubResult.value &&
-            generateStubResult.value.error ? (
-              <ErrorAlert error={generateStubResult.value.error!} />
-            ) : null}
-          </Space>
-          <Typography.Text strong>Result</Typography.Text>
-          <LanguageSelect
-            antdFieldName={SaveFields.stubLanguage}
-            placeholder="Generation language"
-            width="sm"
-            defaultLanguage={Language.javascript}
-            style={{
-              marginBottom: '5px',
-            }}
-          />
-          <CodeEditor
-            language={stubLanguage}
-            defaultValue="// update the stub input to get the result"
-            value={generateStubResult?.value?.stub}
-            readOnly
-          />
+                form.setFields([
+                  {
+                    name: SaveFields.stubGenerator,
+                    errors: [],
+                    value: 'nice',
+                  },
+                ]);
+              }}
+            />
+          </Form.Item>
         </FormCardSection>
 
         <FormCardSection title="Tests" ghost>
@@ -434,27 +489,37 @@ export default function SaveForm(props: SaveFormProps) {
         </FormCardSection>
 
         <FormCardSection title="Solution">
-          <Space
-            style={{
-              marginBottom: '5px',
-            }}
+          <Form.Item
+            name={SaveFields.solutionIsValid}
+            rules={[
+              {
+                required: true,
+                message: 'A valid solution is required',
+              },
+            ]}
           >
-            <LanguageSelect
-              antdFieldName={SaveFields.solutionLanguage}
-              placeholder="Solution language"
-              width="sm"
-              defaultLanguage={Language.javascript}
+            <Space
+              style={{
+                marginBottom: '5px',
+              }}
+            >
+              <LanguageSelect
+                antdFieldName={SaveFields.solutionLanguage}
+                placeholder="Solution language"
+                width="sm"
+                defaultLanguage={Language.javascript}
+                readOnly={statusIsNotDraft}
+              />
+              <Button type="primary">Test Solution</Button>
+            </Space>
+            <CodeEditor
+              editorRef={solutionEditorRef}
+              defaultValue={initialChallenge?.solution.sourceCode}
+              language={solutionLanguage}
+              onModelChange={handleSolutionInputChanged}
               readOnly={statusIsNotDraft}
             />
-            <Button type="primary">Test Solution</Button>
-          </Space>
-          <CodeEditor
-            editorRef={solutionEditorRef}
-            defaultValue={initialChallenge?.solution.sourceCode}
-            language={solutionLanguage}
-            onModelChange={handleSolutionInputChanged}
-            readOnly={statusIsNotDraft}
-          />
+          </Form.Item>
         </FormCardSection>
       </ProForm>
 
@@ -466,13 +531,20 @@ export default function SaveForm(props: SaveFormProps) {
           type="ghost"
           onClick={handleSaveChallenge}
           loading={isSaving}
-          disabled={saveButtonDisabled}
+          disabled={!saveState}
         >
           Save
         </Button>
-        <Button type="primary" loading={isSaving} disabled={saveButtonDisabled}>
-          Publish
-        </Button>
+        {initialChallenge &&
+        initialChallenge.status !== ChallengeStatus.Published ? (
+          <Button
+            type="primary"
+            disabled={saveState}
+            onClick={() => form.submit()}
+          >
+            Publish
+          </Button>
+        ) : null}
       </FooterToolbar>
     </>
   );

@@ -9,6 +9,8 @@ export const SaveFields = {
   testExcepted: 'testExcepted',
   validatorInput: 'validatorInput',
   validatorExcepted: 'validatorExcepted',
+  stubGenerator: 'stubGenerator',
   stubLanguage: 'stubLanguage',
   solutionLanguage: 'solutionLanguage',
+  solutionIsValid: 'solutionIsValid',
 };

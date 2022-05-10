@@ -4,13 +4,13 @@ export const stubInputLanguage = 'stubinputlang';
 
 export const stubLangDefinitions: languages.IMonarchLanguage = {
   keywords: ['input', 'inputloop', 'output'],
-  numberTypes: /(int|float|bool)/, //['int', 'float', 'bool'],
+  numberTypes: /(int|float|bool)/,
   stringTypes: /(word|string)\.\d+/,
   variableName: /(_|[a-z])+[[:alnum:]]*/,
   tokenizer: {
     root: [
       [
-        /[ ]*[a-z]*/,
+        /[ ]*[a-z_$]*/,
         {
           cases: {
             '@keywords': {
