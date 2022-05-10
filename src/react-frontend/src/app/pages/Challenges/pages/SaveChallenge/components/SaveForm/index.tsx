@@ -12,7 +12,7 @@ import { Language } from 'app/types/global';
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SaveFields } from '../../types';
-import FormCardSection from './components/FormCardSection';
+import CardSection from '../../../../../../components/CardSection';
 import monaco from 'monaco-editor';
 import ProCard from '@ant-design/pro-card';
 import { DeleteTwoTone, PlusOutlined } from '@ant-design/icons';
@@ -230,7 +230,7 @@ export default function SaveForm(props: SaveFormProps) {
         onFinish={handleOnPublish}
         scrollToFirstError
       >
-        <FormCardSection title="General Information">
+        <CardSection title="General Information">
           <Typography.Text strong>Title</Typography.Text>
           <ProFormText
             name={SaveFields.name}
@@ -291,9 +291,9 @@ export default function SaveForm(props: SaveFormProps) {
               }}
             />
           </Form.Item>
-        </FormCardSection>
+        </CardSection>
 
-        <FormCardSection title="Stub Generator">
+        <CardSection title="Stub Generator">
           <Form.Item
             name={SaveFields.stubGenerator}
             rules={[
@@ -329,9 +329,9 @@ export default function SaveForm(props: SaveFormProps) {
               }}
             />
           </Form.Item>
-        </FormCardSection>
+        </CardSection>
 
-        <FormCardSection title="Tests" ghost>
+        <CardSection title="Tests" ghost>
           <Form.List name={SaveFields.tests} initialValue={[{}, {}, {}, {}]}>
             {(fields, { add, remove }) => (
               <ProCard ghost split="horizontal" gutter={[16, 16]}>
@@ -486,9 +486,9 @@ export default function SaveForm(props: SaveFormProps) {
               </ProCard>
             )}
           </Form.List>
-        </FormCardSection>
+        </CardSection>
 
-        <FormCardSection title="Solution">
+        <CardSection title="Solution">
           <Form.Item
             name={SaveFields.solutionIsValid}
             rules={[
@@ -520,7 +520,7 @@ export default function SaveForm(props: SaveFormProps) {
               readOnly={statusIsNotDraft}
             />
           </Form.Item>
-        </FormCardSection>
+        </CardSection>
       </ProForm>
 
       <FooterToolbar>

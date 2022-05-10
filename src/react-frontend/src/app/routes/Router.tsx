@@ -21,7 +21,7 @@ export default function Router() {
       </Route>
       <Route path={PATH_CHALLENGES.root}>
         <Route index element={<ChallengePage.Search />} />
-        <Route path=":id" element={<p>id</p>} />
+        <Route path=":id" element={<ChallengePage.Details />} />
         <Route path={PATH_CHALLENGES.save}>
           <Route index element={<ChallengePage.Save />} />
           <Route path=":id" element={<ChallengePage.Save />} />

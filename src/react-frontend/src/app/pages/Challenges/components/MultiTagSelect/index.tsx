@@ -9,6 +9,7 @@ import { challengeTagApi } from 'app/api/challengeTag';
 import { ProFormSelectProps } from '@ant-design/pro-form/lib/components/Select';
 import { DefaultOptionType } from 'antd/lib/select';
 import { RequestOptionsType } from '@ant-design/pro-utils';
+import NoData from 'app/components/NoData';
 
 type MultiTagSelectProps = {
   name: string;
@@ -37,6 +38,9 @@ export default function MultiTagSelect(props: MultiTagSelectProps) {
     placeholder: t(translations.Challenges.Search.Form.tags),
     allowClear: true,
     readonly: readOnly,
+    proFieldProps: {
+      emptyText: <NoData />,
+    },
     rules: requiredRule
       ? [
           {

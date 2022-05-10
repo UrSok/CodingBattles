@@ -38,7 +38,8 @@ import MultiTagSelect from '../../components/MultiTagSelect';
 import Page from 'app/components/Layout/Page';
 import { ChallengeSearchFields } from './types';
 import { OrderStyle } from 'app/api/types';
-import { EditFilled, PlusOutlined } from '@ant-design/icons';
+import { EditFilled, ExpandAltOutlined, ExpandOutlined, PlusOutlined } from '@ant-design/icons';
+import NoData from 'app/components/NoData';
 
 export default function SearchChallenges() {
   const navigate = useNavigate();
@@ -220,10 +221,13 @@ export default function SearchChallenges() {
                 return actions;
               }}
               ghost
-              rowKey={(entity,_) => entity.id}
+              rowKey={(entity, _) => entity.id}
               headerTitle="Challenges"
               itemLayout="vertical"
               split
+              locale={{
+                emptyText: <NoData />,
+              }}
               dataSource={challenges?.value?.items}
               metas={{
                 title: {
@@ -248,7 +252,7 @@ export default function SearchChallenges() {
                                   form.getFieldValue(
                                     ChallengeSearchFields.tags,
                                   );
-                                if (selectedTags.includes(tagId))  return;
+                                if (selectedTags.includes(tagId)) return;
 
                                 form.setFieldsValue({
                                   [`${ChallengeSearchFields.tags}`]: [
@@ -268,7 +272,7 @@ export default function SearchChallenges() {
                     </Space>
                   ),
                 },
-                description: {
+                actions: {
                   render: (_, entity) => (
                     <>
                       <Typography.Text>Difficulty:</Typography.Text>{' '}
@@ -284,6 +288,16 @@ export default function SearchChallenges() {
                   render: (_, entity) => {
                     const actions: React.ReactNode[] = [];
 
+                    actions.push(
+                      <Button
+                        type="dashed"
+                        onClick={() =>
+                          navigate(PATH_CHALLENGES.root + `/${entity.id}`)
+                        }
+                        icon={<ExpandAltOutlined />}
+                      />,
+                    );
+
                     if (entity.createdByUserId === user?.id) {
                       actions.push(
                         <Button
@@ -296,7 +310,7 @@ export default function SearchChallenges() {
                       );
                     }
 
-                    return actions;
+                    return <Space>{actions}</Space>;
                   },
                 },
               }}
