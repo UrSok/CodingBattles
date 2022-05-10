@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Options;
+using Infrastructure.Utils;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
@@ -13,7 +14,6 @@ internal interface IGmailService
 
 internal class GmailService : IGmailService
 {
-    private readonly HttpClient client = new HttpClient();
     private readonly IMailOptions mailOptions;
     private GoogleToken googleToken;
 
@@ -36,7 +36,7 @@ internal class GmailService : IGmailService
           };
 
         var content = new FormUrlEncodedContent(values);
-        var response = await this.client.PostAsync("https://accounts.google.com/o/oauth2/token", content);
+        var response = await Singleton.HttpClient.PostAsync("https://accounts.google.com/o/oauth2/token", content);
         var responseString = await response.Content.ReadAsStringAsync();
         this.googleToken = JsonConvert.DeserializeObject<GoogleToken>(responseString);
         this.googleToken.GenerateExpiresAt();

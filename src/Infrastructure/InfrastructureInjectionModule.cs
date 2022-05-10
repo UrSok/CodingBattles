@@ -4,6 +4,7 @@ using FluentValidation;
 using Infrastructure.Options;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
+using Infrastructure.Services.Compiler;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.Generators;
 using Infrastructure.Services.Mail;
@@ -48,6 +49,7 @@ public class InfrastructureInjectionModule : Module
         builder.RegisterType<MailService>().As<IMailService>().SingleInstance();
         builder.RegisterType<PBKDFCryptoService>().As<ICryptoService>().SingleInstance();
         builder.RegisterType<UrlGeneratorService>().As<IUrlGeneratorService>().SingleInstance();
+        builder.RegisterType<PaizaService>().As<IPaizaService>().SingleInstance();
         #endregion
 
         #region 3rd party Packages

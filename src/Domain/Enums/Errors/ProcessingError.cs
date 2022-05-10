@@ -41,6 +41,15 @@ public class ProcessingError : Error
     public static readonly ProcessingError UserSessionExpired =
         new(nameof(UserSessionExpired), 112);
 
+    public static readonly ProcessingError TesterError =
+        new(nameof(TesterError), 113);
+
+    public static readonly ProcessingError TestNotPassed =
+        new(nameof(TestNotPassed), 114);
+
+    public static readonly ProcessingError ValidatorNotPassed =
+        new(nameof(ValidatorNotPassed), 115);
+
     public ProcessingError(string name, int value) : base(name, value)
     {
     }
