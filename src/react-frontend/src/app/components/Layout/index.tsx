@@ -63,6 +63,9 @@ export default function Layout() {
           width: '331px',
         },
       ]}
+      menu={{
+        hideMenuWhenCollapsed: true,
+      }}
       route={{
         routes: menuRoutes,
       }}

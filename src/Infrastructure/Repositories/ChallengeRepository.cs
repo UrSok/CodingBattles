@@ -17,6 +17,7 @@ internal interface IChallengeRepository
     Task<bool> Update(Challenge challenge, CancellationToken cancellationToken);
     Task<bool> Publish(Challenge challenge, CancellationToken cancellationToken);
     Task<bool> Unpublish(string id, string statusReason, CancellationToken cancellationToken);
+    Task<IEnumerable<Challenge>> GetByIds(IEnumerable<string> enumerable, CancellationToken cancellationToken);
 }
 
 internal class ChallengeRepository : BaseRepository, IChallengeRepository
@@ -146,5 +147,13 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
 
         var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         return result.ModifiedCount == 1 || result.MatchedCount == 1;
+    }
+
+    public async Task<IEnumerable<Challenge>> GetByIds(IEnumerable<string> challengeIds, CancellationToken cancellationToken)
+    {
+        var filter = Builders<ChallengeDocument>.Filter.In(x => x.Id, challengeIds);
+        var challengeDocumnts = (await this.challenges.FindAsync(filter, cancellationToken: cancellationToken))
+            .ToEnumerable(cancellationToken: cancellationToken);
+        return this.mapper.Map<IEnumerable<Challenge>>(challengeDocumnts);
     }
 }

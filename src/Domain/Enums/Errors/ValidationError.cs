@@ -68,6 +68,18 @@ public sealed class ValidationError : Error
     public static readonly ValidationError EmptyStatusReason =
         new(nameof(EmptyStatusReason), 10021);
 
+    public static readonly ValidationError EmptyUserId =
+        new(nameof(EmptyUserId), 10022);
+
+    public static readonly ValidationError InvalidCode =
+        new(nameof(InvalidCode), 10023);
+
+    public static readonly ValidationError EmptyGameId =
+        new(nameof(EmptyGameId), 10024);
+
+    public static readonly ValidationError EmptyChallengeId =
+        new(nameof(EmptyChallengeId), 10025);
+
     public ValidationError(string name, int value) : base(name, value)
     {
     }

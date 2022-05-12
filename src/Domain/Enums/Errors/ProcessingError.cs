@@ -53,6 +53,9 @@ public class ProcessingError : Error
     public static readonly ProcessingError BuildError =
         new(nameof(BuildError), 116);
 
+    public static readonly ProcessingError GameNotFound =
+        new(nameof(GameNotFound), 117);
+
     public ProcessingError(string name, int value) : base(name, value)
     {
     }

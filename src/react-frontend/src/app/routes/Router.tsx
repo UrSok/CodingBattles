@@ -5,6 +5,8 @@ import { PATH_CHALLENGES, PATH_GAMES, PATH_IDE, PATH_PROFILES } from './paths';
 
 import ChallengePages from 'app/pages/Challenges';
 import ErrorResult from 'app/components/ErrorResult';
+import Ide from 'app/pages/Ide';
+import GamesPage from 'app/pages/Games';
 
 export default function Router() {
   return (
@@ -28,11 +30,9 @@ export default function Router() {
           <Route path=":id" element={<ChallengePages.Save />} />
         </Route>
       </Route>
-      <Route path={PATH_GAMES.root}>
-        <Route index element={<p>games</p>} />
-      </Route>
+      <Route path={PATH_GAMES.root} element={<GamesPage />} />
       <Route path={PATH_IDE.root}>
-        <Route index element={<p>ide</p>} />
+        <Route index element={<Ide />} />
       </Route>
       <Route
         path="*"

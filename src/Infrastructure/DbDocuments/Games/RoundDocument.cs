@@ -1,10 +1,28 @@
-﻿namespace Infrastructure.DbDocuments.Games;
+﻿using Domain.Enums;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-internal class RoundDocument : MongoDocumentWithId
+namespace Infrastructure.DbDocuments.Games;
+
+internal class RoundDocument
 {
-    public Guid ProgrammingProblemId { get; set; }
+    [BsonElement("Number")]
+    public int Number { get; set; }
 
+    [BsonElement("StartTime")]
+    [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+    public  DateTime StartTime { get; set; }
 
-    //TODO: Result
-    //TODO: Round state?: InProgress, HasEnded
+    [BsonElement("DurationMinutes")]
+    public int DurationMinutes { get; set; }
+
+    [BsonElement("ChallengeId")]
+    public string ChallengeId { get; set; }
+
+    [BsonElement("Status")]
+    [BsonRepresentation(BsonType.String)]
+    public RoundStatus Status { get; set; }
+
+    [BsonElement("RoundSummaries")]
+    public List<RoundSummaryDocument> RoundSummaries { get; set; }
 }

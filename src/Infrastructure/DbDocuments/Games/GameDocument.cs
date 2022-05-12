@@ -1,12 +1,26 @@
-﻿namespace Infrastructure.DbDocuments.Games;
+﻿using Domain.Enums;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace Infrastructure.DbDocuments.Games;
 
 internal class GameDocument : MongoDocumentWithId
 {
-    public string Name { get; set; }
+    [BsonElement("Code")]
     public string Code { get; set; }
-    public bool IsPrivate { get; set; }
-    public List<Guid> UserIds { get; set; }
 
-    public bool HasEnded { get; set; }
-    // TODO: Should I use state instead?: InProgress, Voting, HasConcluded?
+    [BsonElement("Name")]
+    public string Name { get; set; }
+
+    [BsonElement("IsPrivate")]
+    public bool IsPrivate { get; set; }
+
+    [BsonElement("CreatedByUserId")]
+    public string CreatedByUserId { get; set; }
+
+    [BsonElement("UserIds")]
+    public List<string> UserIds { get; set; }
+
+    [BsonElement("Rounds")]
+    public List<RoundDocument> Rounds { get; set; }
 }

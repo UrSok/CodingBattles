@@ -72,7 +72,7 @@ internal class SaveChallengeHandler : IRequestHandler<SaveChallengeCommand, Resu
             return Result<string>.Failure(ProcessingError.CannotEditForeignRecord);
         }
 
-        challenge.Status = existingChallenge.Status;
+        challenge.Status = existingChallenge.Status == ChallengeStatus.Unpublished ? ChallengeStatus.Published : existingChallenge.Status;
         var result = await this.challengeRepository.Update(challenge, cancellationToken);
         if (!result)
         {

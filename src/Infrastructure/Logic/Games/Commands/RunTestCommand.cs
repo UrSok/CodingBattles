@@ -19,12 +19,12 @@ internal class RunTestCommandValidator : AbstractValidator<RunTestCommand>
     }
 }
 
-internal class RunTestCommandHandler : IRequestHandler<RunTestCommand, Result<RunTestResult>>
+internal class RunTestHandler : IRequestHandler<RunTestCommand, Result<RunTestResult>>
 {
     private readonly IPaizaService paizaService;
     private readonly IMapper mapper;
 
-    public RunTestCommandHandler(IPaizaService paizaService, IMapper mapper)
+    public RunTestHandler(IPaizaService paizaService, IMapper mapper)
     {
         this.paizaService = paizaService;
         this.mapper = mapper;
