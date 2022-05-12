@@ -52,12 +52,11 @@ public class ChallengeController : BaseController
         return this.Process(response);
     }
 
-    //TODO: UPDATE TO JUST UNPUBLISH AND REASON
     [Authorize(Roles = Role.Admin)]
-    [HttpPost("saveAsAdmin/{challengeId}")]
-    public async Task<IActionResult> SaveAsAdmin([FromRoute] string challengeId, [FromBody] ChallengeSaveModel challengeSaveModel, CancellationToken cancellationToken)
+    [HttpPost("unpublish/{challengeId}/{statusReason}")]
+    public async Task<IActionResult> SaveAsAdmin([FromRoute] string challengeId, [FromRoute] string statusReason, CancellationToken cancellationToken)
     {
-        var result = await this.challengeManager.SaveAsAdmin(challengeId, challengeSaveModel, cancellationToken); // TODO: Add status reason
+        var result = await this.challengeManager.Unpublish(challengeId, statusReason, cancellationToken);
         return this.Process(result);
     }
 }

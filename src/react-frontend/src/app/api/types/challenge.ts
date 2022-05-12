@@ -1,4 +1,5 @@
 import { OrderStyle } from '.';
+import { UserModel } from './user';
 
 export type ChallengeTag = {
   id: string;
@@ -63,9 +64,9 @@ export type ChallengeSaveModelWithId = {
 };
 
 export enum ChallengeStatus {
-  Draft = 1,
-  Published = 2,
-  Unpublished = 3,
+  Draft = 0,
+  Published = 1,
+  Unpublished = 2,
 }
 
 export type Feedback = {
@@ -76,6 +77,23 @@ export type Feedback = {
   testCasesRelevancy: number;
   text: string;
   hasIssues: boolean;
+};
+
+export type ChallengeResult = {
+  id: string;
+  name: string;
+  descriptionShort: string;
+  descriptionMarkdown: string;
+  stubGeneratorInput: string;
+  status: ChallengeStatus;
+  statusReason: string;
+  tests: TestPair[];
+  solution: Solution;
+  tags: ChallengeTag[];
+  feedbacks: Feedback[];
+  difficulty: number;
+  user: UserModel;
+  lastModifiedOn: Date;
 };
 
 export type Challenge = {
@@ -93,4 +111,9 @@ export type Challenge = {
   difficulty: number;
   createdByUserId: string;
   lastModifiedOn: Date;
+};
+
+export type UpublishChallengeRequest = {
+  challengeId: string;
+  statusReason: string;
 };

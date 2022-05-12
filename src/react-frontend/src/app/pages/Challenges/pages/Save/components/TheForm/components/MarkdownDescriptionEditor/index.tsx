@@ -8,7 +8,7 @@ export type MarkdownEditorRef = {
 
 type MarkdownDescriptionEditorProps = {
   initialValue?: string;
-  editorRef?: MutableRefObject<MarkdownEditorRef | null>;
+  editorRef?: MutableRefObject<MarkdownEditorRef | undefined>;
   inputChanged?: (value: string | undefined) => void;
 };
 

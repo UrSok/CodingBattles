@@ -16,6 +16,7 @@ internal interface IChallengeRepository
     Task<string> Create(Challenge challenge, CancellationToken cancellationToken);
     Task<bool> Update(Challenge challenge, CancellationToken cancellationToken);
     Task<bool> Publish(Challenge challenge, CancellationToken cancellationToken);
+    Task<bool> Unpublish(string id, string statusReason, CancellationToken cancellationToken);
 }
 
 internal class ChallengeRepository : BaseRepository, IChallengeRepository
@@ -30,6 +31,7 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
     public async Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> Get(ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken)
     {
         var filters = new List<FilterDefinition<ChallengeDocument>>();
+        filters.Add(Builders<ChallengeDocument>.Filter.Eq(x => x.Status, ChallengeStatus.Published));
 
         if (!string.IsNullOrEmpty(challengeSearchModel.Text))
         {
@@ -129,6 +131,18 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
         var update = Builders<ChallengeDocument>.Update
             .Set(x => x.Status, challenge.Status)
             .Set(x => x.LastModifiedOn, challenge.LastModifiedOn);
+
+        var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        return result.ModifiedCount == 1 || result.MatchedCount == 1;
+    }
+
+    public async Task<bool> Unpublish(string id, string statusReason, CancellationToken cancellationToken)
+    {
+        var filter = Builders<ChallengeDocument>.Filter.Eq(x => x.Id, id);
+        var update = Builders<ChallengeDocument>.Update
+            .Set(x => x.Status, ChallengeStatus.Unpublished)
+            .Set(x => x.StatusReason, statusReason)
+            .Set(x => x.LastModifiedOn, DateTime.Now);
 
         var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         return result.ModifiedCount == 1 || result.MatchedCount == 1;

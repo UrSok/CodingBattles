@@ -1,63 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar, Typography } from 'antd';
-import {
-  red,
-  volcano,
-  gold,
-  yellow,
-  lime,
-  green,
-  cyan,
-  blue,
-  geekblue,
-  purple,
-  magenta,
-  grey,
-} from '@ant-design/colors';
 
 import { PATH_PROFILES } from 'app/routes/paths';
-
-const colorsDictionary: Record<string, typeof red> = {
-  ABC: red,
-  CDX: volcano,
-  EF: gold,
-  GH: yellow,
-  IJY: lime,
-  KL: green,
-  MN: cyan,
-  OP: blue,
-  QR: geekblue,
-  STZ: purple,
-  UV: magenta,
-  0: grey,
-};
-
-function getFirstTwoCharacters(name: string) {
-  return name.toUpperCase().substring(0, 2);
-}
-
-function getFirstCharacter(name: string) {
-  return name.toUpperCase().charAt(0);
-}
-
-function getColors(firstChar: string): {
-  background: string;
-  foreground: string;
-} {
-  let color = colorsDictionary[0];
-  for (const key in colorsDictionary) {
-    if (key.includes(firstChar)) {
-      color = colorsDictionary[key];
-      break;
-    }
-  }
-
-  return {
-    background: color[1],
-    foreground: color.primary!,
-  };
-}
+import UserAvatar, {
+  getColors,
+  getFirstCharacter,
+  getFirstTwoCharacters,
+} from '../UserAvatar';
 
 type MenuUserBadgeProps = {
   userName: string;
@@ -83,7 +33,7 @@ export default function MenuUserBadge(props: MenuUserBadgeProps) {
     style: style,
     children: (
       <Link to={PATH_PROFILES.ME.root}>
-        <Avatar style={style}>{firstTwoChars}</Avatar>
+        <UserAvatar userName={userName} />
       </Link>
     ),
   };

@@ -9,12 +9,13 @@ type PageProps = {
   title?: string;
   loading?: boolean;
   extra?: React.ReactNode;
+  subTitle?: React.ReactNode;
   footer?: React.ReactNode[];
   children: React.ReactNode;
 };
 
 export default function Page(props: PageProps) {
-  const { title, ghost, loading, extra, footer, children } = props;
+  const { title, ghost, loading, extra, subTitle, footer, children } = props;
 
   return (
     <PageContainer
@@ -25,6 +26,7 @@ export default function Page(props: PageProps) {
       }}
       footer={footer}
       extra={extra}
+      subTitle={subTitle}
     >
       {children}
     </PageContainer>

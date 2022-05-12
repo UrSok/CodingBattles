@@ -14,17 +14,25 @@ const Centered = styled.div`
 
 type LoadingSpinnerProps = {
   centered?: boolean;
+  size?: 'tiny';
+  noTip?: boolean;
 };
 
 export default function LoadingSpinner(props: LoadingSpinnerProps) {
-  const { centered } = props;
+  const { centered, size, noTip } = props;
   const { t } = useTranslation();
+
+  let fontSize = 30;
+
+  if (size === 'tiny') {
+    fontSize = 10;
+  }
 
   const spinner = (
     <Space>
       <Spin
-        tip={t(translations.loadingProbably)}
-        indicator={<LoadingOutlined style={{ fontSize: 30 }} spin />}
+        tip={!noTip ? t(translations.loadingProbably) : ''}
+        indicator={<LoadingOutlined style={{ fontSize: fontSize }} spin />}
       />
     </Space>
   );

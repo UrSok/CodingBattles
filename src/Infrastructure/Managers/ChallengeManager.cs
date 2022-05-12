@@ -21,7 +21,7 @@ public class ChallengeManager : BaseManager, IChallengeManager
         return await this.SendCommand(query, cancellationToken);
     }
 
-    public async Task<Result<Challenge>> Get(string challengeId, CancellationToken cancellationToken)
+    public async Task<Result<ChallengeResult>> Get(string challengeId, CancellationToken cancellationToken)
     {
         var query = new GetChallengeQuery(challengeId);
         return await this.SendCommand(query, cancellationToken);
@@ -33,15 +33,15 @@ public class ChallengeManager : BaseManager, IChallengeManager
         return await this.SendCommand(command, cancellationToken);
     }
 
-    public async Task<Result> SaveAsAdmin(string challengeId, ChallengeSaveModel challengeSaveModel, CancellationToken cancellationToken)
-    {
-        var command = new SaveAsAdminChallengeCommand(challengeId, challengeSaveModel);
-        return await this.SendCommand(command, cancellationToken);
-    }
-
     public async Task<Result<bool>> Publish(string jwtToken, string challengeId, CancellationToken cancellationToken)
     {
         var command = new PublishChallengeCommand(jwtToken, challengeId);
+        return await this.SendCommand(command, cancellationToken);
+    }
+
+    public async Task<Result> Unpublish(string challengeId, string statusReason, CancellationToken cancellationToken)
+    {
+        var command = new UnpublishCommand(challengeId, statusReason);
         return await this.SendCommand(command, cancellationToken);
     }
 }

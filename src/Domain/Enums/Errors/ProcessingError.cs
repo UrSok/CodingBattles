@@ -50,6 +50,9 @@ public class ProcessingError : Error
     public static readonly ProcessingError ValidatorNotPassed =
         new(nameof(ValidatorNotPassed), 115);
 
+    public static readonly ProcessingError BuildError =
+        new(nameof(BuildError), 116);
+
     public ProcessingError(string name, int value) : base(name, value)
     {
     }

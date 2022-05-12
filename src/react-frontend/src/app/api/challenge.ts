@@ -1,12 +1,14 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 
 import { axiosBaseQuery } from './config';
-import { Paginated, ResultValue } from './types';
+import { Paginated, Result, ResultValue } from './types';
 import {
   Challenge,
+  ChallengeResult,
   ChallengeSaveModelWithId,
   ChallengeSearchRequest,
   ChallengeSearchResultItem,
+  UpublishChallengeRequest,
 } from './types/challenge';
 
 export const challengeApi = createApi({
@@ -36,7 +38,7 @@ export const challengeApi = createApi({
           : ['Challenge'],
     }),
 
-    getChallenge: build.query<ResultValue<Challenge>, string>({
+    getChallenge: build.query<ResultValue<ChallengeResult>, string>({
       query: (id: string) => ({
         url: id,
         method: 'GET',
@@ -67,6 +69,16 @@ export const challengeApi = createApi({
         method: 'POST',
       }),
       invalidatesTags: (result, error, arg) => [{ type: 'Challenge', id: arg }],
+    }),
+
+    unpublishChallenge: build.mutation<Result, UpublishChallengeRequest>({
+      query: request => ({
+        url: `unpublish/${request.challengeId}/${request.statusReason}`,
+        method: 'POST',
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: 'Challenge', id: arg.challengeId },
+      ],
     }),
   }),
 });

@@ -7,7 +7,7 @@ import { getLanguageKeyName } from 'app/utils/enumHelpers';
 type LanguageSelectProps = {
   antdFieldName: string;
   placeholder?: string;
-  readOnly?: boolean;
+  disabled?: boolean;
   width?: number | 'sm' | 'md' | 'xl' | 'xs' | 'lg';
   defaultLanguage: Language;
   style?: React.CSSProperties;
@@ -17,7 +17,7 @@ export default function LanguageSelect(props: LanguageSelectProps) {
   const {
     antdFieldName,
     placeholder,
-    readOnly,
+    disabled,
     width,
     defaultLanguage,
     style,
@@ -27,7 +27,7 @@ export default function LanguageSelect(props: LanguageSelectProps) {
     <ProFormSelect
       name={antdFieldName}
       placeholder={placeholder}
-      readonly={readOnly}
+      disabled={disabled}
       width={width}
       allowClear={false}
       initialValue={getLanguageKeyName(defaultLanguage)}

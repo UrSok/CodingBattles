@@ -1,10 +1,9 @@
-import { FormInstance, Space, Typography } from 'antd';
+import { Space, Typography } from 'antd';
 import CodeEditor from 'app/components/Input/CodeEditor';
 import LanguageSelect from 'app/components/Input/LanguageSelect';
 import { Language } from 'app/types/global';
 import React, { MutableRefObject, useEffect } from 'react';
 import monaco from 'monaco-editor';
-import { SaveFields } from '../../../../types';
 import { stubInputLanguage } from 'config/monaco';
 import { useWatch } from 'antd/lib/form/Form';
 import { StubGeneratorModel } from 'app/api/types/stubGenerator';
@@ -12,34 +11,41 @@ import { skipToken } from '@reduxjs/toolkit/dist/query';
 import { stubGeneratorApi } from 'app/api/stubGenerator';
 import { getLanguageKeyName } from 'app/utils/enumHelpers';
 import ErrorAlert from './components/ErrorAlert';
+import { FormFields } from '../../types';
 
 type StubGeneratorProps = {
-  stubCodeEditorRef: MutableRefObject<monaco.editor.IStandaloneCodeEditor | null>;
-  readOnly?: boolean;
+  stubCodeEditorRef: MutableRefObject<
+    monaco.editor.IStandaloneCodeEditor | undefined
+  >;
+  disabled?: boolean;
   initialValue?: string;
   onStubInputChangedDecorator?: (value: string | undefined) => void;
-  onResultChanged?: (stub: string, isValid: boolean) => void;
+  onResultChanged?: (
+    stubInput: string | undefined,
+    generatedStub: string | undefined,
+    isValid: boolean,
+  ) => void;
 };
 
 export default function StubGenerator(props: StubGeneratorProps) {
   const {
     stubCodeEditorRef,
-    readOnly,
+    disabled,
     initialValue,
     onStubInputChangedDecorator,
     onResultChanged,
   } = props;
 
-  const stubLanguage: Language = useWatch(SaveFields.stubLanguage);
+  const stubLanguage: Language = useWatch(FormFields.stubLanguage);
 
   const getStubQueryValue = (
     language: Language,
     generatorInput: string | undefined,
   ): StubGeneratorModel | typeof skipToken => {
-    if (!generatorInput || generatorInput.length === 0) return skipToken;
+    //if (!generatorInput || generatorInput.length === 0) return skipToken;
     return {
       language: language,
-      input: generatorInput,
+      input: generatorInput ?? '',
     };
   };
 
@@ -60,7 +66,6 @@ export default function StubGenerator(props: StubGeneratorProps) {
     value: string | undefined,
     ev: monaco.editor.IModelContentChangedEvent,
   ) => {
-    //setEmptyStubInput(!value || value?.length === 0);
     triggerStubGeneration(value);
     if (onStubInputChangedDecorator) {
       onStubInputChangedDecorator(value);
@@ -79,9 +84,14 @@ export default function StubGenerator(props: StubGeneratorProps) {
         (generatorResult.isSuccess && !generatorResult.value?.error);
 
       if (onResultChanged) {
-        onResultChanged(generatorResult.value?.stub ?? '', isValid);
+        onResultChanged(
+          stubCodeEditorRef.current?.getValue() ?? initialValue,
+          generatorResult.value?.stub,
+          isValid,
+        );
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [generatorResult]);
 
   return (
@@ -96,7 +106,7 @@ export default function StubGenerator(props: StubGeneratorProps) {
           editorRef={stubCodeEditorRef}
           defaultValue={initialValue}
           language={stubInputLanguage}
-          readOnly={readOnly}
+          readOnly={disabled}
           onModelChange={handleStubInputChanged}
         />
 
@@ -109,7 +119,7 @@ export default function StubGenerator(props: StubGeneratorProps) {
       </Space>
       <Typography.Text strong>Result</Typography.Text>
       <LanguageSelect
-        antdFieldName={SaveFields.stubLanguage}
+        antdFieldName={FormFields.stubLanguage}
         placeholder="Generation language"
         width="sm"
         defaultLanguage={Language.javascript}

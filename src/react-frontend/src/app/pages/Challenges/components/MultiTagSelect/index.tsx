@@ -8,8 +8,10 @@ import { ChallengeTag } from 'app/api/types/challenge';
 import { challengeTagApi } from 'app/api/challengeTag';
 import { ProFormSelectProps } from '@ant-design/pro-form/lib/components/Select';
 import { DefaultOptionType } from 'antd/lib/select';
-import { RequestOptionsType } from '@ant-design/pro-utils';
 import NoData from 'app/components/NoData';
+import { skipToken } from '@reduxjs/toolkit/dist/query';
+import LoadingSpinner from 'app/components/LoadingSpinner';
+import { Form } from 'antd';
 
 type MultiTagSelectProps = {
   name: string;
@@ -30,26 +32,9 @@ export default function MultiTagSelect(props: MultiTagSelectProps) {
 
   const { t } = useTranslation();
 
-  const [triggerGetTags] = challengeTagApi.useLazyGetTagsQuery();
-
-  const commonProps: ProFormSelectProps = {
-    mode: 'multiple',
-    style: { width: '100%' },
-    placeholder: t(translations.Challenges.Search.Form.tags),
-    allowClear: true,
-    readonly: readOnly,
-    proFieldProps: {
-      emptyText: <NoData />,
-    },
-    rules: requiredRule
-      ? [
-          {
-            required: true,
-            message: 'Tags are required',
-          },
-        ]
-      : [],
-  };
+  const { isLoading, data } = challengeTagApi.useGetTagsQuery(
+    !tags ? undefined : skipToken,
+  );
 
   const mapTags = (
     challengeTags: ChallengeTag[] | undefined,
@@ -64,28 +49,41 @@ export default function MultiTagSelect(props: MultiTagSelectProps) {
     );
   };
 
-  if (loadingOutsideTags || tags) {
+  if (!tags && !data?.value) {
     return (
-      <ProFormSelect
-        {...commonProps}
-        name={name}
-        fieldProps={{
-          loading: loadingOutsideTags,
-        }}
-        options={mapTags(tags)}
-      />
+      <Form.Item>
+        <LoadingSpinner size="tiny" noTip />
+      </Form.Item>
     );
   }
 
   return (
-    <ProFormSelect
-      {...commonProps}
+    <ProFormSelect<ChallengeTag>
       name={name}
-      request={async () => {
-        const result = await triggerGetTags().unwrap();
-
-        return mapTags(result?.value) as RequestOptionsType[];
+      mode="multiple"
+      style={{ width: '100%' }}
+      placeholder={t(translations.Challenges.Search.Form.tags)}
+      allowClear={true}
+      readonly={readOnly}
+      proFieldProps={{
+        emptyText: <NoData />,
       }}
+      rules={
+        requiredRule
+          ? [
+              {
+                required: true,
+                message: 'Tags are required',
+              },
+            ]
+          : []
+      }
+      fieldProps={{
+        loading: loadingOutsideTags || isLoading,
+        showArrow: true,
+      }}
+      options={mapTags(tags || data?.value)}
+      showSearch
     />
   );
 }

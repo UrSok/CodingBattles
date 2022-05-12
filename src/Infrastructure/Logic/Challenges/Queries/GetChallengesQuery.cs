@@ -57,7 +57,7 @@ internal class GetChallengesHandler : IRequestHandler<GetChallengesQuery, Result
             Items = this.mapper.Map<IEnumerable<ChallengeSearchResultItem>>(challenges)
         };
 
-        //TODO: Leave only published methods
+
 
         return Result<PaginatedModel<ChallengeSearchResultItem>>.Success(paginatedModel);
     }

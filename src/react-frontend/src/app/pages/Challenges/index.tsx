@@ -1,17 +1,17 @@
-import SearchChallenges from './pages/SearchChallenges';
-import SaveChallenge from './pages/SaveChallenge';
-import DetailsChallenge from './pages/DetailsChallenge';
+import Index from './pages/Index';
+import Save from './pages/Save';
+import Details from './pages/Details';
 
-type ChallengePageProps = {
-  Details: typeof DetailsChallenge,
-  Save: typeof SaveChallenge;
-  Search: typeof SearchChallenges;
+type ChallengePagesProps = {
+  Index: typeof Index;
+  Details: typeof Details;
+  Save: typeof Save;
 };
 
-const ChallengePage: ChallengePageProps = {
-  Details: DetailsChallenge,
-  Save: SaveChallenge,
-  Search: SearchChallenges,
+const ChallengePages: ChallengePagesProps = {
+  Index: Index,
+  Details: Details,
+  Save: Save,
 };
 
-export default ChallengePage;
+export default ChallengePages;

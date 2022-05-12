@@ -13,6 +13,6 @@ public class Tests
     [Test]
     public async Task Test1()
     {
-        await new PaizaService().Execute("let v = 0; for(; v < 100000; v+=1) {}", "typescript", "5");
+        await new PaizaService().Execute("letg v = 0; for(; v < 100000; v+=1) {}", "typescript", "5");
     }
 }

@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import LoadingSpinner from '../../LoadingSpinner';
 
 type CodeEditorProps = {
-  editorRef?: MutableRefObject<monaco.editor.IStandaloneCodeEditor | null>;
+  editorRef?: MutableRefObject<monaco.editor.IStandaloneCodeEditor | undefined>;
   language: string;
   height?: number;
   defaultValue?: string;
@@ -38,14 +38,14 @@ export default function CodeEditor(props: CodeEditorProps) {
   return (
     <EditorWrapper>
       <Editor
-        //className="bordered-editor"
         loading={<LoadingSpinner />}
         height={height ?? 300}
         language={language}
         defaultValue={defaultValue}
+        className="updated-monaco-editor"
         value={value ?? ''}
         options={{
-          readOnly: readOnly,
+          readOnly: readOnly
         }}
         onMount={onMount}
         onChange={onModelChange}
@@ -57,4 +57,8 @@ export default function CodeEditor(props: CodeEditorProps) {
 const EditorWrapper = styled.div`
   border: 1px solid #d9d9d9;
   border-radius: 2px;
+  section {
+    resize: vertical;
+    overflow: auto;
+  }
 `;

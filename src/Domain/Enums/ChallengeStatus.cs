@@ -2,7 +2,7 @@
 
 public enum ChallengeStatus
 {
-    Draft = 1,
-    Published = 2,
-    Unpublished = 3,
+    Draft = 0,
+    Published = 1,
+    Unpublished = 2,
 }

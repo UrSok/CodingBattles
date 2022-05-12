@@ -3,7 +3,8 @@ import { Route, Routes } from 'react-router-dom';
 
 import { PATH_CHALLENGES, PATH_GAMES, PATH_IDE, PATH_PROFILES } from './paths';
 
-import ChallengePage from 'app/pages/Challenges';
+import ChallengePages from 'app/pages/Challenges';
+import ErrorResult from 'app/components/ErrorResult';
 
 export default function Router() {
   return (
@@ -20,11 +21,11 @@ export default function Router() {
         </Route>
       </Route>
       <Route path={PATH_CHALLENGES.root}>
-        <Route index element={<ChallengePage.Search />} />
-        <Route path=":id" element={<ChallengePage.Details />} />
+        <Route index element={<ChallengePages.Index />} />
+        <Route path=":id" element={<ChallengePages.Details />} />
         <Route path={PATH_CHALLENGES.save}>
-          <Route index element={<ChallengePage.Save />} />
-          <Route path=":id" element={<ChallengePage.Save />} />
+          <Route index element={<ChallengePages.Save />} />
+          <Route path=":id" element={<ChallengePages.Save />} />
         </Route>
       </Route>
       <Route path={PATH_GAMES.root}>
@@ -33,7 +34,16 @@ export default function Router() {
       <Route path={PATH_IDE.root}>
         <Route index element={<p>ide</p>} />
       </Route>
-      <Route path="*" element={<p>404</p>} />
+      <Route
+        path="*"
+        element={
+          <ErrorResult
+            status="404"
+            title="Page not found"
+            subTitle="Looks like todays not your day : ("
+          />
+        }
+      />
     </Routes>
   );
 }

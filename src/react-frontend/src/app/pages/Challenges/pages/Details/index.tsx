@@ -2,19 +2,22 @@ import ProCard from '@ant-design/pro-card';
 import { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import ProList from '@ant-design/pro-list';
 import MDEditor from '@uiw/react-md-editor';
-import { Button, Space, Typography } from 'antd';
+import { Avatar, Button, Space, Tag, Typography } from 'antd';
 import { challengeApi } from 'app/api/challenge';
-import { Feedback } from 'app/api/types/challenge';
+import { Role } from 'app/api/types/auth';
+import { ChallengeStatus, Feedback } from 'app/api/types/challenge';
+import UserAvatar from 'app/components/Auth/UserAvatar';
 import CardSection from 'app/components/CardSection';
 import ChallengeDescription from 'app/components/ChallengeDescription';
 import ErrorResult from 'app/components/ErrorResult';
 import Page from 'app/components/Layout/Page';
 import NoData from 'app/components/NoData';
-import { PATH_CHALLENGES } from 'app/routes/paths';
+import { PATH_CHALLENGES, PATH_PROFILES } from 'app/routes/paths';
 import { selectAuth } from 'app/slices/auth/selectors';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import UnPublishModal from '../../components/UnPublishModal';
 
 export default function DetailsChallenge() {
   const { id } = useParams();
@@ -35,8 +38,7 @@ export default function DetailsChallenge() {
   }
 
   if (data?.value) {
-    const { tagIds, descriptionMarkdown, tests, createdByUserId, feedbacks } =
-      data.value;
+    const { tags, descriptionMarkdown, tests, user, feedbacks } = data.value;
 
     pageContent = (
       <>
@@ -90,9 +92,34 @@ export default function DetailsChallenge() {
                 />
               </ProCard>
             </ProCard>
+
             <ProCard colSpan={8} ghost direction="column" gutter={[16, 16]}>
-              <ProCard title="Created by">{createdByUserId}</ProCard>
-              <ProCard title="Tags">{createdByUserId}</ProCard>
+              <ProCard title="Created by">
+                <Link to={PATH_PROFILES.root + `${user.id}`}>
+                  <Space className="challenge-created-by">
+                    <UserAvatar userName={user.username} size="large" />
+                    <Typography.Text
+                      strong
+                      style={{
+                        fontSize: 15,
+                      }}
+                    >
+                      {user.username}
+                    </Typography.Text>
+                  </Space>
+                </Link>
+              </ProCard>
+
+              <ProCard title="Tags">
+                {
+                  <>
+                    {tags.map(tag => (
+                      <Tag key={tag.id}>{tag.name}</Tag>
+                    ))}
+                  </>
+                }
+              </ProCard>
+
               <ProCard title="Statistics">
                 {!feedbacks || feedbacks.length === 0 ? (
                   'Not enough feedbacks'
@@ -107,6 +134,16 @@ export default function DetailsChallenge() {
     );
   }
 
+  let subTitle: React.ReactNode | undefined = undefined;
+  switch (data.value?.status) {
+    case ChallengeStatus.Draft:
+      subTitle = <Tag color="yellow">Draft</Tag>;
+      break;
+    case ChallengeStatus.Unpublished:
+      subTitle = <Tag color="red">Unpublished</Tag>;
+      break;
+  }
+
   return (
     <Page
       loading={isLoading}
@@ -114,15 +151,21 @@ export default function DetailsChallenge() {
       extra={
         <>
           {isAuthenticated &&
-          user?.id &&
-          user?.id === data?.value?.createdByUserId ? (
+          user?.role === Role.Admin &&
+          data.value?.status === ChallengeStatus.Published ? (
+            <UnPublishModal challengeId={data.value!.id} />
+          ) : null}
+          {isAuthenticated && user?.id && user?.id === data?.value?.user.id ? (
             <Button onClick={() => navigate(PATH_CHALLENGES.save + `/${id}`)}>
               Edit
             </Button>
           ) : null}
-          <Button type="primary">Play</Button>
+          {data.value?.status === ChallengeStatus.Published ? (
+            <Button type="primary">Play</Button>
+          ) : null}
         </>
       }
+      subTitle={subTitle}
     >
       {pageContent}
     </Page>

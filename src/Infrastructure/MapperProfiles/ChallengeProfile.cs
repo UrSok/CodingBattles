@@ -19,5 +19,6 @@ internal class ChallengeProfile : Profile
         this.CreateMap<ChallengeSaveModel, Challenge>();
 
         this.CreateMap<Challenge, ChallengeSearchResultItem>();
+        this.CreateMap<Challenge, ChallengeResult>();
     }
 }

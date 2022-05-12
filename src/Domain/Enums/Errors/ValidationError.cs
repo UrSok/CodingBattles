@@ -65,6 +65,9 @@ public sealed class ValidationError : Error
     public static readonly ValidationError InvalidId =
         new(nameof(InvalidId), 10020);
 
+    public static readonly ValidationError EmptyStatusReason =
+        new(nameof(EmptyStatusReason), 10021);
+
     public ValidationError(string name, int value) : base(name, value)
     {
     }

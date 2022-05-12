@@ -14,5 +14,7 @@ internal class UserProfile : Profile
         this.CreateMap<User, UserDocument>().ReverseMap();
 
         this.CreateMap<User, AuthUserModel>();
+
+        this.CreateMap<User, UserModel>();
     }
 }

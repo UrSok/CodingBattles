@@ -5,13 +5,13 @@ import { Guard } from 'app/components/Guards';
 import { useParams } from 'react-router-dom';
 import { challengeApi } from 'app/api/challenge';
 import ErrorResult, { ErrorResult500 } from 'app/components/ErrorResult';
-import SaveForm from './components/SaveForm';
+import TheForm from './components/TheForm';
 
 import { ApiException } from 'app/api/config/axios';
 import { ErrorCode } from 'app/api/types';
 import { skipToken } from '@reduxjs/toolkit/dist/query';
 
-export default function SaveChallenge() {
+export default function Save() {
   const { id: paramId } = useParams();
 
   const { isLoading, data, error } = challengeApi.useGetChallengeQuery(
@@ -21,11 +21,11 @@ export default function SaveChallenge() {
   let pageContent: React.ReactNode = '';
 
   if (!paramId) {
-    pageContent = <SaveForm />;
+    pageContent = <TheForm />;
   } else if (data && data.value && data.isSuccess) {
     pageContent = (
-      <Guard.Mine createdById={data.value.createdByUserId}>
-        <SaveForm challenge={data.value} />
+      <Guard.Mine createdById={data.value.user.id}>
+        <TheForm challenge={data.value} />
       </Guard.Mine>
     );
   } else if (

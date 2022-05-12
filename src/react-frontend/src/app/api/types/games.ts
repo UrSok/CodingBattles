@@ -27,6 +27,7 @@ export type TestResult = {
 
 export type RunTestResult = {
   id: string;
+  outputError: string;
   test: TestResult;
   validator: TestResult;
 };

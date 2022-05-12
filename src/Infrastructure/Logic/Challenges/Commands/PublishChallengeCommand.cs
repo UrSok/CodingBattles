@@ -60,25 +60,6 @@ internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand
             return Result<bool>.Failure(ProcessingError.CannotEditForeignRecord);
         }
 
-        /*var validationResult = this.Validate(challenge);
-        if (!validationResult.IsSuccess)
-        {
-            return Result<string>.Failure(validationResult.Errors);
-        }
-
-        var stubInputError = StubGeneratorEntry.Validate(challenge.StubGeneratorInput);
-        if (stubInputError is not null)
-        {
-            var publishChangllengeResult = new PublishChallengeResult()
-            {
-                ChallengeId = challenge.Id,
-                Error = this.mapper.Map<StubGeneratorError>(stubInputError),
-            };
-            return Result<string>.Failure(publishChangllengeResult, ProcessingError.StubInputError);
-        }
-
-        //TODO: Run TESTS*/
-
         challenge.Status = ChallengeStatus.Published;
         challenge.LastModifiedOn = DateTime.Now;
 

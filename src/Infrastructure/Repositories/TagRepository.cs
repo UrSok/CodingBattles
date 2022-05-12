@@ -9,6 +9,7 @@ namespace Infrastructure.Repositories;
 internal interface ITagRepository
 {
     Task<IEnumerable<TagEntity>> GetAll(CancellationToken cancellationToken);
+    Task<IEnumerable<TagEntity>> GetByIds(List<string> tagIds, CancellationToken cancellationToken);
 }
 
 internal class TagRepository : BaseRepository, ITagRepository
@@ -58,6 +59,14 @@ internal class TagRepository : BaseRepository, ITagRepository
     public async Task<IEnumerable<TagEntity>> GetAll(CancellationToken cancellationToken)
     {
         var tagDocuments = (await this.tags.FindAsync(x => true, cancellationToken: cancellationToken))
+            .ToEnumerable(cancellationToken: cancellationToken);
+        return this.mapper.Map<IEnumerable<TagEntity>>(tagDocuments);
+    }
+
+    public async Task<IEnumerable<TagEntity>> GetByIds(List<string> tagIds, CancellationToken cancellationToken)
+    {
+        var filter = Builders<TagDocument>.Filter.In(x => x.Id, tagIds);
+        var tagDocuments = (await this.tags.FindAsync(filter, cancellationToken: cancellationToken))
             .ToEnumerable(cancellationToken: cancellationToken);
         return this.mapper.Map<IEnumerable<TagEntity>>(tagDocuments);
     }
