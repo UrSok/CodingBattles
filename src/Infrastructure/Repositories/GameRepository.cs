@@ -16,7 +16,7 @@ internal interface IGameRepository
     Task<Game> Get(string gameId, CancellationToken cancellationToken);
     Task<bool> StartRound(string id, Round round, CancellationToken cancellationToken);
     Task<IEnumerable<Game>> Get(CancellationToken cancellationToken);
-    Task<IEnumerable<Game>> GetGamesByCreator(string userId, CancellationToken cancellationToken);
+    Task<IEnumerable<Game>> GetGamesByUserId(string userId, CancellationToken cancellationToken);
     Task<bool> AddRecordSummary(string id, int roundNumber, RoundSummary roundSummary, CancellationToken cancellationToken);
     Task<bool> RemoveFromGame(string userId, string gameId, CancellationToken cancellationToken);
 }
@@ -86,9 +86,9 @@ internal class GameRepository : BaseRepository, IGameRepository
         return this.mapper.Map<IEnumerable<Game>>(gameDocuments);
     }
 
-    public async Task<IEnumerable<Game>> GetGamesByCreator(string userId, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Game>> GetGamesByUserId(string userId, CancellationToken cancellationToken)
     {
-        var gameDocuments = (await this.games.FindAsync(x => x.CreatedByUserId == userId, cancellationToken: cancellationToken))
+        var gameDocuments = (await this.games.FindAsync(x => x.CreatedByUserId == userId || x.UserIds.Contains(userId), cancellationToken: cancellationToken))
             .ToEnumerable(cancellationToken: cancellationToken);
         return this.mapper.Map<IEnumerable<Game>>(gameDocuments);
     }

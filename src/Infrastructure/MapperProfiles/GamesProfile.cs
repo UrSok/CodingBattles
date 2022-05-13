@@ -21,5 +21,6 @@ public class GamesProfile : Profile
         this.CreateMap<PaizaJobDetails, TestResult>().ReverseMap();
         this.CreateMap<GameDocument, Game>().ReverseMap();
         this.CreateMap<Game, GetGameResult>().ReverseMap();
+        this.CreateMap<Game, GetGameListResultItem>().ReverseMap();
     }
 }

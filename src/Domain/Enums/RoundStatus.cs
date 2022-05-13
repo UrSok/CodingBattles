@@ -2,6 +2,7 @@
 
 public enum RoundStatus
 {
-    InProgress = 0,
-    Finished = 1
+    NotStarted = 0,
+    InProgress = 1,
+    Finished = 2
 }

@@ -11,7 +11,7 @@ using System;
 
 namespace Infrastructure.Logic.Games.Commands;
 
-internal record CreateGameCommand(string UserId, bool isPrivate) : IRequest<Result<string>>;
+internal record CreateGameCommand(string UserId, string Name, bool IsPrivate) : IRequest<Result<string>>;
 
 internal class CreateGameCommandValidator : AbstractValidator<CreateGameCommand>
 {
@@ -22,26 +22,28 @@ internal class CreateGameCommandValidator : AbstractValidator<CreateGameCommand>
     }
 }
 
-internal class CreateGameHandler : IRequestHandler<CreateGameCommand, Result>
+internal class CreateGameHandler : IRequestHandler<CreateGameCommand, Result<string>>
 {
-    private readonly IGameRepository gamesRepository;
+    private readonly IGameRepository gameRepository;
 
-    public CreateGameHandler(IGameRepository gamesRepository)
+    public CreateGameHandler(IGameRepository gameRepository)
     {
-        this.gamesRepository = gamesRepository;
+        this.gameRepository = gameRepository;
     }
 
-    public async Task<Result> Handle(CreateGameCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(CreateGameCommand request, CancellationToken cancellationToken)
     {
         var game = new Game()
         {
             Code = CodeGeneratorService.GetRandomAlphanumericString(8),
+            Name = request.Name,
             CreatedByUserId = request.UserId,
-            IsPrivate = request.isPrivate,
+            IsPrivate = request.IsPrivate,
+            UserIds = new List<string> { request.UserId },
         };
 
-        var gameId = await this.gamesRepository.Create(game, cancellationToken);
-        if (!string.IsNullOrEmpty(gameId))
+        var gameId = await this.gameRepository.Create(game, cancellationToken);
+        if (string.IsNullOrEmpty(gameId))
         {
             return Result<string>.Failure(Error.InternalServerError);
         }

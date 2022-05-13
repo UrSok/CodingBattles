@@ -3,7 +3,7 @@ import {
   authApi,
   challengeApi,
   challengeTagApi,
-  gamesApi,
+  gameApi,
   stubGeneratorApi,
 } from 'app/api';
 
@@ -18,7 +18,7 @@ export function createReducer(injectedReducers: InjectedReducersType = {}) {
       [authApi.reducerPath]: authApi.reducer,
       [challengeApi.reducerPath]: challengeApi.reducer,
       [challengeTagApi.reducerPath]: challengeTagApi.reducer,
-      [gamesApi.reducerPath]: gamesApi.reducer,
+      [gameApi.reducerPath]: gameApi.reducer,
       [stubGeneratorApi.reducerPath]: stubGeneratorApi.reducer,
       ...injectedReducers,
     });

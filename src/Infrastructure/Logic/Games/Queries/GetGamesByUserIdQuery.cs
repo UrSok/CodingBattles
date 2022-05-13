@@ -11,33 +11,33 @@ using MediatR;
 
 namespace Infrastructure.Logic.Games.Queries;
 
-internal record GetMyGamesQuery(string UserId) : IRequest<Result<List<GetGameListResultItem>>>;
+internal record GetGamesByUserIdQuery(string UserId) : IRequest<Result<List<GetGameListResultItem>>>;
 
-internal class GetMyGamesQueryValidator : AbstractValidator<GetMyGamesQuery>
+internal class GetGamesByUserIdQueryValidator : AbstractValidator<GetGamesByUserIdQuery>
 {
-    public GetMyGamesQueryValidator()
+    public GetGamesByUserIdQueryValidator()
     {
         this.RuleFor(x => x.UserId)
             .NotEmpty().WithError(ValidationError.EmptyUserId);
     }
 }
 
-internal class GetMyGamesHandler : IRequestHandler<GetMyGamesQuery, Result<List<GetGameListResultItem>>>
+internal class GetGamesByUserIdHandler : IRequestHandler<GetGamesByUserIdQuery, Result<List<GetGameListResultItem>>>
 {
     private readonly IGameRepository gameRepository;
     private readonly IUserRepository userRepository;
     private readonly IMapper mapper;
 
-    public GetMyGamesHandler(IGameRepository gameRepository, IUserRepository userRepository, IMapper mapper)
+    public GetGamesByUserIdHandler(IGameRepository gameRepository, IUserRepository userRepository, IMapper mapper)
     {
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.mapper = mapper;
     }
 
-    public async Task<Result<List<GetGameListResultItem>>> Handle(GetMyGamesQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<GetGameListResultItem>>> Handle(GetGamesByUserIdQuery request, CancellationToken cancellationToken)
     {
-        var games = await this.gameRepository.GetGamesByCreator(request.UserId, cancellationToken);
+        var games = await this.gameRepository.GetGamesByUserId(request.UserId, cancellationToken);
         var userIds = games.SelectMany(x => x.UserIds).ToList();
         var users = await this.userRepository.GetByIds(userIds, cancellationToken);
         var userModels = this.mapper.Map<List<UserModel>>(users);

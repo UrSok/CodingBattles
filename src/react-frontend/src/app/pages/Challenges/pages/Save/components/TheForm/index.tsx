@@ -37,7 +37,7 @@ import { useEffectOnce, useBoolean } from 'usehooks-ts';
 import StubGenerator from './components/StubGenerator';
 
 import { FieldData } from 'rc-field-form/es/interface';
-import { gamesApi } from 'app/api';
+import { gameApi } from 'app/api';
 import { FormFields, FormType } from './types';
 import { getLanguageKeyName } from 'app/utils/enumHelpers';
 import ChallengeStatusAlert from './components/ChallengeStatusAlert';
@@ -69,7 +69,7 @@ export default function TheForm(props: Props) {
   const solutionEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
 
   const [trigerTestSolution, { isLoading: isTesting, data: testResult }] =
-    gamesApi.useRunTestMutation();
+    gameApi.useRunTestMutation();
 
   const [triggerSaveChallenge, { isLoading: isSaving, data: savingResult }] =
     challengeApi.useSaveChallengeMutation();

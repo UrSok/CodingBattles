@@ -10,7 +10,7 @@ type CardSectionProps = {
   children: React.ReactNode;
 };
 
-export default function CardSection(props: CardSectionProps) {
+export default function  CardSection(props: CardSectionProps) {
   const { title, ghost, colSpan, children } = props;
 
   const titleNode = title ? (

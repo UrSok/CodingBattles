@@ -45,7 +45,7 @@ internal class GetGamesHandler : IRequestHandler<GetGamesQuery, Result<List<GetG
         for (int i = 0; i < getGameListResult.Count; i++)
         {
             getGameListResult[i].Users = userModels.Where(x => games.ElementAt(i).UserIds.Contains(x.Id)).ToList();
-            getGameListResult[i].RoundStatus = games.ElementAt(i).Rounds.LastOrDefault().Status;
+            getGameListResult[i].RoundStatus = games.ElementAt(i).Rounds.LastOrDefault()?.Status ?? Domain.Enums.RoundStatus.NotStarted;
         }
 
         return Result<List<GetGameListResultItem>>.Success(getGameListResult);

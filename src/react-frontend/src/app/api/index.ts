@@ -1,14 +1,14 @@
 import { authApi } from './auth';
 import { challengeApi } from './challenge';
 import { challengeTagApi } from './challengeTag';
-import { gamesApi } from './games';
+import { gameApi } from './game';
 import { stubGeneratorApi } from './stubGenerator';
 
 export {
   authApi,
   challengeApi,
   challengeTagApi,
-  gamesApi,
+  gameApi,
   stubGeneratorApi,
   //userApi,
 };

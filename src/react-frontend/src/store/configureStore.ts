@@ -7,7 +7,7 @@ import {
   authApi,
   challengeApi,
   challengeTagApi,
-  gamesApi,
+  gameApi,
   stubGeneratorApi,
 } from 'app/api';
 import { createInjectorsEnhancer } from 'redux-injectors';
@@ -24,7 +24,7 @@ export function configureAppStore() {
     authApi.middleware,
     challengeApi.middleware,
     challengeTagApi.middleware,
-    gamesApi.middleware,
+    gameApi.middleware,
     stubGeneratorApi.middleware,
   ];
   // Create the store with saga middleware

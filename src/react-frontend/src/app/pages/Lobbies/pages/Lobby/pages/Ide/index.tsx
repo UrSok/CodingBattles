@@ -1,0 +1,413 @@
+import ProCard from '@ant-design/pro-card';
+import ProList from '@ant-design/pro-list';
+import { Avatar, Button, Form, Space, Tag, Typography } from 'antd';
+import { TestPair } from 'app/api/types/challenge';
+import ChallengeDescription from 'app/components/ChallengeDescription';
+import CodeEditor from 'app/components/Input/CodeEditor';
+import LanguageSelect from 'app/components/Input/LanguageSelect';
+import Page from 'app/components/Layout/Page';
+import { Language } from 'app/types/global';
+import React, { ReactText, useEffect, useRef, useState } from 'react';
+import Play from '@2fd/ant-design-icons/lib/Play';
+import { GetGameResult } from 'app/api/types/games';
+import ProForm from '@ant-design/pro-form';
+import monaco from 'monaco-editor';
+import { useEffectOnce, useMap } from 'usehooks-ts';
+import { gameApi, stubGeneratorApi } from 'app/api';
+import { useForm, useWatch } from 'antd/lib/form/Form';
+import { getLanguageKeyName } from 'app/utils/enumHelpers';
+import UserAvatar from 'app/components/Auth/UserAvatar';
+import Countdown from 'antd/lib/statistic/Countdown';
+import {
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  ExclamationCircleOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
+
+type TestState = 'None' | 'Validating' | 'Passed' | 'Failed' | 'Unvalidated';
+
+type IdeProps = {
+  gameInfo?: GetGameResult;
+};
+
+export default function Ide(props: IdeProps) {
+  const { gameInfo } = props;
+  const latestRound = gameInfo?.rounds[gameInfo.rounds.length - 1];
+  const deadLine =
+    latestRound && latestRound.startTime
+      ? new Date(latestRound.startTime).getTime() + 1800000
+      : 0;
+
+  const [form] = useForm();
+  const solutionLanguage: Language = useWatch('solutionLang', form);
+
+  const [expandedRowKeys, setExpandedRowKeys] = useState<readonly ReactText[]>(
+    [],
+  );
+
+  //const [testsState, updateTestsState] =
+  const [testsMap, testsMapActions] = useMap<string, TestState>();
+
+  const solutionEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
+
+  const [
+    triggerStubGenerator,
+    { isLoading: isGenerating, data: stubGeneratorResult },
+  ] = stubGeneratorApi.useLazyGenerateStubQuery();
+
+  const [triggerTestRun, { isLoading: isTesting, data: testResult }] =
+    gameApi.useRunTestMutation();
+
+  useEffectOnce(() => {
+    let tests = latestRound?.challenge.tests;
+
+    if (tests) {
+      for (let i = 0; i < tests?.length; i++) {
+        testsMapActions.set(i.toString(), 'None');
+      }
+    }
+
+    triggerStubGenerator({
+      input: latestRound?.challenge.stubGeneratorInput ?? '',
+      language: solutionLanguage ?? getLanguageKeyName(Language.javascript),
+    });
+  });
+
+  useEffect(() => {
+    triggerStubGenerator({
+      input: latestRound?.challenge.stubGeneratorInput ?? '',
+      language: solutionLanguage ?? getLanguageKeyName(Language.javascript),
+    });
+  }, [solutionLanguage]);
+
+  useEffect(() => {
+    if (!testResult || !testResult.value) return;
+
+    if (testResult.isSuccess) {
+      testsMapActions.set(testResult.value.id, 'Passed');
+    } else {
+      testsMapActions.set(testResult.value.id, 'Failed');
+    }
+  }, [testResult]);
+
+  useEffect(() => {
+    console.log(stubGeneratorResult);
+    if (
+      stubGeneratorResult?.isSuccess &&
+      stubGeneratorResult &&
+      stubGeneratorResult.value
+    ) {
+      solutionEditorRef.current?.setValue(stubGeneratorResult.value.stub);
+    }
+  }, [stubGeneratorResult]);
+
+  const upperRowMaxSize: React.CSSProperties = {
+    height: '42vh',
+  };
+  const lowerRowMaxSize: React.CSSProperties = {
+    height: '35vh',
+  };
+
+  const autoResizeStyle: React.CSSProperties = {
+    resize: 'vertical',
+    overflow: 'auto',
+  };
+
+  const TaskCard = (
+    <ProCard
+      title="Task"
+      bodyStyle={{ ...autoResizeStyle, ...upperRowMaxSize }}
+    >
+      <ChallengeDescription
+        value={latestRound?.challenge.descriptionMarkdown}
+      />
+    </ProCard>
+  );
+
+  const handleOnTestClick = async (value: TestPair, index: number) => {
+    const solutionText = solutionEditorRef.current?.getValue();
+    if (!solutionText) return;
+
+    testsMapActions.set(index.toString(), 'Validating');
+
+    await triggerTestRun({
+      id: index.toString(),
+      test: value,
+      language: solutionLanguage,
+      sourceCode: solutionText,
+    });
+  };
+
+  const handleRuntAllTests = async () => {
+    if (!latestRound) return;
+    const solutionText = solutionEditorRef.current?.getValue();
+    if (!solutionText) return;
+
+    for (let i = 0; i < latestRound.challenge.tests.length; i++) {
+      testsMapActions.set(i.toString(), 'Validating');
+
+      var result = await triggerTestRun({
+        id: i.toString(),
+        test: latestRound.challenge.tests[i],
+        language: solutionLanguage,
+        sourceCode: solutionText,
+      }).unwrap();
+
+      if (!result.isSuccess) {
+        testsMapActions.set(i.toString(), 'Failed');
+        return;
+      }
+
+      testsMapActions.set(i.toString(), 'Passed');
+    }
+  };
+
+  const TestsCard = (
+    <ProCard
+      title="Tests"
+      direction="column"
+      bodyStyle={{ ...autoResizeStyle, ...lowerRowMaxSize }}
+      extra={
+        <Button size="small" disabled={isTesting} onClick={handleRuntAllTests}>
+          RUN ALL
+        </Button>
+      }
+    >
+      <ProList<TestPair>
+        ghost
+        split
+        expandable={{
+          expandedRowKeys,
+          onExpandedRowsChange: setExpandedRowKeys,
+        }}
+        metas={{
+          avatar: {
+            render: (dom, test, index) => (
+              <Typography.Text strong>{index + 1}.</Typography.Text>
+            ),
+          },
+          title: {
+            dataIndex: 'title',
+          },
+          subTitle: {
+            render: (dom, test, index) => {
+              const testState = testsMap.get(index.toString());
+
+              if (testState === 'Validating') {
+                return (
+                  <Tag icon={<SyncOutlined spin />} color="processing">
+                    Processing
+                  </Tag>
+                );
+              }
+
+              if (testState === 'Passed') {
+                return (
+                  <Tag icon={<CheckCircleOutlined />} color="success">
+                    Passed
+                  </Tag>
+                );
+              }
+
+              if (testState === 'Unvalidated') {
+                return (
+                  <Tag icon={<ExclamationCircleOutlined />} color="warning">
+                    Unvalidated
+                  </Tag>
+                );
+              }
+
+              if (testState === 'Failed') {
+                return (
+                  <Tag icon={<CloseCircleOutlined />} color="error">
+                    Failed
+                  </Tag>
+                );
+              }
+
+              return null;
+            },
+          },
+          actions: {
+            render: (dom, value, index) => {
+              return (
+                <Button
+                  type="ghost"
+                  icon={<Play style={{ fontSize: 24 }} />}
+                  onClick={() => handleOnTestClick(value, index)}
+                  disabled={
+                    testsMap.get(index.toString()) === 'Validating' && isTesting
+                  }
+                />
+              );
+            },
+          },
+          description: {
+            render: (dom, test, index) => {
+              return (
+                <ProCard key={index} direction="row" gutter={[8, 0]} ghost>
+                  <ProCard ghost>
+                    <Typography.Text>Input:</Typography.Text>
+                    <Typography.Paragraph>
+                      <pre
+                        style={{
+                          marginTop: 0,
+                        }}
+                      >
+                        {test.case?.input}
+                      </pre>
+                    </Typography.Paragraph>
+                  </ProCard>
+                  <ProCard ghost>
+                    <Typography.Text>Expected Output:</Typography.Text>
+                    <Typography.Paragraph>
+                      <pre
+                        style={{
+                          marginTop: 0,
+                        }}
+                      >
+                        {test.case?.expectedOutput}
+                      </pre>
+                    </Typography.Paragraph>
+                  </ProCard>
+                </ProCard>
+              );
+            },
+          },
+        }}
+        dataSource={latestRound?.challenge.tests}
+      />
+    </ProCard>
+  );
+
+  const handleSolutionInputChanged = (
+    value: string | undefined,
+    ev: monaco.editor.IModelContentChangedEvent,
+  ) => {
+    let tests = latestRound?.challenge.tests;
+
+    if (tests) {
+      for (let i = 0; i < tests?.length; i++) {
+        if (
+          testsMap.get(i.toString()) !== 'None' &&
+          testsMap.get(i.toString()) !== 'Unvalidated'
+        ) {
+          testsMapActions.set(i.toString(), 'Unvalidated');
+        }
+      }
+    }
+  };
+
+  const SolutionEditorCard = (
+    <ProCard
+      title="Solution"
+      bodyStyle={{ ...autoResizeStyle, ...upperRowMaxSize }}
+      extra={
+        <Space>
+          <Form form={form}>
+            <LanguageSelect
+              antdFieldName="solutionLang"
+              width="sm"
+              defaultLanguage={Language.javascript}
+              placeholder="Solution Language"
+            />
+          </Form>
+          <Button type="primary" icon={<Play />}>
+            SUBMIT
+          </Button>
+        </Space>
+      }
+    >
+      <CodeEditor
+        editorRef={solutionEditorRef}
+        defaultValue={stubGeneratorResult?.value?.stub}
+        language={solutionLanguage}
+        onModelChange={handleSolutionInputChanged}
+      />
+    </ProCard>
+  );
+
+  const OutputCard = (
+    <ProCard
+      title="Output"
+      bodyStyle={{ ...autoResizeStyle, ...lowerRowMaxSize }}
+    ></ProCard>
+  );
+
+  const UsersCard = (
+    <ProCard
+      title="Users"
+      colSpan={8}
+      direction="column"
+      bodyStyle={{ ...autoResizeStyle, ...lowerRowMaxSize }}
+    >
+      <ProList
+        ghost
+        split
+        metas={{
+          title: {
+            render: (dom, value, index) => {
+              return (
+                <Space>
+                  <UserAvatar userName={value.username} size="large" />
+                  <Typography.Text>{value.username}</Typography.Text>
+                </Space>
+              );
+            },
+          },
+          actions: {
+            render: (dom, value, index) => {
+              return null;
+              <Tag color="error">Error</Tag>;
+            },
+          },
+        }}
+        dataSource={gameInfo?.users}
+      />
+    </ProCard>
+  );
+
+  const handleOnCountdownFinish = () => {};
+
+  return (
+    <Page
+      title={latestRound?.challenge.name}
+      extra={
+        <Space>
+          <Typography.Text
+            strong
+            style={{
+              fontSize: 20,
+            }}
+          >
+            Time Left:
+          </Typography.Text>
+          <Countdown
+            valueStyle={{
+              fontSize: 20,
+            }}
+            value={deadLine}
+            onFinish={handleOnCountdownFinish}
+          />
+        </Space>
+      }
+    >
+      <ProCard direction="column" ghost gutter={[16, 16]}>
+        <ProCard gutter={16} ghost>
+          <ProCard ghost colSpan={10} direction="column" gutter={[16, 16]}>
+            {TaskCard}
+            {TestsCard}
+          </ProCard>
+          <ProCard ghost colSpan={14} direction="column" gutter={[16, 16]}>
+            {SolutionEditorCard}
+            <ProCard gutter={16} ghost>
+              {OutputCard}
+              {UsersCard}
+            </ProCard>
+          </ProCard>
+        </ProCard>
+      </ProCard>
+    </Page>
+  );
+}

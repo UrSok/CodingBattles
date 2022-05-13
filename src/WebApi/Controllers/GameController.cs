@@ -35,19 +35,19 @@ public class GameController : BaseController
     }
     // pooling game status
 
-    [HttpGet("my/{userId}")]
-    public async Task<IActionResult> GetMyGames([FromRoute] string userId, CancellationToken cancellationToken)
+    [HttpGet("gamesByUser/{userId}")]
+    public async Task<IActionResult> GetGamesByUserId([FromRoute] string userId, CancellationToken cancellationToken)
     {
-        var result = await this.gameManager.GetMyGames(userId, cancellationToken);
+        var result = await this.gameManager.GetGamesByUserId(userId, cancellationToken);
         return this.Process(result);
     }
 
     // create game
 
-    [HttpPost("createGame/{userId}/{isPrivate}")]
-    public async Task<IActionResult> CreateGame([FromRoute] string userId, [FromRoute] bool isPrivate, CancellationToken cancellationToken)
+    [HttpPost("createGame/{userId}/{name}/{isPrivate}")]
+    public async Task<IActionResult> CreateGame([FromRoute] string userId, [FromRoute] string name, [FromRoute] bool isPrivate, CancellationToken cancellationToken)
     {
-        var result = await this.gameManager.CreateGame(userId, isPrivate, cancellationToken);
+        var result = await this.gameManager.CreateGame(userId, name,isPrivate, cancellationToken);
         return this.Process(result);
     }
 

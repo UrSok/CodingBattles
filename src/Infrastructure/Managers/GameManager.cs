@@ -16,9 +16,9 @@ public class GameManager : BaseManager, IGameManager
     {
     }
 
-    public async Task<Result<string>> CreateGame(string userId, bool isPrivate, CancellationToken cancellationToken)
+    public async Task<Result<string>> CreateGame(string userId, string name, bool isPrivate, CancellationToken cancellationToken)
     {
-        var command = new CreateGameCommand(userId, isPrivate);
+        var command = new CreateGameCommand(userId, name, isPrivate);
         return await this.SendCommand(command, cancellationToken);
     }
 
@@ -52,9 +52,9 @@ public class GameManager : BaseManager, IGameManager
         return await this.SendCommand(query, cancellationToken);
     }
 
-    public async Task<Result<List<GetGameListResultItem>>> GetMyGames(string userId, CancellationToken cancellationToken)
+    public async Task<Result<List<GetGameListResultItem>>> GetGamesByUserId(string userId, CancellationToken cancellationToken)
     {
-        var query = new GetMyGamesQuery(userId);
+        var query = new GetGamesByUserIdQuery(userId);
         return await this.SendCommand(query, cancellationToken);
     }
 

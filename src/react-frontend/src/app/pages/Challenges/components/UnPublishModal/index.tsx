@@ -35,15 +35,15 @@ export default function UnPublishModal(props: UnPublishModalProps) {
     <ModalForm<ModalFormProps>
       form={form}
       trigger={<Button danger>Upublish</Button>}
-      title="Upublish challenge"
+      title="UnPublish challenge"
       onFinish={handleSubmit}
       submitter={{
         submitButtonProps: {
           danger: true,
-        }
+        },
       }}
       modalProps={{
-        okText: 'Unpublish',
+        okText: 'UnPublish',
         destroyOnClose: true,
         cancelText: 'Cancel',
       }}

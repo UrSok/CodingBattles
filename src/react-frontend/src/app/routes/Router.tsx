@@ -1,12 +1,13 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-import { PATH_CHALLENGES, PATH_GAMES, PATH_IDE, PATH_PROFILES } from './paths';
+import { PATH_CHALLENGES, PATH_IDE, PATH_LOBBY, PATH_PROFILES } from './paths';
 
 import ChallengePages from 'app/pages/Challenges';
 import ErrorResult from 'app/components/ErrorResult';
 import Ide from 'app/pages/Ide';
-import GamesPage from 'app/pages/Games';
+import LobbiesPage from 'app/pages/Lobbies/pages/Index';
+import Lobby from 'app/pages/Lobbies/pages/Lobby';
 
 export default function Router() {
   return (
@@ -30,7 +31,10 @@ export default function Router() {
           <Route path=":id" element={<ChallengePages.Save />} />
         </Route>
       </Route>
-      <Route path={PATH_GAMES.root} element={<GamesPage />} />
+      <Route path={PATH_LOBBY.root}>
+        <Route index element={<LobbiesPage />} />
+        <Route path=":id" element={<Lobby />} />
+      </Route>
       <Route path={PATH_IDE.root}>
         <Route index element={<Ide />} />
       </Route>

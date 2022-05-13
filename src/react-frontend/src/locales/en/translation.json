@@ -43,7 +43,7 @@
     "validationPasswordDontMatch": "Password don't match",
     "SuccessNotification": {
       "message": "Sign up successful!",
-      "description": "A mail confirmation was sent to the indicated email!"
+      "description": "A confirmation mail was sent to the indicated email!"
     }
   },
   "ProfileBadge": {

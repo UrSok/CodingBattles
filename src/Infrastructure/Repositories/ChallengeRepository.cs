@@ -32,7 +32,7 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
     public async Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> Get(ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken)
     {
         var filters = new List<FilterDefinition<ChallengeDocument>>();
-        filters.Add(Builders<ChallengeDocument>.Filter.Eq(x => x.Status, ChallengeStatus.Published));
+        //filters.Add(Builders<ChallengeDocument>.Filter.Eq(x => x.Status, ChallengeStatus.Published));
 
         if (!string.IsNullOrEmpty(challengeSearchModel.Text))
         {
