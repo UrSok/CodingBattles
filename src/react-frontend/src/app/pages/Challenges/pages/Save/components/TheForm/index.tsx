@@ -16,7 +16,12 @@ import {
 } from 'antd';
 import { useForm, useWatch } from 'antd/lib/form/Form';
 import { challengeApi } from 'app/api/challenge';
-import { Challenge, ChallengeResult, ChallengeStatus, TestPair } from 'app/api/types/challenge';
+import {
+  Challenge,
+  ChallengeResult,
+  ChallengeStatus,
+  TestPair,
+} from 'app/api/types/challenge';
 import CodeEditor from 'app/components/Input/CodeEditor';
 import LanguageSelect from 'app/components/Input/LanguageSelect';
 import MultiTagSelect from 'app/pages/Challenges/components/MultiTagSelect';
@@ -295,14 +300,16 @@ export default function TheForm(props: Props) {
         message={`${testPair.title} failed with the following ${testType} error`}
         description={
           <Space direction="vertical">
-            <Typography.Text>
+            <Typography.Paragraph>
               <Typography.Text strong>Expected output:</Typography.Text>
-              <pre>{expectedOutput}</pre>
-            </Typography.Text>
-            <Typography.Text>
+              <pre style={{ marginTop: 0 }}>{expectedOutput}</pre>
+            </Typography.Paragraph>
+            <Typography.Paragraph>
               <Typography.Text strong>Actual output:</Typography.Text>
-              <pre>{testResult.value?.outputError}</pre>
-            </Typography.Text>
+              <pre style={{ marginTop: 0 }}>
+                {testResult.value?.outputError}
+              </pre>
+            </Typography.Paragraph>
           </Space>
         }
       />,

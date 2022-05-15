@@ -42,7 +42,11 @@ export default function Layout() {
 
   return (
     <ProLayout
-      title="Coding Battles"
+      title="Coding Battle"
+      logo={false}
+      fixedHeader
+      fixSiderbar
+      locale="en-US"
       layoutBgImgList={[
         {
           src: 'https://img.alicdn.com/imgextra/i2/O1CN01O4etvp1DvpFLKfuWq_!!6000000000279-2-tps-609-606.png',
@@ -72,7 +76,6 @@ export default function Layout() {
       location={{
         pathname: pathname,
       }}
-      fixSiderbar
       onMenuHeaderClick={() => navigate('/')}
       menuDataRender={(menuData: MenuDataItem[]): MenuDataItem[] => {
         // TODO: REFACTOR THIS LOGIC AS IT DOESN'T WORK AS EXPECTED

@@ -8,11 +8,12 @@ import ErrorResult from 'app/components/ErrorResult';
 import Ide from 'app/pages/Ide';
 import LobbiesPage from 'app/pages/Lobbies/pages/Index';
 import Lobby from 'app/pages/Lobbies/pages/Lobby';
+import Welcome from 'app/pages/Welcome';
 
 export default function Router() {
   return (
     <Routes>
-      <Route index element={<p>welcome</p>} />
+      <Route index element={<Welcome />} />
       <Route path={PATH_PROFILES.root}>
         <Route index element={<p>profiles</p>} />
         <Route path={PATH_PROFILES.ME.root}>

@@ -1,6 +1,6 @@
 import ProCard from '@ant-design/pro-card';
 import ProList from '@ant-design/pro-list';
-import { Avatar, Button, Form, Space, Tag, Typography } from 'antd';
+import { Alert, Avatar, Button, Form, Space, Tag, Typography } from 'antd';
 import { TestPair } from 'app/api/types/challenge';
 import ChallengeDescription from 'app/components/ChallengeDescription';
 import CodeEditor from 'app/components/Input/CodeEditor';
@@ -10,7 +10,7 @@ import { Language } from 'app/types/global';
 import React, { ReactText, useEffect, useRef, useState } from 'react';
 import Play from '@2fd/ant-design-icons/lib/Play';
 import { GetGameResult } from 'app/api/types/games';
-import ProForm from '@ant-design/pro-form';
+import ProForm, { ProFormTextArea } from '@ant-design/pro-form';
 import monaco from 'monaco-editor';
 import { useEffectOnce, useMap } from 'usehooks-ts';
 import { gameApi, stubGeneratorApi } from 'app/api';
@@ -24,6 +24,8 @@ import {
   ExclamationCircleOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
+import { ErrorCode } from 'app/api/types';
+import { useParams } from 'react-router-dom';
 
 type TestState = 'None' | 'Validating' | 'Passed' | 'Failed' | 'Unvalidated';
 
@@ -32,6 +34,7 @@ type IdeProps = {
 };
 
 export default function Ide(props: IdeProps) {
+  const { id } = useParams();
   const { gameInfo } = props;
   const latestRound = gameInfo?.rounds[gameInfo.rounds.length - 1];
   const deadLine =
@@ -58,6 +61,9 @@ export default function Ide(props: IdeProps) {
 
   const [triggerTestRun, { isLoading: isTesting, data: testResult }] =
     gameApi.useRunTestMutation();
+
+  const [triggerSubmitSummary, { isLoading: isSubmiting, data: submitResult }] =
+    gameApi.useSubmitResultMutation();
 
   useEffectOnce(() => {
     let tests = latestRound?.challenge.tests;
@@ -299,6 +305,19 @@ export default function Ide(props: IdeProps) {
     }
   };
 
+  const onHandleSubmit = () => {
+    // TODO: fix that candva
+
+    /*triggerSubmitSummary({
+      gameId: id!,
+      roundNumber: latestRound!.number,
+      roundSummary: [
+
+      ]
+    })*/
+
+  };
+
   const SolutionEditorCard = (
     <ProCard
       title="Solution"
@@ -313,7 +332,7 @@ export default function Ide(props: IdeProps) {
               placeholder="Solution Language"
             />
           </Form>
-          <Button type="primary" icon={<Play />}>
+          <Button type="primary" icon={<Play />} onClick={onHandleSubmit}>
             SUBMIT
           </Button>
         </Space>
@@ -328,11 +347,65 @@ export default function Ide(props: IdeProps) {
     </ProCard>
   );
 
+  const handleTheOutput = (): React.ReactNode => {
+    if (testResult && !testResult?.isSuccess) {
+      if (testResult?.errors?.at(0)?.name === ErrorCode.BuildError) {
+        const error = testResult.value?.outputError
+          ? testResult.value.test.buildStderr
+          : testResult?.value?.test.stderr;
+
+        return (
+          <>
+            <Alert showIcon type="error" message="Build error" />
+            <Typography.Paragraph>
+              <pre>{error}</pre>
+            </Typography.Paragraph>
+          </>
+        );
+      }
+
+      if (
+        testResult?.errors?.at(0)?.name === ErrorCode.TestNotPassed ||
+        testResult?.errors?.at(0)?.name === ErrorCode.ValidatorNotPassed
+      ) {
+        return (
+          <>
+            <Alert
+              showIcon
+              type="error"
+              message="Expected output differs from the actual"
+            />
+            <Typography.Paragraph>
+              <pre>{testResult?.value?.outputError}</pre>
+            </Typography.Paragraph>
+          </>
+        );
+      }
+    }
+
+    if (testResult?.isSuccess) {
+      return (
+        <>
+          <Typography.Paragraph>
+            <pre>
+              {testResult?.value?.test?.stdout ??
+                testResult?.value?.validator?.stdout}
+            </pre>
+          </Typography.Paragraph>
+        </>
+      );
+    }
+
+    return undefined;
+  };
+
   const OutputCard = (
     <ProCard
       title="Output"
       bodyStyle={{ ...autoResizeStyle, ...lowerRowMaxSize }}
-    ></ProCard>
+    >
+      {handleTheOutput()}
+    </ProCard>
   );
 
   const UsersCard = (

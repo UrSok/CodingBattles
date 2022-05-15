@@ -16,7 +16,13 @@ import { translations } from 'locales/translations';
 import { EMAIL_REGEX } from 'app/utils/constants';
 import { authApi } from 'app/api/auth';
 
-export default function SingInModalForm() {
+type SingInModalFormProps = {
+  textButton?: boolean;
+};
+
+export default function SingInModalForm(props: SingInModalFormProps) {
+  const { textButton } = props;
+
   const [form] = Form.useForm();
   const { t } = useTranslation();
 
@@ -69,7 +75,15 @@ export default function SingInModalForm() {
         destroyOnClose: true,
         afterClose: () => setSubmitDisabled(true),
       }}
-      trigger={<LoginOutlined style={{ fontSize: '20px' }} />}
+      trigger={
+        textButton ? (
+          <Button type="ghost" size="large" icon={<LoginOutlined />}>
+            Sign In
+          </Button>
+        ) : (
+          <LoginOutlined style={{ fontSize: '20px' }} />
+        )
+      }
       onFieldsChange={validateFields}
       onFinish={onSubmit}
       submitter={{

@@ -7,17 +7,22 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import ProForm, { ModalForm, ProFormText } from '@ant-design/pro-form';
-import { Form, notification } from 'antd';
+import { Button, Form, notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { FieldData } from 'rc-field-form/es/interface';
-
 
 import { SignUpModel } from 'app/api/types/auth';
 import { translations } from 'locales/translations';
 import { EMAIL_REGEX } from 'app/utils/constants';
 import { authApi } from 'app/api/auth';
 
-export default function SingUpModalForm() {
+type SignUpModalFormProps = {
+  textButton?: boolean;
+};
+
+export default function SingUpModalForm(props: SignUpModalFormProps) {
+  const { textButton } = props;
+
   const [form] = Form.useForm();
   const { t } = useTranslation();
   const [submitDisabled, setSubmitDisabled] = useState(true);
@@ -143,7 +148,13 @@ export default function SingUpModalForm() {
         afterClose: () => setSubmitDisabled(true),
       }}
       trigger={
-        <UserAddOutlined style={{ fontSize: '20px', color: blue.primary }} />
+        textButton ? (
+          <Button type="primary" size="large" icon={<UserAddOutlined />}>
+            Sign Up
+          </Button>
+        ) : (
+          <UserAddOutlined style={{ fontSize: '20px', color: blue.primary }} />
+        )
       }
       submitter={{
         submitButtonProps: {

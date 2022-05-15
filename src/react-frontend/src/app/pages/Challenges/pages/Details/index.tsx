@@ -95,7 +95,7 @@ export default function DetailsChallenge() {
 
             <ProCard colSpan={8} ghost direction="column" gutter={[16, 16]}>
               <ProCard title="Created by">
-                <Link to={PATH_PROFILES.root + `${user.id}`}>
+                <Link to={PATH_PROFILES.root + `/${user.id}`}>
                   <Space className="challenge-created-by">
                     <UserAvatar userName={user.username} size="large" />
                     <Typography.Text
