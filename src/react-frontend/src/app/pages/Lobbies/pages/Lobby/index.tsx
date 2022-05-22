@@ -1,43 +1,53 @@
 import { gameApi } from 'app/api';
 import Page from 'app/components/Layout/Page';
 import LoadingSpinner from 'app/components/LoadingSpinner';
-import { selectAuth } from 'app/slices/auth/selectors';
-import React from 'react';
+import { selectAuth, selectUser } from 'app/slices/auth/selectors';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Ide from './pages/Ide';
 import Room from './pages/Room';
 import { addMinutesToDate } from './pages/utils/date';
 
+import { getTokenFromLocalStorage } from 'app/utils/jwt';
+import * as signalR from '@microsoft/signalr';
+import { useEffectOnce } from 'usehooks-ts';
+import { Button } from 'antd';
+
+const connection: signalR.HubConnection;
+
 export default function Lobby() {
   const { id } = useParams();
-  const user = useSelector(selectAuth);
+  const token = getTokenFromLocalStorage();
+  const user = useSelector(selectUser);
 
-  const { data } = gameApi.useGetByIdQuery(id!, {
-    pollingInterval: 2000,
+ useEffectOnce(() => {
+    
+
+    connection.start();
+
+    connection.on('send', data => {
+      console.log('Received: ', data);
+    });
   });
 
-  if (!data)
-    return (
-      <Page>
-        <LoadingSpinner centered />
-      </Page>
-    );
+  const join = () => {
+    if (connection.state === signalR.HubConnectionState.Connected) {
+      connection.send('JoinLobby', user?.id, 'NYCrV6Tc');
+    }
+  };
 
-  const { value: gameInfo } = data;
+  const salut = () => {
+    if (connection.state === signalR.HubConnectionState.Connected) {
+      connection.send('send', id, 'Salut');
+    }
+  };
 
-  const getActiveRounds = gameInfo?.rounds.filter(x => {
-    //console.log(addMinutesToDate(x.startTime, x.durationMinutes).getTime);
-    //console.log(Date.now);
-    //addMinutesToDate(x.startTime, x.durationMinutes).getTime
-  });
+  return (
+    <div>
+      <Button onClick={join}>JoinLobby</Button>
+      <Button onClick={salut}>Salut</Button>
+    </div>
+  );
 
-  //console.log(getActiveRounds);
-  //if (gameInfo?.rounds && gameInfo.r)
-  //console.log(game)
-  if (!gameInfo?.rounds || gameInfo.rounds.length === 0) {
-    return <Room gameInfo={gameInfo} />;
-  }
-
-  return <Ide gameInfo={gameInfo} />;
 }

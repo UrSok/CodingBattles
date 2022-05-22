@@ -24,7 +24,7 @@ public class GameManager : BaseManager, IGameManager
 
     public async Task<Result<string>> JoinGame(string userId, string code, CancellationToken cancellationToken)
     {
-        var command = new JoinGameCommand(userId, code);
+        var command = new JoinLobbyCommand(userId, code);
         return await this.SendCommand(command, cancellationToken);
     }
 

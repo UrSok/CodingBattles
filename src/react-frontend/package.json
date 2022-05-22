@@ -14,6 +14,7 @@
     "@ant-design/pro-skeleton": "1.0.5",
     "@ant-design/pro-table": "2.74.2",
     "@craco/craco": "6.4.3",
+    "@microsoft/signalr": "6.0.5",
     "@monaco-editor/react": "4.4.5",
     "@reduxjs/toolkit": "1.8.1",
     "@testing-library/jest-dom": "5.16.4",

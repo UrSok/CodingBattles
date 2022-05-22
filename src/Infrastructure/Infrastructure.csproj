@@ -39,4 +39,8 @@
     <ProjectReference Include="..\StubGenerator\StubGenerator.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Logic\Lobby\Queries\" />
+  </ItemGroup>
+
 </Project>

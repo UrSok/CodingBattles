@@ -6,12 +6,13 @@ using Infrastructure.Repositories;
 using Infrastructure.Utils.Validation;
 using MediatR;
 
-namespace Infrastructure.Logic.Games.Commands;
+namespace Infrastructure.Logic.Lobby.Commands;
+
 internal record JoinLobbyCommand(string UserId, string Code) : IRequest<Result<string>>;
 
-internal class JoinGameCommandValidator : AbstractValidator<JoinLobbyCommand>
+internal class JoinLobbyCommandValidator : AbstractValidator<JoinLobbyCommand>
 {
-    public JoinGameCommandValidator()
+    public JoinLobbyCommandValidator()
     {
         this.RuleFor(x => x.UserId)
             .NotEmpty().WithError(ValidationError.EmptyUserId);
@@ -22,11 +23,11 @@ internal class JoinGameCommandValidator : AbstractValidator<JoinLobbyCommand>
     }
 }
 
-internal class JoinGameHandler : IRequestHandler<JoinLobbyCommand, Result<string>>
+internal class JoinLobbyHandler : IRequestHandler<JoinLobbyCommand, Result<string>>
 {
     private readonly IGameRepository gameRepository;
 
-    public JoinGameHandler(IGameRepository gameRepository)
+    public JoinLobbyHandler(IGameRepository gameRepository)
     {
         this.gameRepository = gameRepository;
     }
