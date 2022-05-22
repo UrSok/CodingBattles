@@ -12,15 +12,15 @@ public class GamesProfile : Profile
     public GamesProfile()
     {
         this.CreateMap<RoundDocument, Round>().ReverseMap();
-        this.CreateMap<RoundSummaryDocument, RoundSummary>().ReverseMap();
+        this.CreateMap<RoundSummaryDocument, Domain.Entities.Games.RoundSummary>().ReverseMap();
         this.CreateMap<TestSummaryDocument, TestSummary>().ReverseMap();
-        this.CreateMap<Round, GetGameRoundResult>();
-        this.CreateMap<RoundSummary, GetGameRoundSummaryResult>().ReverseMap();
+        this.CreateMap<Round, RoundDetails>();
+        this.CreateMap<RoundSummary, RoundSummary>().ReverseMap();
 
 
         this.CreateMap<PaizaJobDetails, TestResult>().ReverseMap();
         this.CreateMap<GameDocument, Game>().ReverseMap();
-        this.CreateMap<Game, GetGameResult>().ReverseMap();
-        this.CreateMap<Game, GetGameListResultItem>().ReverseMap();
+        this.CreateMap<Game, GameDetails>().ReverseMap();
+        this.CreateMap<Game, GameSearchItem>().ReverseMap();
     }
 }

@@ -10,7 +10,7 @@ using Infrastructure.Utils.Validation;
 using MediatR;
 
 namespace Infrastructure.Logic.Games.Queries;
-internal record GetGamesQuery() : IRequest<Result<List<GetGameListResultItem>>>;
+internal record GetGamesQuery() : IRequest<Result<List<GameSearchItem>>>;
 
 internal class GetGamesQueryValidator : AbstractValidator<GetGamesQuery>
 {
@@ -20,7 +20,7 @@ internal class GetGamesQueryValidator : AbstractValidator<GetGamesQuery>
     }
 }
 
-internal class GetGamesHandler : IRequestHandler<GetGamesQuery, Result<List<GetGameListResultItem>>>
+internal class GetGamesHandler : IRequestHandler<GetGamesQuery, Result<List<GameSearchItem>>>
 {
     private readonly IGameRepository gameRepository;
     private readonly IUserRepository userRepository;
@@ -33,21 +33,21 @@ internal class GetGamesHandler : IRequestHandler<GetGamesQuery, Result<List<GetG
         this.mapper = mapper;
     }
 
-    public async Task<Result<List<GetGameListResultItem>>> Handle(GetGamesQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<GameSearchItem>>> Handle(GetGamesQuery request, CancellationToken cancellationToken)
     {
         var games = await this.gameRepository.Get(cancellationToken);
         var userIds = games.SelectMany(x => x.UserIds).ToList();
         var users = await this.userRepository.GetByIds(userIds, cancellationToken);
         var userModels = this.mapper.Map<List<UserModel>>(users);
 
-        var getGameListResult = this.mapper.Map<List<GetGameListResultItem>>(games);
+        var gameSearchItemList = this.mapper.Map<List<GameSearchItem>>(games);
 
-        for (int i = 0; i < getGameListResult.Count; i++)
+        foreach (var gameSearchItem in gameSearchItemList)
         {
-            getGameListResult[i].Users = userModels.Where(x => games.ElementAt(i).UserIds.Contains(x.Id)).ToList();
-            getGameListResult[i].RoundStatus = games.ElementAt(i).Rounds.LastOrDefault()?.Status ?? Domain.Enums.RoundStatus.NotStarted;
+            var game = games.First(x => x.Id == gameSearchItem.Id);
+            gameSearchItem.Users = userModels.Where(user => game.UserIds.Contains(user.Id)).ToList();
         }
 
-        return Result<List<GetGameListResultItem>>.Success(getGameListResult);
+        return Result<List<GameSearchItem>>.Success(gameSearchItemList);
     }
 }

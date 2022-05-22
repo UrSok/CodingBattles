@@ -7,6 +7,7 @@ using Infrastructure.Utils.Validation;
 using MediatR;
 
 namespace Infrastructure.Logic.Games.Commands;
+
 internal record JoinGameCommand(string UserId, string Code) : IRequest<Result<string>>;
 
 internal class JoinGameCommandValidator : AbstractValidator<JoinGameCommand>

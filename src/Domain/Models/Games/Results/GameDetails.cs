@@ -7,7 +7,7 @@ using Domain.Models.Users;
 namespace Domain.Models.Games.Results;
 
 
-public class GetGameRoundSummaryResult
+public class RoundSummaryDetails
 {
     public UserModel User { get; set; }
     public Solution Solution { get; set; }
@@ -15,29 +15,31 @@ public class GetGameRoundSummaryResult
 
 }
 
-public class GetGameRoundResult
+public class RoundDetails
 {
     public int Number { get; set; }
     public DateTime StartTime { get; set; }
     public int DurationMinutes { get; set; }
     public Challenge Challenge { get; set; }
-    public List<GetGameRoundSummaryResult> RoundSummaries { get; set; }
+    public List<RoundSummaryDetails> RoundSummaries { get; set; }
 
 }
 
-public class GetGameResult
+public class GameDetails
 {
     public string Code { get; set; }
 
     public string Name { get; set; }
+    
+    public GameStatus Status { get; set; }
 
     public bool IsPrivate { get; set; }
 
-    public UserModel CreatedByUser { get; set; }
+    public UserModel GameMasterUser { get; set; }
 
     public List<UserModel> Users { get; set; }
 
-    public RoundStatus Status { get; set; }
+    public RoundDetails CurrentRound { get; set; }
 
-    public List<GetGameRoundResult> Rounds { get; set; }
+    public List<RoundDetails> PreviousRounds { get; set; }
 }

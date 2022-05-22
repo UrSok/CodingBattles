@@ -15,7 +15,7 @@ internal interface IUserRepository
     Task<User> GetByJwtToken(string jwtToken, CancellationToken cancellationToken);
     Task<User> Get(string id, CancellationToken cancellationToken);
     Task<bool> ActivateUser(string userId, string role, CancellationToken cancellationToken);
-    Task<IEnumerable<User>> GetByIds(List<string> userIds, CancellationToken cancellationToken);
+    Task<IEnumerable<User>> GetByIds(IEnumerable<string> userIds, CancellationToken cancellationToken);
 }
 
 internal class UserRepository : BaseRepository, IUserRepository
@@ -99,7 +99,7 @@ internal class UserRepository : BaseRepository, IUserRepository
         return result.ModifiedCount == 1;
     }
 
-    public async Task<IEnumerable<User>> GetByIds(List<string> userIds, CancellationToken cancellationToken)
+    public async Task<IEnumerable<User>> GetByIds(IEnumerable<string> userIds, CancellationToken cancellationToken)
     {
         var filter = Builders<UserDocument>.Filter.In(x => x.Id, userIds);
         var userDocuments = (await this.users.FindAsync(filter, cancellationToken: cancellationToken))

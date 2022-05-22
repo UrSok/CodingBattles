@@ -19,10 +19,6 @@ internal class RoundDocument
     [BsonElement("ChallengeId")]
     public string ChallengeId { get; set; }
 
-    [BsonElement("Status")]
-    [BsonRepresentation(BsonType.String)]
-    public RoundStatus Status { get; set; }
-
     [BsonElement("RoundSummaries")]
     public List<RoundSummaryDocument> RoundSummaries { get; set; }
 }

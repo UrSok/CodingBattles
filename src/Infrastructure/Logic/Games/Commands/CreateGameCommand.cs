@@ -37,7 +37,7 @@ internal class CreateGameHandler : IRequestHandler<CreateGameCommand, Result<str
         {
             Code = CodeGeneratorService.GetRandomAlphanumericString(8),
             Name = request.Name,
-            CreatedByUserId = request.UserId,
+            GameMasterUserId = request.UserId,
             IsPrivate = request.IsPrivate,
             UserIds = new List<string> { request.UserId },
         };

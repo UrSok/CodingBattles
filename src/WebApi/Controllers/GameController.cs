@@ -71,10 +71,10 @@ public class GameController : BaseController
 
     // start round
 
-    [HttpPost("startRound")]
-    public async Task<IActionResult> StartRound([FromBody] StartRoundRequest startRoundRequest, CancellationToken cancellationToken)
+    [HttpPost("{gameId}/startRound")]
+    public async Task<IActionResult> StartRound([FromRoute] string gameId, CancellationToken cancellationToken)
     {
-        var result = await this.gameManager.StartRound(startRoundRequest, cancellationToken);
+        var result = await this.gameManager.StartRound(gameId, cancellationToken);
         return this.Process(result);
     }
 
@@ -92,6 +92,14 @@ public class GameController : BaseController
     public async Task<IActionResult> RunTest([FromBody] RunTestRequest runTestModel, CancellationToken cancellationToken)
     {
         var result = await this.gameManager.RunTest(runTestModel, cancellationToken);
+        return this.Process(result);
+    }
+
+
+    [HttpPost("{gameId}/selectChallenge/{challengeId}")]
+    public async Task<IActionResult> SelectChallenge([FromRoute] string gameId, [FromRoute] string challengeId, CancellationToken cancellationToken)
+    {
+        var result = await this.gameManager.SelectChallenge(gameId, challengeId, cancellationToken);
         return this.Process(result);
     }
 }

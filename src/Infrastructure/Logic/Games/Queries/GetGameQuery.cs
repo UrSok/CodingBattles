@@ -11,7 +11,7 @@ using Infrastructure.Utils.Validation;
 using MediatR;
 
 namespace Infrastructure.Logic.Games.Queries;
-internal record GetGameQuery(string GameId) : IRequest<Result<GetGameResult>>;
+internal record GetGameQuery(string GameId) : IRequest<Result<GameDetails>>;
 
 internal class GetGameQueryValidator : AbstractValidator<GetGameQuery>
 {
@@ -22,7 +22,7 @@ internal class GetGameQueryValidator : AbstractValidator<GetGameQuery>
     }
 }
 
-internal class GetGameHandler : IRequestHandler<GetGameQuery, Result<GetGameResult>>
+internal class GetGameHandler : IRequestHandler<GetGameQuery, Result<GameDetails>>
 {
     private readonly IGameRepository gameRepository;
     private readonly IUserRepository userRepository;
@@ -37,39 +37,62 @@ internal class GetGameHandler : IRequestHandler<GetGameQuery, Result<GetGameResu
         this.mapper = mapper;
     }
 
-    public async Task<Result<GetGameResult>> Handle(GetGameQuery request, CancellationToken cancellationToken)
+    public async Task<Result<GameDetails>> Handle(GetGameQuery request, CancellationToken cancellationToken)
     {
         var game = await this.gameRepository.Get(request.GameId, cancellationToken);
         if (game is null)
         {
-            return Result<GetGameResult>.Failure(ProcessingError.GameNotFound);
+            return Result<GameDetails>.Failure(ProcessingError.GameNotFound);
         }
 
-        var rounds = game.Rounds.SelectMany(x => x.RoundSummaries.Select(y => y.UserId));
         var userIds = game.UserIds;
-        userIds.Add(game.CreatedByUserId);
-        userIds.AddRange(game.Rounds.SelectMany(x => x.RoundSummaries.Select(y => y.UserId)));
+        userIds.Add(game.GameMasterUserId);
+        userIds.AddRange(game.PreviousRounds.SelectMany(x => x.RoundSummaries.Select(y => y.UserId)));
 
-        var users = await this.userRepository.GetByIds(userIds, cancellationToken);
-        var challenges = await this.challengeRepository.GetByIds(game.Rounds.Select(x => x.ChallengeId), cancellationToken);
+        if (game.CurrentRound is not null)
+        {
+            userIds.AddRange(game.CurrentRound.RoundSummaries.Select(y => y.UserId));
+        }
+
+        var users = await this.userRepository.GetByIds(userIds.Distinct(), cancellationToken);
+
+        var challengeIds = game.PreviousRounds.Select(x => x.ChallengeId).ToList();
+        
+        if (game.CurrentRound is not null)
+        {
+            challengeIds.Add(game.CurrentRound.ChallengeId);
+        }
+
+        var challenges = await this.challengeRepository.GetByIds(challengeIds, cancellationToken);
+
         var userModels = this.mapper.Map<IEnumerable<UserModel>>(users);
 
-        var gameResult = this.mapper.Map<GetGameResult>(game);
+        var gameDetails = this.mapper.Map<GameDetails>(game);
 
-        gameResult.CreatedByUser = userModels.First(x => x.Id == game.CreatedByUserId);
-        gameResult.Users = userModels.Where(x => game.UserIds.Contains(x.Id)).ToList();
+        gameDetails.GameMasterUser = userModels.First(x => x.Id == game.GameMasterUserId);
+        gameDetails.Users = userModels.Where(x => game.UserIds.Contains(x.Id)).ToList();
 
-        foreach (var gameResultRound in gameResult.Rounds)
+        foreach (var previousRoundDetails in gameDetails.PreviousRounds)
         {
-            var round = game.Rounds.First(x => x.Number == gameResultRound.Number);
-            gameResultRound.Challenge = challenges.First(x => x.Id == round.ChallengeId);
+            var round = game.PreviousRounds.First(x => x.Number == previousRoundDetails.Number);
+            previousRoundDetails.Challenge = challenges.First(x => x.Id == round.ChallengeId);
 
-            for (int i = 0; i < gameResultRound.RoundSummaries.Count; i++)
+            for (int i = 0; i < previousRoundDetails.RoundSummaries.Count; i++)
             {
-                gameResultRound.RoundSummaries[0].User = userModels.First(x => x.Id == round.RoundSummaries[i].UserId);
+                previousRoundDetails.RoundSummaries[0].User = userModels.First(x => x.Id == round.RoundSummaries[i].UserId);
             }
         }
 
-        return Result<GetGameResult>.Success(gameResult);
+        if (gameDetails.CurrentRound is not null)
+        {
+            gameDetails.CurrentRound.Challenge = challenges.FirstOrDefault(x => x.Id == game.CurrentRound.ChallengeId);
+
+            for (int i = 0; i < gameDetails.CurrentRound.RoundSummaries.Count; i++)
+            {
+                gameDetails.CurrentRound.RoundSummaries[0].User = userModels.First(x => x.Id == game.CurrentRound.RoundSummaries[i].UserId);
+            }
+        }
+
+        return Result<GameDetails>.Success(gameDetails);
     }
 }

@@ -8,11 +8,15 @@ public class Game : EntityWithId
 
     public string Name { get; set; }
 
+    public GameStatus Status { get; set; }
+
     public bool IsPrivate { get; set; }
 
-    public string CreatedByUserId { get; set; }
+    public string GameMasterUserId { get; set; }
 
     public List<string> UserIds { get; set; }
 
-    public List<Round> Rounds { get; set; }
+    public Round CurrentRound { get; set; }
+
+    public List<Round> PreviousRounds { get; set; }
 }

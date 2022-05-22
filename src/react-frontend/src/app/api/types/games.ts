@@ -1,7 +1,7 @@
 import { Challenge, Solution, TestPair } from './challenge';
 import { UserModel } from './user';
 
-export enum RoundStatus {
+export enum GameStatus {
   NotStarted = 0,
   InProgress = 1,
   Finished = 2,
@@ -78,42 +78,42 @@ export type LeaveGameRequest = {
 };
 
 //===========================
-export type GetGameListResultItem = {
+export type GameSearchItem = {
   id: string;
   code: string;
   name: string;
-  roundStatus: RoundStatus;
+  status: GameStatus;
   users: UserModel[];
 };
 
 //===========================
-export type GetGameRoundSummaryResult = {
+export type RoundSummaryDetails = {
   user: UserModel;
   solution: Solution;
   testSummaries: TestSummary[];
 };
 
-export type GetGameRoundResult = {
+export type RoundDetails = {
   number: number;
-  startTime: Date;
+  startTime?: Date;
   durationMinutes: number;
   challenge: Challenge;
-  roundSummaries: GetGameRoundSummaryResult[];
+  roundSummaries: RoundSummaryDetails[];
 };
 
-export type GetGameResult = {
+export type GameDetails = {
   code: string;
   name: string;
+  status: GameStatus;
   isPrivate: boolean;
-  createdByUser: UserModel;
+  gameMasterUser: UserModel;
   users: UserModel[];
-  status: RoundStatus;
-  rounds: GetGameRoundResult[];
+  currentRound?: RoundDetails;
+  previousRounds: RoundDetails[];
 };
 //===========================
 export type StartRoundRequest = {
   gameId: string;
-  challengeId: string;
 }
 
 //===========================
@@ -121,4 +121,10 @@ export type SubmitResultRequest = {
   gameId: string;
   roundNumber: number;
   roundSummary: RoundSummary;
+};
+
+//===========================
+export type SelectChallengeRequest = {
+  gameId: string;
+  challengeId: string;
 };

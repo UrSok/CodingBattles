@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.Games;
+using Domain.Enums;
 using Domain.Enums.Errors;
 using Domain.Models.Common;
 using Domain.Models.Games;
@@ -9,21 +10,18 @@ using Infrastructure.Utils.Validation;
 using MediatR;
 
 namespace Infrastructure.Logic.Games.Commands;
-internal record StartRoundCommand(StartRoundRequest Model) : IRequest<Result<int>>;
+internal record StartRoundCommand(string GameId) : IRequest<Result>;
 
 internal class StartRoundCommandValidator : AbstractValidator<StartRoundCommand>
 {
     public StartRoundCommandValidator()
     {
-        this.RuleFor(x => x.Model.ChallengeId)
-            .NotEmpty().WithError(ValidationError.EmptyChallengeId);
-
-        this.RuleFor(x => x.Model.GameId)
+        this.RuleFor(x => x.GameId)
             .NotEmpty().WithError(ValidationError.EmptyGameId);
     }
 }
 
-internal class StartRoundHandler : IRequestHandler<StartRoundCommand, Result<int>>
+internal class StartRoundHandler : IRequestHandler<StartRoundCommand, Result>
 {
     private readonly IChallengeRepository challengeRepository;
     private readonly IGameRepository gameRepository;
@@ -34,36 +32,30 @@ internal class StartRoundHandler : IRequestHandler<StartRoundCommand, Result<int
         this.gameRepository = gameRepository;
     }
 
-    public async Task<Result<int>> Handle(StartRoundCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(StartRoundCommand request, CancellationToken cancellationToken)
     {
-        var game = await this.gameRepository.Get(request.Model.GameId, cancellationToken);
+        var game = await this.gameRepository.Get(request.GameId, cancellationToken);
         if (game is null)
         {
-            return Result<int>.Failure(ProcessingError.GameNotFound);
+            return Result.Failure(ProcessingError.GameNotFound);
         }
 
-        var challenge = await this.challengeRepository.Get(request.Model.ChallengeId, cancellationToken);
-        if (challenge is null)
-        {
-            return Result<int>.Failure(ProcessingError.ChallengeNotFound);  
-        }
+        game.CurrentRound.StartTime = DateTime.Now;
+        game.CurrentRound.DurationMinutes = 30;
 
-        var lastRound = game.Rounds.LastOrDefault();
-
-        var round = new Round
-        {
-            Number = lastRound is null ? 1 : lastRound.Number + 1,
-            StartTime = DateTime.Now,
-            DurationMinutes = 30,
-            ChallengeId = challenge.Id,
-        };
-
-        var result = await this.gameRepository.StartRound(game.Id, round, cancellationToken);
+        var result = await this.gameRepository.UpdateCurrentRound(game.Id, game.CurrentRound, cancellationToken);
         if (!result)
         {
-            return Result<int>.Failure(Error.InternalServerError);
+            return Result.Failure(Error.InternalServerError);
         }
 
-        return Result<int>.Success(round.Number);
+        game.Status = GameStatus.InProgress;
+        result = await this.gameRepository.UpdateGameStatus(game.Id, GameStatus.InProgress, cancellationToken);
+        if (!result)
+        {
+            return Result.Failure(Error.InternalServerError);
+        }
+
+        return Result.Success();
     }
 }

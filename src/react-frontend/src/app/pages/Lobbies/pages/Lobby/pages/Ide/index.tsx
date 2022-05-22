@@ -9,7 +9,7 @@ import Page from 'app/components/Layout/Page';
 import { Language } from 'app/types/global';
 import React, { ReactText, useEffect, useRef, useState } from 'react';
 import Play from '@2fd/ant-design-icons/lib/Play';
-import { GetGameResult } from 'app/api/types/games';
+import { GameDetails } from 'app/api/types/games';
 import ProForm, { ProFormTextArea } from '@ant-design/pro-form';
 import monaco from 'monaco-editor';
 import { useEffectOnce, useMap } from 'usehooks-ts';
@@ -30,16 +30,17 @@ import { useParams } from 'react-router-dom';
 type TestState = 'None' | 'Validating' | 'Passed' | 'Failed' | 'Unvalidated';
 
 type IdeProps = {
-  gameInfo?: GetGameResult;
+  gameInfo?: GameDetails;
 };
 
 export default function Ide(props: IdeProps) {
   const { id } = useParams();
   const { gameInfo } = props;
-  const latestRound = gameInfo?.rounds[gameInfo.rounds.length - 1];
+  const { currentRound } = gameInfo!;
+
   const deadLine =
-    latestRound && latestRound.startTime
-      ? new Date(latestRound.startTime).getTime() + 1800000
+    currentRound && currentRound.startTime
+      ? new Date(currentRound.startTime).getTime() + 1800000
       : 0;
 
   const [form] = useForm();
@@ -66,7 +67,7 @@ export default function Ide(props: IdeProps) {
     gameApi.useSubmitResultMutation();
 
   useEffectOnce(() => {
-    let tests = latestRound?.challenge.tests;
+    let tests = currentRound?.challenge.tests;
 
     if (tests) {
       for (let i = 0; i < tests?.length; i++) {
@@ -75,14 +76,14 @@ export default function Ide(props: IdeProps) {
     }
 
     triggerStubGenerator({
-      input: latestRound?.challenge.stubGeneratorInput ?? '',
+      input: currentRound?.challenge.stubGeneratorInput ?? '',
       language: solutionLanguage ?? getLanguageKeyName(Language.javascript),
     });
   });
 
   useEffect(() => {
     triggerStubGenerator({
-      input: latestRound?.challenge.stubGeneratorInput ?? '',
+      input: currentRound?.challenge.stubGeneratorInput ?? '',
       language: solutionLanguage ?? getLanguageKeyName(Language.javascript),
     });
   }, [solutionLanguage]);
@@ -126,7 +127,7 @@ export default function Ide(props: IdeProps) {
       bodyStyle={{ ...autoResizeStyle, ...upperRowMaxSize }}
     >
       <ChallengeDescription
-        value={latestRound?.challenge.descriptionMarkdown}
+        value={currentRound?.challenge.descriptionMarkdown}
       />
     </ProCard>
   );
@@ -146,16 +147,16 @@ export default function Ide(props: IdeProps) {
   };
 
   const handleRuntAllTests = async () => {
-    if (!latestRound) return;
+    if (!currentRound) return;
     const solutionText = solutionEditorRef.current?.getValue();
     if (!solutionText) return;
 
-    for (let i = 0; i < latestRound.challenge.tests.length; i++) {
+    for (let i = 0; i < currentRound.challenge.tests.length; i++) {
       testsMapActions.set(i.toString(), 'Validating');
 
       var result = await triggerTestRun({
         id: i.toString(),
-        test: latestRound.challenge.tests[i],
+        test: currentRound.challenge.tests[i],
         language: solutionLanguage,
         sourceCode: solutionText,
       }).unwrap();
@@ -282,7 +283,7 @@ export default function Ide(props: IdeProps) {
             },
           },
         }}
-        dataSource={latestRound?.challenge.tests}
+        dataSource={currentRound?.challenge.tests}
       />
     </ProCard>
   );
@@ -291,7 +292,7 @@ export default function Ide(props: IdeProps) {
     value: string | undefined,
     ev: monaco.editor.IModelContentChangedEvent,
   ) => {
-    let tests = latestRound?.challenge.tests;
+    let tests = currentRound?.challenge.tests;
 
     if (tests) {
       for (let i = 0; i < tests?.length; i++) {
@@ -310,7 +311,7 @@ export default function Ide(props: IdeProps) {
 
     /*triggerSubmitSummary({
       gameId: id!,
-      roundNumber: latestRound!.number,
+      roundNumber: currentRound!.number,
       roundSummary: [
 
       ]
@@ -445,7 +446,7 @@ export default function Ide(props: IdeProps) {
 
   return (
     <Page
-      title={latestRound?.challenge.name}
+      title={currentRound?.challenge.name}
       extra={
         <Space>
           <Typography.Text

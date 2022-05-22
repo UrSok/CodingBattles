@@ -35,7 +35,7 @@ internal class SubmitResultHandler : IRequestHandler<SubmitResultCommand, Result
             return Result.Failure(ProcessingError.GameNotFound);
         }
 
-        game.Rounds[request.Model.RoundNumber].RoundSummaries.Add(request.Model.RoundSummary);
+        game.PreviousRounds[request.Model.RoundNumber].RoundSummaries.Add(request.Model.RoundSummary);
 
         var result = await this.gameRepository.AddRecordSummary(game.Id, request.Model.RoundNumber, request.Model.RoundSummary, cancellationToken);
         if (!result)

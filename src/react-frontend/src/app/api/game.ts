@@ -3,14 +3,15 @@ import { axiosBaseQuery } from './config';
 import { Result, ResultValue } from './types';
 import {
   CreateGameRequest,
-  GetGameListResultItem,
-  GetGameResult,
+  GameSearchItem,
+  GameDetails,
   JoinGameRequest,
   LeaveGameRequest,
   RunTestRequest,
   RunTestResult,
   StartRoundRequest,
   SubmitResultRequest,
+  SelectChallengeRequest,
 } from './types/games';
 
 export const gameApi = createApi({
@@ -20,7 +21,7 @@ export const gameApi = createApi({
   }),
   tagTypes: ['Game'],
   endpoints: build => ({
-    getAll: build.query<ResultValue<GetGameListResultItem[]>, void>({
+    getAll: build.query<ResultValue<GameSearchItem[]>, void>({
       query: () => ({
         method: 'GET',
       }),
@@ -36,7 +37,7 @@ export const gameApi = createApi({
           : ['Game'],
     }),
 
-    getByUserId: build.query<ResultValue<GetGameListResultItem[]>, string>({
+    getByUserId: build.query<ResultValue<GameSearchItem[]>, string>({
       query: userId => ({
         url: `gamesByUser/${userId}`,
         method: 'GET',
@@ -53,7 +54,7 @@ export const gameApi = createApi({
           : ['Game'],
     }),
 
-    getById: build.query<ResultValue<GetGameResult>, string>({
+    getById: build.query<ResultValue<GameDetails>, string>({
       query: gameId => ({
         url: `${gameId}`,
         method: 'GET',
@@ -92,11 +93,20 @@ export const gameApi = createApi({
       ],
     }),
 
+    selectChallenge: build.mutation<Result, SelectChallengeRequest>({
+      query: request => ({
+        url: `${request.gameId}/selectChallenge/${request.challengeId}`,
+        method: 'POST',
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: 'Game', id: arg.gameId },
+      ],
+    }),
+
     startRound: build.mutation<ResultValue<number>, StartRoundRequest>({
       query: request => ({
-        url: `startRound`,
+        url: `${request.gameId}/startRound`,
         method: 'POST',
-        data: request,
       }),
       invalidatesTags: (result, error, arg) => [
         { type: 'Game', id: arg.gameId },

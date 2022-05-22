@@ -6,7 +6,7 @@ import ProList from '@ant-design/pro-list';
 import Skeleton from '@ant-design/pro-skeleton';
 import { Avatar, Button, Space, Tag, Tooltip } from 'antd';
 import { gameApi } from 'app/api';
-import { RoundStatus } from 'app/api/types/games';
+import { GameStatus } from 'app/api/types/games';
 import UserAvatar from 'app/components/Auth/UserAvatar';
 import Page from 'app/components/Layout/Page';
 import NoData from 'app/components/NoData';
@@ -17,12 +17,6 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import CreateLobbyModal from './components/CreateLobbyModal';
 import JoinLobbyModal from './components/JoinLobbyModal';
-
-/* 
-Code,
-Create,
-Join
-*/
 
 export default function GamesPage() {
   const { isAuthenticated, user } = useSelector(selectAuth);
@@ -82,11 +76,11 @@ export default function GamesPage() {
             render: (dom, value, index) => {
               let tag: React.ReactNode = [];
 
-              if (value.roundStatus === RoundStatus.NotStarted) {
+              if (value.status === GameStatus.NotStarted) {
                 tag = <Tag color="green">Not Started</Tag>;
               }
-              if (value.roundStatus === RoundStatus.InProgress) {
-                tag = <Tag color="green">In Progress</Tag>;
+              if (value.status === GameStatus.InProgress) {
+                tag = <Tag color="warning">In Progress</Tag>;
               }
 
               return (
@@ -135,11 +129,11 @@ export default function GamesPage() {
             render: (dom, value, index) => {
               let tag: React.ReactNode = [];
 
-              if (value.roundStatus === RoundStatus.NotStarted) {
+              if (value.status === GameStatus.NotStarted) {
                 tag = <Tag color="green">Not Started</Tag>;
               }
-              if (value.roundStatus === RoundStatus.InProgress) {
-                tag = <Tag color="green">In Progress</Tag>;
+              if (value.status === GameStatus.InProgress) {
+                tag = <Tag color="warning">In Progress</Tag>;
               }
 
               return (

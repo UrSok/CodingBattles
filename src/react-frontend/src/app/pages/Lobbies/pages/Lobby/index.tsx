@@ -1,4 +1,5 @@
 import { gameApi } from 'app/api';
+import { GameStatus } from 'app/api/types/games';
 import Page from 'app/components/Layout/Page';
 import LoadingSpinner from 'app/components/LoadingSpinner';
 import { selectAuth } from 'app/slices/auth/selectors';
@@ -14,7 +15,7 @@ export default function Lobby() {
   const user = useSelector(selectAuth);
 
   const { data } = gameApi.useGetByIdQuery(id!, {
-    pollingInterval: 2000,
+    pollingInterval: 1000,
   });
 
   if (!data)
@@ -26,16 +27,11 @@ export default function Lobby() {
 
   const { value: gameInfo } = data;
 
-  const getActiveRounds = gameInfo?.rounds.filter(x => {
-    //console.log(addMinutesToDate(x.startTime, x.durationMinutes).getTime);
-    //console.log(Date.now);
-    //addMinutesToDate(x.startTime, x.durationMinutes).getTime
-  });
 
   //console.log(getActiveRounds);
   //if (gameInfo?.rounds && gameInfo.r)
   //console.log(game)
-  if (!gameInfo?.rounds || gameInfo.rounds.length === 0) {
+  if (!gameInfo?.currentRound || gameInfo?.status !== GameStatus.InProgress) {
     return <Room gameInfo={gameInfo} />;
   }
 

@@ -34,25 +34,25 @@ public class GameManager : BaseManager, IGameManager
         return await this.SendCommand(command, cancellationToken);
     }
 
-    public async Task<Result<GetGameResult>> Get(string gameId, CancellationToken cancellationToken)
+    public async Task<Result<GameDetails>> Get(string gameId, CancellationToken cancellationToken)
     {
         var query = new GetGameQuery(gameId);
         return await this.SendCommand(query, cancellationToken);
     }
 
-    public async Task<Result<int>> StartRound(StartRoundRequest startRoundRequest, CancellationToken cancellationToken)
+    public async Task<Result> StartRound(string gameId, CancellationToken cancellationToken)
     {
-        var command = new StartRoundCommand(startRoundRequest);
+        var command = new StartRoundCommand(gameId);
         return await this.SendCommand(command, cancellationToken);
     }
 
-    public async Task<Result<List<GetGameListResultItem>>> Get(CancellationToken cancellationToken)
+    public async Task<Result<List<GameSearchItem>>> Get(CancellationToken cancellationToken)
     {
         var query = new GetGamesQuery();
         return await this.SendCommand(query, cancellationToken);
     }
 
-    public async Task<Result<List<GetGameListResultItem>>> GetGamesByUserId(string userId, CancellationToken cancellationToken)
+    public async Task<Result<List<GameSearchItem>>> GetGamesByUserId(string userId, CancellationToken cancellationToken)
     {
         var query = new GetGamesByUserIdQuery(userId);
         return await this.SendCommand(query, cancellationToken);
@@ -67,6 +67,12 @@ public class GameManager : BaseManager, IGameManager
     public async Task<Result> LeaveGame(string userId, string gameId, CancellationToken cancellationToken)
     {
         var command = new LeaveGameCommand(userId, gameId);
+        return await this.SendCommand(command, cancellationToken);
+    }
+
+    public async Task<Result> SelectChallenge(string gameId, string challengeId, CancellationToken cancellationToken)
+    {
+        var command = new SelectChallengeCommand(gameId, challengeId);
         return await this.SendCommand(command, cancellationToken);
     }
 }
