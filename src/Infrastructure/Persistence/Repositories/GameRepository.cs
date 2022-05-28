@@ -17,7 +17,7 @@ internal interface IGameRepository
     Task<bool> UpdateCurrentRound(string id, Round round, CancellationToken cancellationToken);
     Task<IEnumerable<Game>> Get(CancellationToken cancellationToken);
     Task<IEnumerable<Game>> GetGamesByUserId(string userId, CancellationToken cancellationToken);
-    Task<bool> AddRecordSummary(string id, int roundNumber, RoundSummary roundSummary, CancellationToken cancellationToken);
+    Task<bool> AddRecordSummary(string id, RoundSummary roundSummary, CancellationToken cancellationToken);
     Task<bool> RemoveFromGame(string userId, string gameId, CancellationToken cancellationToken);
     Task<bool> UpdateGameStatus(string id, GameStatus status, CancellationToken cancellationToken);
 }
@@ -94,7 +94,7 @@ internal class GameRepository : BaseRepository, IGameRepository
         return this.mapper.Map<IEnumerable<Game>>(gameDocuments);
     }
 
-    public async Task<bool> AddRecordSummary(string gameId, int roundNumber, RoundSummary roundSummary, CancellationToken cancellationToken)
+    public async Task<bool> AddRecordSummary(string gameId, RoundSummary roundSummary, CancellationToken cancellationToken)
     {
         var roundSummaryDocument = this.mapper.Map<RoundSummaryDocument>(roundSummary);
 

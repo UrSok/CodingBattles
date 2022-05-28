@@ -119,8 +119,8 @@ export type StartRoundRequest = {
 //===========================
 export type SubmitResultRequest = {
   gameId: string;
-  roundNumber: number;
-  roundSummary: RoundSummary;
+  userId: string;
+  solution: Solution;
 };
 
 //===========================

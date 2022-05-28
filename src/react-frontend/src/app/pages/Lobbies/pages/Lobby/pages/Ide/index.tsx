@@ -26,6 +26,8 @@ import {
 } from '@ant-design/icons';
 import { ErrorCode } from 'app/api/types';
 import { useParams } from 'react-router-dom';
+import { selectUser } from 'app/slices/auth/selectors';
+import { useSelector } from 'react-redux';
 
 type TestState = 'None' | 'Validating' | 'Passed' | 'Failed' | 'Unvalidated';
 
@@ -37,6 +39,7 @@ export default function Ide(props: IdeProps) {
   const { id } = useParams();
   const { gameInfo } = props;
   const { currentRound } = gameInfo!;
+  const user = useSelector(selectUser);
 
   const deadLine =
     currentRound && currentRound.startTime
@@ -63,7 +66,7 @@ export default function Ide(props: IdeProps) {
   const [triggerTestRun, { isLoading: isTesting, data: testResult }] =
     gameApi.useRunTestMutation();
 
-  const [triggerSubmitSummary, { isLoading: isSubmiting, data: submitResult }] =
+  const [triggerSubmitResult, { isLoading: isSubmiting, data: submitResult }] =
     gameApi.useSubmitResultMutation();
 
   useEffectOnce(() => {
@@ -306,17 +309,17 @@ export default function Ide(props: IdeProps) {
     }
   };
 
-  const onHandleSubmit = () => {
-    // TODO: fix that candva
+  const handleSubmit = () => {
+    const solutionText = solutionEditorRef.current?.getValue();
 
-    /*triggerSubmitSummary({
+    triggerSubmitResult({
       gameId: id!,
-      roundNumber: currentRound!.number,
-      roundSummary: [
-
-      ]
-    })*/
-
+      userId: user!.id,
+      solution: {
+        language: solutionLanguage,
+        sourceCode: solutionText ?? '',
+      },
+    });
   };
 
   const SolutionEditorCard = (
@@ -333,7 +336,12 @@ export default function Ide(props: IdeProps) {
               placeholder="Solution Language"
             />
           </Form>
-          <Button type="primary" icon={<Play />} onClick={onHandleSubmit}>
+          <Button
+            type="primary"
+            icon={<Play />}
+            onClick={handleSubmit}
+            loading={isSubmiting}
+          >
             SUBMIT
           </Button>
         </Space>

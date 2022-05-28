@@ -12,14 +12,20 @@ const Centered = styled.div`
   align-content: center;
 `;
 
+const HorizontallyCentered = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
 type LoadingSpinnerProps = {
+  horizontallyCentered?: boolean;
   centered?: boolean;
   size?: 'tiny';
   noTip?: boolean;
 };
 
 export default function LoadingSpinner(props: LoadingSpinnerProps) {
-  const { centered, size, noTip } = props;
+  const { horizontallyCentered, centered, size, noTip } = props;
   const { t } = useTranslation();
 
   let fontSize = 30;
@@ -36,6 +42,10 @@ export default function LoadingSpinner(props: LoadingSpinnerProps) {
       />
     </Space>
   );
+
+  if (horizontallyCentered) {
+    return <HorizontallyCentered>{spinner}</HorizontallyCentered>;
+  }
 
   if (centered) {
     return <Centered>{spinner}</Centered>;

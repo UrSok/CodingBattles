@@ -1,7 +1,7 @@
 export const ChallengeSearchFields = {
   searchText: 'searchText',
   sortBy: 'sortBy',
-  sortOrder: 'sortOrder',
+  orderStyle: 'orderStyle',
   tags: 'tags',
   difficulty: 'difficulty',
   includeNoDifficulty: 'includeNoDifficulty',

@@ -1,15 +1,40 @@
 import ProCard from '@ant-design/pro-card';
+import ProForm, {
+  ProFormCheckbox,
+  ProFormSelect,
+  ProFormSlider,
+} from '@ant-design/pro-form';
 import ProList from '@ant-design/pro-list';
-import { Button, Drawer, Rate, Space, Tag, Typography } from 'antd';
+import {
+  Button,
+  Drawer,
+  Form,
+  Input,
+  Rate,
+  Space,
+  Tag,
+  Typography,
+} from 'antd';
+import { useForm, useWatch } from 'antd/lib/form/Form';
 import { challengeApi, challengeTagApi, gameApi } from 'app/api';
-import { Challenge, ChallengeSearchResultItem } from 'app/api/types/challenge';
-import { GameDetails, GameStatus } from 'app/api/types/games';
+import { OrderStyle } from 'app/api/types';
+import {
+  Challenge,
+  ChallengeSearchResultItem,
+  SortBy,
+} from 'app/api/types/challenge';
+import { GameDetails, GameStatus, RoundDetails } from 'app/api/types/games';
 import UserAvatar from 'app/components/Auth/UserAvatar';
+import ChallengeList from 'app/components/ChallengeList';
 import Page from 'app/components/Layout/Page';
 import NoData from 'app/components/NoData';
 import ChallengePages from 'app/pages/Challenges';
+import MultiTagSelect from 'app/pages/Challenges/components/MultiTagSelect';
+import { ChallengeSearchFields } from 'app/pages/Challenges/pages/Index/types';
 import { selectUser } from 'app/slices/auth/selectors';
+import { translations } from 'locales/translations';
 import React, { ReactText, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { useBoolean } from 'usehooks-ts';
@@ -22,29 +47,30 @@ export type RoomProps = {
 export default function Room(props: RoomProps) {
   const { gameInfo, onNewRoundStarted } = props;
   const user = useSelector(selectUser);
+  const { t } = useTranslation();
+  const [form] = useForm();
 
   const { id } = useParams();
 
   const [expandedRowKeys, setExpandedRowKeys] = useState<readonly ReactText[]>(
     [],
   );
+  const { data: dataTags } = challengeTagApi.useGetTagsQuery();
   const [
     triggerSelectChallenge,
     { isLoading: isLoadingSelectChallenge, data: selectChallengeResult },
   ] = gameApi.useSelectChallengeMutation();
 
-  const { data: dataTags } = challengeTagApi.useGetTagsQuery();
-  const { data: data, isLoading: isLoadingChallenges } =
-    challengeApi.useGetChallengesQuery({});
   const [triggerStartRound, { data: round, isLoading: isRoundLoading }] =
     gameApi.useStartRoundMutation();
 
   const {
     value: drawerState,
-    setTrue: enableDrawer,
     setValue: changeDrawerValue,
     setFalse: disableDrawer,
   } = useBoolean(false);
+
+  const searchText = useWatch(ChallengeSearchFields.searchText, form);
 
   const renderTags = (_, entity) => {
     const tags = dataTags?.value?.filter(x => entity.tagIds.includes(x.id));
@@ -65,6 +91,18 @@ export default function Room(props: RoomProps) {
     if (result && result.isSuccess && onNewRoundStarted) {
       onNewRoundStarted(result.value!);
     }
+  };
+
+  const handleOnChallengeClick = (record, index) => {
+    return {
+      onClick: () => {
+        disableDrawer();
+        triggerSelectChallenge({
+          gameId: id!,
+          challengeId: record.id,
+        });
+      },
+    };
   };
 
   return (
@@ -161,9 +199,9 @@ export default function Room(props: RoomProps) {
         </ProCard>
         <ProCard title="Statistics" ghost>
           <ProCard>
-            <ProList<ChallengeSearchResultItem>
+            <ProList<RoundDetails>
               ghost
-              rowKey={(entity, _) => entity.id}
+              rowKey={(entity, _) => entity.number}
               expandable={{
                 expandedRowKeys,
                 onExpandedRowsChange: setExpandedRowKeys,
@@ -171,38 +209,17 @@ export default function Room(props: RoomProps) {
               locale={{
                 emptyText: <NoData />,
               }}
-              //dataSource={selectedChallenge}
+              dataSource={
+                gameInfo?.currentRound
+                  ? [gameInfo.currentRound, ...gameInfo.previousRounds]
+                  : gameInfo?.previousRounds
+              }
               metas={{
                 title: {
-                  dataIndex: 'name',
+                  dataIndex: 'number',
                 },
                 content: {
                   dataIndex: 'descriptionShort',
-                },
-                subTitle: {
-                  render: (_, entity) => (
-                    <Space size={0} wrap>
-                      {entity.tagIds?.map(tagId => {
-                        if (tagId) {
-                          return <Tag key={tagId}>{tagId}</Tag>;
-                        }
-
-                        return null;
-                      })}
-                    </Space>
-                  ),
-                },
-                actions: {
-                  render: (_, entity) => (
-                    <>
-                      <Typography.Text>Difficulty:</Typography.Text>{' '}
-                      {entity.difficulty > 0 ? (
-                        <Rate disabled value={entity.difficulty} allowHalf />
-                      ) : (
-                        '???'
-                      )}
-                    </>
-                  ),
                 },
               }}
             />
@@ -217,50 +234,23 @@ export default function Room(props: RoomProps) {
         visible={drawerState}
         onClose={() => disableDrawer()}
       >
-        <ProList<ChallengeSearchResultItem>
-          ghost
-          rowKey={(entity, _) => entity.id}
-          itemLayout="vertical"
-          split
-          onItem={(record, index) => {
-            return {
-              onClick: () => {
-                disableDrawer();
-                triggerSelectChallenge({
-                  gameId: id!,
-                  challengeId: record.id,
-                });
-              },
-            };
+        <ProForm
+          layout="vertical"
+          form={form}
+          initialValues={{
+            [`${ChallengeSearchFields.searchText}`]: undefined,
           }}
-          locale={{
-            emptyText: <NoData />,
-          }}
-          dataSource={data?.value?.items}
-          metas={{
-            title: {
-              dataIndex: 'name',
-            },
-            content: {
-              dataIndex: 'descriptionShort',
-            },
-            subTitle: {
-              render: renderTags,
-            },
-            actions: {
-              render: (_, entity) => (
-                <>
-                  <Typography.Text>Difficulty:</Typography.Text>{' '}
-                  {entity.difficulty > 0 ? (
-                    <Rate disabled value={entity.difficulty} allowHalf />
-                  ) : (
-                    '???'
-                  )}
-                </>
-              ),
-            },
-          }}
-        />
+          submitter={false}
+        >
+          <Form.Item name={ChallengeSearchFields.searchText}>
+            <Input.Search
+              placeholder={t(translations.Challenges.Search.Form.searchInput)}
+              enterButton
+              allowClear
+            />
+          </Form.Item>
+        </ProForm>
+        <ChallengeList text={searchText} onItem={handleOnChallengeClick} />
       </Drawer>
     </Page>
   );

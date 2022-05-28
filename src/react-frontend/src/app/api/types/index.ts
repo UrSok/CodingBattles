@@ -31,6 +31,6 @@ export enum OrderStyle {
 
 export type Paginated<T> = {
   totalPages: number;
-  totalItmes: number;
+  totalItems: number;
   items: T[];
 };

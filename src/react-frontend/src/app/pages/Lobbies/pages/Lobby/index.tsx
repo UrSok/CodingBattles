@@ -12,7 +12,7 @@ import { addMinutesToDate } from './pages/utils/date';
 
 export default function Lobby() {
   const { id } = useParams();
-  const user = useSelector(selectAuth);
+  const { user } = useSelector(selectAuth);
 
   const { data } = gameApi.useGetByIdQuery(id!, {
     pollingInterval: 1000,
@@ -27,11 +27,14 @@ export default function Lobby() {
 
   const { value: gameInfo } = data;
 
-
   //console.log(getActiveRounds);
   //if (gameInfo?.rounds && gameInfo.r)
   //console.log(game)
-  if (!gameInfo?.currentRound || gameInfo?.status !== GameStatus.InProgress) {
+  if (
+    !gameInfo?.currentRound ||
+    gameInfo?.status !== GameStatus.InProgress ||
+    gameInfo.currentRound.roundSummaries.some(x => x.user.id === user?.id)
+  ) {
     return <Room gameInfo={gameInfo} />;
   }
 
