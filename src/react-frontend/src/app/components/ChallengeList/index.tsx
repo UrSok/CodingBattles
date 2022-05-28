@@ -87,7 +87,6 @@ export default function ChallengeList(
     hasNextPage,
     onLoadMore: () => {
       incrementPage();
-      console.log(page);
     },
   });
 
