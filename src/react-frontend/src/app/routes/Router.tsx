@@ -5,7 +5,6 @@ import { PATH_CHALLENGES, PATH_IDE, PATH_LOBBY, PATH_PROFILES } from './paths';
 
 import ChallengePages from 'app/pages/Challenges';
 import ErrorResult from 'app/components/ErrorResult';
-import Ide from 'app/pages/Ide';
 import LobbiesPage from 'app/pages/Lobbies/pages/Index';
 import Lobby from 'app/pages/Lobbies/pages/Lobby';
 import Welcome from 'app/pages/Welcome';
@@ -35,9 +34,6 @@ export default function Router() {
       <Route path={PATH_LOBBY.root}>
         <Route index element={<LobbiesPage />} />
         <Route path=":id" element={<Lobby />} />
-      </Route>
-      <Route path={PATH_IDE.root}>
-        <Route index element={<Ide />} />
       </Route>
       <Route
         path="*"

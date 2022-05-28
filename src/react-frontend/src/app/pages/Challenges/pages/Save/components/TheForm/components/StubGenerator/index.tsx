@@ -1,17 +1,17 @@
 import { Space, Typography } from 'antd';
 import CodeEditor from 'app/components/Input/CodeEditor';
 import LanguageSelect from 'app/components/Input/LanguageSelect';
-import { Language } from 'app/types/global';
+import { Language } from 'app/types/enums/language';
 import React, { MutableRefObject, useEffect } from 'react';
 import monaco from 'monaco-editor';
 import { stubInputLanguage } from 'config/monaco';
 import { useWatch } from 'antd/lib/form/Form';
-import { StubGeneratorModel } from 'app/api/types/stubGenerator';
 import { skipToken } from '@reduxjs/toolkit/dist/query';
 import { stubGeneratorApi } from 'app/api/stubGenerator';
 import { getLanguageKeyName } from 'app/utils/enumHelpers';
 import ErrorAlert from './components/ErrorAlert';
 import { FormFields } from '../../types';
+import { GenerateStubRequest } from 'app/api/stubGenerator/types/generateStub';
 
 type StubGeneratorProps = {
   stubCodeEditorRef: MutableRefObject<
@@ -41,7 +41,7 @@ export default function StubGenerator(props: StubGeneratorProps) {
   const getStubQueryValue = (
     language: Language,
     generatorInput: string | undefined,
-  ): StubGeneratorModel | typeof skipToken => {
+  ): GenerateStubRequest | typeof skipToken => {
     //if (!generatorInput || generatorInput.length === 0) return skipToken;
     return {
       language: language,
@@ -111,11 +111,11 @@ export default function StubGenerator(props: StubGeneratorProps) {
         />
 
         {generatorResult &&
-        !generatorResult.isSuccess &&
-        generatorResult.value &&
-        generatorResult.value.error ? (
-          <ErrorAlert error={generatorResult.value.error!} />
-        ) : null}
+          !generatorResult.isSuccess &&
+          generatorResult.value &&
+          generatorResult.value.error && (
+            <ErrorAlert error={generatorResult.value.error!} />
+          )}
       </Space>
       <Typography.Text strong>Result</Typography.Text>
       <LanguageSelect

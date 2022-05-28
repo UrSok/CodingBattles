@@ -1,5 +1,5 @@
 import { Alert, Typography } from 'antd';
-import { Challenge, ChallengeStatus } from 'app/api/types/challenge';
+import { ChallengeStatus } from 'app/types/enums/challengeStatus';
 import React from 'react';
 
 type ChallengeStatusAlertProps = {

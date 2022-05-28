@@ -13,8 +13,6 @@ internal class UserProfile : Profile
         this.CreateMap<Verification, VerificationDocument>().ReverseMap();
         this.CreateMap<User, UserDocument>().ReverseMap();
 
-        this.CreateMap<User, AuthUserModel>();
-
-        this.CreateMap<User, UserModel>();
+        this.CreateMap<User, UserDto>();
     }
 }

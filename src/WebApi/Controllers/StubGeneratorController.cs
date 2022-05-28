@@ -1,5 +1,5 @@
 ﻿using Application.Managers;
-using Domain.Models.Common;
+using Domain.Models.General.RequestsResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,12 +16,11 @@ public class StubGeneratorController : BaseController
         this.stubGeneratorMananger = stubGeneratorMananger;
     }
 
-
     [Authorize]
     [HttpPost]
-    public async Task<IActionResult> Generate([FromBody] StubGeneratorModel stubGeneratorModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> Generate([FromBody] GenerateStubRequest generateStubRequest, CancellationToken cancellationToken)
     {
-        var result = await this.stubGeneratorMananger.Generate(stubGeneratorModel, cancellationToken);
+        var result = await this.stubGeneratorMananger.Generate(generateStubRequest, cancellationToken);
         return this.Process(result);
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Domain.Entities.Common;
 using Domain.Enums;
-using Domain.Models.Common;
-using Domain.Utils.MailDataModels;
+using Domain.Models.Mails;
 using Infrastructure.Options;
 using Infrastructure.Repositories;
 using MimeKit;
@@ -10,7 +9,7 @@ namespace Infrastructure.Services.Mail;
 
 internal interface IMailService
 {
-    Task SendAccountActivation(VerificationMailData mailData, CancellationToken cancellationToken);
+    Task SendAccountActivation(VerificationMailDto mailData, CancellationToken cancellationToken);
 }
 
 internal class MailService : IMailService
@@ -49,7 +48,7 @@ internal class MailService : IMailService
         await this.mailTemplateRepository.InsertTemplatesIfDontExist(templates);
     }
 
-    private MimeMessage GetMimeMessage(MailRequest mailRequest)
+    private MimeMessage GetMimeMessage(SendMailDto mailRequest)
     {
         var mailMessage = new MimeMessage();
         mailMessage.From.Add(new MailboxAddress(this.mailOptions.DisplayName, this.mailOptions.Email));
@@ -63,7 +62,7 @@ internal class MailService : IMailService
         return mailMessage;
     }
 
-    public async Task SendAccountActivation(VerificationMailData mailData, CancellationToken cancellationToken)
+    public async Task SendAccountActivation(VerificationMailDto mailData, CancellationToken cancellationToken)
     {
         var mailTemplate = await this.mailTemplateRepository
             .GetTemplateByCode(MailTemplateCode.AccountVerification, cancellationToken);
@@ -74,7 +73,7 @@ internal class MailService : IMailService
                     mailData.VerificationCode,
                     mailData.VerificationUrl);
 
-        var mimeMail = this.GetMimeMessage(new MailRequest()
+        var mimeMail = this.GetMimeMessage(new SendMailDto()
         {
             Recipient = mailData.Email,
             Subject = mailTemplate.Subject,

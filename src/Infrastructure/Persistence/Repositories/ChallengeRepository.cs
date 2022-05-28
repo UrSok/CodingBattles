@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Entities.Challenges;
 using Domain.Enums;
-using Domain.Models.Challenges;
+using Domain.Models.Challenges.RequestsResults;
 using Infrastructure.DbDocuments.Challenges;
 using Infrastructure.Persistence;
 using Infrastructure.Utils;
@@ -11,7 +11,7 @@ namespace Infrastructure.Repositories;
 
 internal interface IChallengeRepository
 {
-    Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> Get(ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken);
+    Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> Get(ChallengeSearchRequest challengeSearchRequest, CancellationToken cancellationToken);
     Task<Challenge> Get(string id, CancellationToken cancellationToken);
     Task<string> Create(Challenge challenge, CancellationToken cancellationToken);
     Task<bool> Update(Challenge challenge, CancellationToken cancellationToken);
@@ -29,18 +29,18 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
         this.challenges = mongoDbContext.Challenges;
     }
 
-    public async Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> Get(ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken)
+    public async Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> Get(ChallengeSearchRequest challengeSearchRequest, CancellationToken cancellationToken)
     {
         var filters = new List<FilterDefinition<ChallengeDocument>>();
         //filters.Add(Builders<ChallengeDocument>.Filter.Eq(x => x.Status, ChallengeStatus.Published));
 
-        if (!string.IsNullOrEmpty(challengeSearchModel.Text))
+        if (!string.IsNullOrEmpty(challengeSearchRequest.Text))
         {
             var textFilters = Builders<ChallengeDocument>.Filter.Or(
                     Builders<ChallengeDocument>.Filter.Regex(x
-                    => x.Name, new MongoDB.Bson.BsonRegularExpression(challengeSearchModel.Text, "i")),
+                    => x.Name, new MongoDB.Bson.BsonRegularExpression(challengeSearchRequest.Text, "i")),
                     Builders<ChallengeDocument>.Filter.Regex(x
-                    => x.DescriptionShort, new MongoDB.Bson.BsonRegularExpression(challengeSearchModel.Text, "i"))
+                    => x.DescriptionShort, new MongoDB.Bson.BsonRegularExpression(challengeSearchRequest.Text, "i"))
                 );
 
             filters.Add(textFilters);
@@ -50,30 +50,30 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
         var maxFilter = Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty <= 5);
         var includeNoDifficultyFilter = Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty == 0);
 
-        if (challengeSearchModel.MinimumDifficulty is not null)
+        if (challengeSearchRequest.MinimumDifficulty is not null)
         {
-            minFilter = Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty >= challengeSearchModel.MinimumDifficulty);
+            minFilter = Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty >= challengeSearchRequest.MinimumDifficulty);
         }
 
-        if (challengeSearchModel.MaximumDifficulty is not null)
+        if (challengeSearchRequest.MaximumDifficulty is not null)
         {
-            maxFilter = Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty <= challengeSearchModel.MaximumDifficulty);
+            maxFilter = Builders<ChallengeDocument>.Filter.Where(x => x.Difficulty <= challengeSearchRequest.MaximumDifficulty);
         }
 
         var minMaxFilter = Builders<ChallengeDocument>.Filter.And(minFilter, maxFilter);
         var difficultiesFilter = Builders<ChallengeDocument>.Filter.Or(minMaxFilter, includeNoDifficultyFilter);
 
-        if (!challengeSearchModel.IncludeNoDifficulty)
+        if (!challengeSearchRequest.IncludeNoDifficulty)
         {
             difficultiesFilter = Builders<ChallengeDocument>.Filter.Or(minMaxFilter);
         }
 
         filters.Add(difficultiesFilter);
 
-        if (challengeSearchModel.TagIds.Any())
+        if (challengeSearchRequest.TagIds.Any())
         {
             filters.Add(
-                Builders<ChallengeDocument>.Filter.All(x => x.TagIds, challengeSearchModel.TagIds));
+                Builders<ChallengeDocument>.Filter.All(x => x.TagIds, challengeSearchRequest.TagIds));
         }
 
         var filterDefinition = filters.Count > 0 
@@ -83,10 +83,10 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
         var (totalPages, totalPageItems, data) = 
             await this.challenges.AggregateByPage(
             filterDefinition,
-            challengeSearchModel.SortBy,
-            challengeSearchModel.OrderStyle,
-            challengeSearchModel.Page,
-            challengeSearchModel.PageSize);
+            challengeSearchRequest.SortBy,
+            challengeSearchRequest.OrderStyle,
+            challengeSearchRequest.Page,
+            challengeSearchRequest.PageSize);
 
         return (totalPages, totalPageItems, this.mapper.Map<IEnumerable<Challenge>>(data));
     }

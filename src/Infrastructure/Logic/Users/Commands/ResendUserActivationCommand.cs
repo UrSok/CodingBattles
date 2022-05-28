@@ -2,8 +2,8 @@
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Enums.Errors;
-using Domain.Models.Results;
-using Domain.Utils.MailDataModels;
+using Domain.Models.Common.Results;
+using Domain.Models.Mails;
 using FluentValidation;
 using Infrastructure.Repositories;
 using Infrastructure.Services.Generators;
@@ -40,7 +40,7 @@ internal class ResendUserActivationHandler : IRequestHandler<ResendUserActivatio
         this.urlGeneratorService = urlGeneratorService;
     }
 
-    public async Task<Result> Handle(ResendUserActivationCommand request, CancellationToken cancellationToken) // TODO: Maybe combine password and activation resend???
+    public async Task<Result> Handle(ResendUserActivationCommand request, CancellationToken cancellationToken)
     {
         Guard.Against.Null(request, nameof(request));
 
@@ -64,7 +64,7 @@ internal class ResendUserActivationHandler : IRequestHandler<ResendUserActivatio
 
         await this.userRepository.CreateVerification(user.Id, verification, cancellationToken);
 
-        await this.mailService.SendAccountActivation(new VerificationMailData
+        await this.mailService.SendAccountActivation(new VerificationMailDto
         {
             Username = user.Username,
             Email = user.Email,

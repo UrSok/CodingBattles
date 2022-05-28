@@ -1,6 +1,6 @@
 ﻿using Application.Managers;
-using Domain.Models.Common;
-using Domain.Models.Results;
+using Domain.Models.Common.Results;
+using Domain.Models.General.RequestsResults;
 using Infrastructure.Logic.StubGenerator;
 using MediatR;
 
@@ -12,9 +12,9 @@ public class StubGeneratorManager : BaseManager, IStubGeneratorManager
     {
     }
 
-    public async Task<Result<StubGeneratorResult>> Generate(StubGeneratorModel stubGeneratorModel, CancellationToken cancellationToken)
+    public async Task<Result<GenerateStubResult>> Generate(GenerateStubRequest generateStubRequest, CancellationToken cancellationToken)
     {
-        var command = new GenerateCommand(stubGeneratorModel);
+        var command = new GenerateCommand(generateStubRequest);
         return await this.mediator.Send(command, cancellationToken);
     }
 }

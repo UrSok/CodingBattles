@@ -1,4 +1,4 @@
-﻿using Domain.Models.Results;
+﻿using Domain.Models.Common.Results;
 using MediatR;
 
 namespace Infrastructure.Managers;

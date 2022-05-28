@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Domain.Entities.Common;
 using Domain.Entities.Games;
-using Domain.Models.Results;
+using Domain.Models.General;
+using Domain.Models.General.RequestsResults;
 using Infrastructure.DbDocuments.Common;
 using Infrastructure.DbDocuments.Games;
 using MongoDB.Bson;
@@ -22,11 +23,11 @@ internal class GeneralProfile : Profile
         this.CreateMap<Game, GameDocument>().ReverseMap();
         this.CreateMap<MailTemplate, MailTemplateDocument>().ReverseMap();
 
-        this.CreateMap<StubInputError, StubGeneratorError>()
+        this.CreateMap<StubInputError, GenerateStubError>()
             .ForMember(destination => destination.ValidationCode,
-                action 
+                action
                     => action.MapFrom(source => source.ValidationCode.Name));
-        this.CreateMap<GeneratorResult, StubGeneratorResult>();
+        this.CreateMap<GeneratorResult, GenerateStubResult>();
     }
 
     private static string GenerateIdIfEmpty(string id) =>

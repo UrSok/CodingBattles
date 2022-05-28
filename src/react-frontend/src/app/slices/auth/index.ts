@@ -1,9 +1,11 @@
 import { PayloadAction } from '@reduxjs/toolkit';
+import { AuthUserResult } from 'app/api/auth/types/authUser';
+import { Role } from 'app/types/enums/role';
+import { UserDto } from 'app/types/models/user/userDto';
 import { createSlice } from 'utils/@reduxjs/toolkit';
 
 import { useInjectReducer, useInjectSaga } from 'utils/redux-injectors';
 
-import { AuthUser, AuthUserWithToken, Role } from 'app/api/types/auth';
 import { authSaga } from './saga';
 import { AuthState } from './types';
 
@@ -19,7 +21,7 @@ const slice = createSlice({
   initialState,
   reducers: {
     initialize(state) {},
-    signIn(state, action: PayloadAction<AuthUserWithToken>) {},
+    signIn(state, action: PayloadAction<AuthUserResult>) {},
     signOut(state) {},
 
     setNotAuthenticated(state) {
@@ -28,7 +30,7 @@ const slice = createSlice({
       state.user = initialState.user;
       state.isInitialized = true;
     },
-    setAuthenticated(state, action: PayloadAction<AuthUser>) {
+    setAuthenticated(state, action: PayloadAction<UserDto>) {
       state.user = action.payload;
       if (action.payload.role === Role.Admin) {
         state.isAdmin = true;

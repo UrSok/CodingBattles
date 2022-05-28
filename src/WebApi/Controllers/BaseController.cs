@@ -1,5 +1,5 @@
 ﻿using Domain.Enums.Errors;
-using Domain.Models.Results;
+using Domain.Models.Common.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;

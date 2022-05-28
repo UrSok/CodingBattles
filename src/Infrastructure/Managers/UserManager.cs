@@ -1,11 +1,9 @@
 ﻿using Application.Managers;
-using Domain.Models.Results;
-using Domain.Models.Users;
+using Domain.Models.Common.Results;
+using Domain.Models.Users.RequestsResults;
 using Infrastructure.Logic.Users.Commands;
 using Infrastructure.Logic.Users.Queries;
 using MediatR;
-using System;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Managers;
 
@@ -15,7 +13,7 @@ public class UserManager : BaseManager, IUserManager
     {
     }
 
-    public async Task<Result> Register(UserRegistrationModel userRegistrationModel, CancellationToken cancellationToken)
+    public async Task<Result> Register(RegisterUserRequest userRegistrationModel, CancellationToken cancellationToken)
     {
         var command = new RegisterUserCommand(userRegistrationModel);
         return await this.SendCommand(command, cancellationToken);
@@ -33,20 +31,14 @@ public class UserManager : BaseManager, IUserManager
         return await this.SendCommand(command, cancellationToken);
     }
 
-    public async Task<Result<AuthResult>> Authenticate(UserLoginModel userLoginModel, CancellationToken cancellationToken)
+    public async Task<Result<AuthUserResult>> Authenticate(AuthUserRequest authUserRequest, CancellationToken cancellationToken)
     {
-        var command = new AuthUserCommand(userLoginModel);
+        var command = new AuthUserCommand(authUserRequest);
         return await this.SendCommand(command, cancellationToken);
 
     }
 
-    public async Task<Result<AuthUserModel>> GetAuthUserByJwtToken(string jwtToken, CancellationToken cancellationToken)
-    {
-        var query = new GetAuthUserByJwtTokenQuery(jwtToken);
-        return await this.SendCommand(query, cancellationToken);
-    }
-
-    public async Task<Result<bool>> IsUniqueEmail(string email, CancellationToken cancellationToken)
+    public async Task<Result> IsUniqueEmail(string email, CancellationToken cancellationToken)
     {
         var query = new GetIsUniqueUserEmailQuery(email);
         return await this.SendCommand(query, cancellationToken);

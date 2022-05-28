@@ -2,9 +2,9 @@
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Enums.Errors;
-using Domain.Models.Results;
-using Domain.Models.Users;
-using Domain.Utils.MailDataModels;
+using Domain.Models.Common.Results;
+using Domain.Models.Mails;
+using Domain.Models.Users.RequestsResults;
 using FluentValidation;
 using Infrastructure.Repositories;
 using Infrastructure.Services.Cryptography;
@@ -15,7 +15,7 @@ using MediatR;
 
 namespace Infrastructure.Logic.Users.Commands;
 
-internal record RegisterUserCommand(UserRegistrationModel UserRegistrationModel) : IRequest<Result>;
+internal record RegisterUserCommand(RegisterUserRequest UserRegistrationModel) : IRequest<Result>;
 
 internal class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
 {
@@ -30,7 +30,6 @@ internal class RegisterUserCommandValidator : AbstractValidator<RegisterUserComm
 
         this.RuleFor(x => x.UserRegistrationModel.Password)
             .NotEmpty().WithError(ValidationError.InvalidPassword);
-        //.MinimumLength(6).WithError(ValidationError.InvalidPassword); TODO: Uncomment Password validation
     }
 }
 
@@ -77,7 +76,7 @@ internal class RegisterUserHandler : IRequestHandler<RegisterUserCommand, Result
 
         var newUserId = await this.userRepository.Create(newUser, cancellationToken);
 
-        await this.mailService.SendAccountActivation(new VerificationMailData
+        await this.mailService.SendAccountActivation(new VerificationMailDto
         {
             Username = newUser.Username,
             Email = newUser.Email,
@@ -88,7 +87,7 @@ internal class RegisterUserHandler : IRequestHandler<RegisterUserCommand, Result
         return Result.Success();
     }
 
-    private User GetNewUser(UserRegistrationModel userRegistrationModel)
+    private User GetNewUser(RegisterUserRequest userRegistrationModel)
     {
         var dateTimeNow = DateTime.Now;
         var passwordSalt = this.cryptoService.GenerateSalt();

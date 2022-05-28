@@ -1,25 +1,21 @@
-import * as React from 'react';
 import { LogoutOutlined, SettingOutlined } from '@ant-design/icons';
 import ProLayout, { MenuDataItem } from '@ant-design/pro-layout';
 import { notification, Space } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-
-import { translations } from 'locales/translations';
-
-import { Role } from 'app/api/types/auth';
 import { useAuthSlice } from 'app/slices/auth';
 import { selectAuth } from 'app/slices/auth/selectors';
-
+import { Role } from 'app/types/enums/role';
+import { translations } from 'locales/translations';
+import * as React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { menuRoutes } from '../../routes/menuRoutes';
 import { PATH_PROFILES } from '../../routes/paths';
 import Router from '../../routes/Router';
-
-import SingUpModalForm from '../Auth/Forms/SignUpModalForm';
-import HeaderAlerts from '../HeaderAlerts';
-import MenuUserBadge from '../Auth/MenuUserBadge';
 import SingInModalForm from '../Auth/Forms/SignInModalForm';
+import SingUpModalForm from '../Auth/Forms/SignUpModalForm';
+import MenuUserBadge from '../Auth/MenuUserBadge';
+import HeaderAlerts from '../HeaderAlerts';
 
 export default function Layout() {
   const { pathname } = useLocation();

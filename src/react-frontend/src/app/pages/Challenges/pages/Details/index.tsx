@@ -1,19 +1,17 @@
 import ProCard from '@ant-design/pro-card';
-import { ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import ProList from '@ant-design/pro-list';
-import MDEditor from '@uiw/react-md-editor';
-import { Avatar, Button, Space, Tag, Typography } from 'antd';
+import { Button, Space, Tag, Typography } from 'antd';
 import { challengeApi } from 'app/api/challenge';
-import { Role } from 'app/api/types/auth';
-import { ChallengeStatus, Feedback } from 'app/api/types/challenge';
 import UserAvatar from 'app/components/Auth/UserAvatar';
-import CardSection from 'app/components/CardSection';
 import ChallengeDescription from 'app/components/ChallengeDescription';
 import ErrorResult from 'app/components/ErrorResult';
 import Page from 'app/components/Layout/Page';
 import NoData from 'app/components/NoData';
 import { PATH_CHALLENGES, PATH_PROFILES } from 'app/routes/paths';
 import { selectAuth } from 'app/slices/auth/selectors';
+import { ChallengeStatus } from 'app/types/enums/challengeStatus';
+import { Role } from 'app/types/enums/role';
+import { Feedback } from 'app/types/models/challenge/feedback';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -151,18 +149,18 @@ export default function DetailsChallenge() {
       extra={
         <>
           {isAuthenticated &&
-          user?.role === Role.Admin &&
-          data.value?.status === ChallengeStatus.Published ? (
-            <UnPublishModal challengeId={data.value!.id} />
-          ) : null}
-          {isAuthenticated && user?.id && user?.id === data?.value?.user.id ? (
+            user?.role === Role.Admin &&
+            data.value?.status === ChallengeStatus.Published && (
+              <UnPublishModal challengeId={data.value!.id} />
+            )}
+          {isAuthenticated && user?.id && user?.id === data?.value?.user.id && (
             <Button onClick={() => navigate(PATH_CHALLENGES.save + `/${id}`)}>
               Edit
             </Button>
-          ) : null}
-          {data.value?.status === ChallengeStatus.Published ? (
+          )}
+          {data.value?.status === ChallengeStatus.Published && (
             <Button type="primary">Play</Button>
-          ) : null}
+          )}
         </>
       }
       subTitle={subTitle}

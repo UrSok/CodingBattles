@@ -1,40 +1,24 @@
-import React from 'react';
 import { ProFormSelect } from '@ant-design/pro-form';
-import { useTranslation } from 'react-i18next';
-
-import { translations } from 'locales/translations';
-
-import { ChallengeTag } from 'app/api/types/challenge';
-import { challengeTagApi } from 'app/api/challengeTag';
-import { ProFormSelectProps } from '@ant-design/pro-form/lib/components/Select';
 import { DefaultOptionType } from 'antd/lib/select';
+import { challengeTagApi } from 'app/api/challengeTag';
 import NoData from 'app/components/NoData';
-import { skipToken } from '@reduxjs/toolkit/dist/query';
-import LoadingSpinner from 'app/components/LoadingSpinner';
-import { Form } from 'antd';
+import { ChallengeTag } from 'app/types/models/challenge/challengeTag';
+import { translations } from 'locales/translations';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type MultiTagSelectProps = {
   name: string;
-  loading?: boolean;
   readOnly?: boolean;
   requiredRule?: boolean;
-  tags?: ChallengeTag[];
 };
 
 export default function MultiTagSelect(props: MultiTagSelectProps) {
-  const {
-    name,
-    loading: loadingOutsideTags,
-    readOnly,
-    requiredRule,
-    tags,
-  } = props;
+  const { name, readOnly, requiredRule } = props;
 
   const { t } = useTranslation();
 
-  const { isLoading, data } = challengeTagApi.useGetTagsQuery(
-    !tags ? undefined : skipToken,
-  );
+  const { isLoading, data } = challengeTagApi.useGetTagsQuery();
 
   const mapTags = (
     challengeTags: ChallengeTag[] | undefined,
@@ -48,14 +32,6 @@ export default function MultiTagSelect(props: MultiTagSelectProps) {
       }),
     );
   };
-
-  if (!tags && !data?.value) {
-    return (
-      <Form.Item>
-        <LoadingSpinner size="tiny" noTip />
-      </Form.Item>
-    );
-  }
 
   return (
     <ProFormSelect<ChallengeTag>
@@ -79,11 +55,11 @@ export default function MultiTagSelect(props: MultiTagSelectProps) {
           : []
       }
       fieldProps={{
-        loading: loadingOutsideTags || isLoading,
+        loading: isLoading,
         showArrow: true,
       }}
-      options={mapTags(tags || data?.value)}
+      options={mapTags(data?.value)}
       showSearch
     />
   );
-}
+};

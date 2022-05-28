@@ -2,8 +2,8 @@
 using Domain.Enums;
 using Domain.Enums.Errors;
 using Domain.Models.Common;
+using Domain.Models.Common.Results;
 using Domain.Models.Games;
-using Domain.Models.Results;
 using FluentValidation;
 using Infrastructure.Repositories;
 using Infrastructure.Utils.Validation;

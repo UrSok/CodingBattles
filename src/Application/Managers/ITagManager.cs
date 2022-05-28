@@ -1,5 +1,5 @@
 ﻿using Domain.Entities.Challenges;
-using Domain.Models.Results;
+using Domain.Models.Common.Results;
 
 namespace Application.Managers;
 

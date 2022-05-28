@@ -1,15 +1,13 @@
-import React, { useEffect } from 'react';
-
-import Page from 'app/components/Layout/Page';
-import { Guard } from 'app/components/Guards';
-import { useParams } from 'react-router-dom';
+import { skipToken } from '@reduxjs/toolkit/dist/query';
 import { challengeApi } from 'app/api/challenge';
 import ErrorResult, { ErrorResult500 } from 'app/components/ErrorResult';
+import { Guard } from 'app/components/Guards';
+import Page from 'app/components/Layout/Page';
+import { ApiException } from 'app/config/api/axios';
+import { ErrorCode } from 'app/types/enums/errorCode';
+import * as React from 'react';
+import { useParams } from 'react-router-dom';
 import TheForm from './components/TheForm';
-
-import { ApiException } from 'app/api/config/axios';
-import { ErrorCode } from 'app/api/types';
-import { skipToken } from '@reduxjs/toolkit/dist/query';
 
 export default function Save() {
   const { id: paramId } = useParams();

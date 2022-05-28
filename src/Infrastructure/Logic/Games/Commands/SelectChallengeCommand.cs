@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.Games;
 using Domain.Enums.Errors;
-using Domain.Models.Results;
+using Domain.Models.Common.Results;
 using Infrastructure.Repositories;
 using MediatR;
 using System;

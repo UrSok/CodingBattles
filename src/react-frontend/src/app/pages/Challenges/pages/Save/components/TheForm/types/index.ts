@@ -1,5 +1,4 @@
-import { TestPair } from 'app/api/types/challenge';
-import { Language } from 'app/types/global';
+import { TestPair } from 'app/types/models/challenge/testPair';
 
 export const FormFields = {
   name: 'name',

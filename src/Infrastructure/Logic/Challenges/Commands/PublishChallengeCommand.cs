@@ -2,7 +2,7 @@
 using Domain.Entities.Challenges;
 using Domain.Enums;
 using Domain.Enums.Errors;
-using Domain.Models.Results;
+using Domain.Models.Common.Results;
 using FluentValidation;
 using Infrastructure.Repositories;
 using Infrastructure.Utils.Validation;
@@ -10,7 +10,7 @@ using MediatR;
 using StubGenerator;
 
 namespace Infrastructure.Logic.Challenges.Commands;
-internal record PublishChallengeCommand(string JwtToken, string ChallengeId) : IRequest<Result<bool>>;
+internal record PublishChallengeCommand(string JwtToken, string ChallengeId) : IRequest<Result>;
 
 internal class PublishChallengeCommandValidator : AbstractValidator<PublishChallengeCommand>
 {
@@ -24,7 +24,7 @@ internal class PublishChallengeCommandValidator : AbstractValidator<PublishChall
     }
 }
 
-internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand, Result<bool>>
+internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand, Result>
 {
     private readonly IChallengeRepository challengeRepository;
     private readonly IUserRepository userRepository;
@@ -40,24 +40,24 @@ internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand
         this.mapper = mapper;
     }
 
-    public async Task<Result<bool>> Handle(PublishChallengeCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(PublishChallengeCommand request, CancellationToken cancellationToken)
     {
 
         var user = await this.userRepository.GetByJwtToken(request.JwtToken, cancellationToken);
         if (user is null)
         {
-            return Result<bool>.Failure(ProcessingError.UserNotFound);
+            return Result.Failure(ProcessingError.UserNotFound);
         }
 
         var challenge = await this.challengeRepository.Get(request.ChallengeId, cancellationToken);
         if (challenge is null)
         {
-            return Result<bool>.Failure(ProcessingError.ChallengeNotFound);
+            return Result.Failure(ProcessingError.ChallengeNotFound);
         }
 
         if (challenge.CreatedByUserId != user.Id)
         {
-            return Result<bool>.Failure(ProcessingError.CannotEditForeignRecord);
+            return Result.Failure(ProcessingError.CannotEditForeignRecord);
         }
 
         challenge.Status = ChallengeStatus.Published;
@@ -66,10 +66,10 @@ internal class PublishChallengeHandler : IRequestHandler<PublishChallengeCommand
         var result = await this.challengeRepository.Publish(challenge, cancellationToken);
         if (!result)
         {
-            return Result<bool>.Failure(Error.InternalServerError);
+            return Result.Failure(Error.InternalServerError);
         }
 
-        return Result<bool>.Success(true);
+        return Result.Success();
     }
 
     private Result Validate(Challenge challenge)

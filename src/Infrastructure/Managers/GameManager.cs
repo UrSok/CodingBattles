@@ -1,9 +1,7 @@
 ﻿using Application.Managers;
-using Domain.Entities.Games;
-using Domain.Models.Common;
+using Domain.Models.Common.Results;
 using Domain.Models.Games;
-using Domain.Models.Games.Results;
-using Domain.Models.Results;
+using Domain.Models.Games.RequestsResults;
 using Infrastructure.Logic.Games.Commands;
 using Infrastructure.Logic.Games.Queries;
 using MediatR;
@@ -34,7 +32,7 @@ public class GameManager : BaseManager, IGameManager
         return await this.SendCommand(command, cancellationToken);
     }
 
-    public async Task<Result<GameDetails>> Get(string gameId, CancellationToken cancellationToken)
+    public async Task<Result<GameDto>> Get(string gameId, CancellationToken cancellationToken)
     {
         var query = new GetGameQuery(gameId);
         return await this.SendCommand(query, cancellationToken);

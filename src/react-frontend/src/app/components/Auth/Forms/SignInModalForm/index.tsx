@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-
 import { LockOutlined, LoginOutlined, MailOutlined } from '@ant-design/icons';
 import ProForm, {
   ModalForm,
@@ -7,14 +5,14 @@ import ProForm, {
   ProFormText,
 } from '@ant-design/pro-form';
 import { Alert, Button, Form, notification } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { FieldData } from 'rc-field-form/es/interface';
-import styled from 'styled-components';
-
-import { SignInModel } from 'app/api/types/auth';
-import { translations } from 'locales/translations';
-import { EMAIL_REGEX } from 'app/utils/constants';
 import { authApi } from 'app/api/auth';
+import { AuthUserRequest } from 'app/api/auth/types/authUser';
+import { EMAIL_REGEX } from 'app/utils/constants';
+import { translations } from 'locales/translations';
+import { FieldData } from 'rc-field-form/es/interface';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 
 type SingInModalFormProps = {
   textButton?: boolean;
@@ -30,7 +28,7 @@ export default function SingInModalForm(props: SingInModalFormProps) {
 
   const [triggerSignIn, { data }] = authApi.useSignInMutation();
 
-  const onSubmit = async (values: SignInModel) => {
+  const onSubmit = async (values: AuthUserRequest) => {
     const result = await triggerSignIn(values).unwrap();
 
     if (result.isSuccess) {
@@ -62,7 +60,7 @@ export default function SingInModalForm(props: SingInModalFormProps) {
   };
 
   return (
-    <ModalForm<SignInModel>
+    <ModalForm<AuthUserRequest>
       form={form}
       initialValues={{
         remember: true,
@@ -115,7 +113,7 @@ export default function SingInModalForm(props: SingInModalFormProps) {
               message: t(translations.SignInModalForm.validationEmailRequired),
             },
             {
-              pattern: EMAIL_REGEX,
+              type: 'email',
               message: t(translations.SignInModalForm.validationInvalidEmail),
             },
           ]}

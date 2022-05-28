@@ -1,5 +1,5 @@
 ﻿using Application.Managers;
-using Domain.Models.Games;
+using Domain.Models.Games.RequestsResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;

@@ -1,9 +1,9 @@
-﻿using Domain.Models.Common;
-using Domain.Models.Results;
+﻿using Domain.Models.Common.Results;
+using Domain.Models.General.RequestsResults;
 
 namespace Application.Managers;
 
 public interface IStubGeneratorManager
 {
-    Task<Result<StubGeneratorResult>> Generate(StubGeneratorModel stubGeneratorModel, CancellationToken cancellationToken);
+    Task<Result<GenerateStubResult>> Generate(GenerateStubRequest stubGeneratorModel, CancellationToken cancellationToken);
 }

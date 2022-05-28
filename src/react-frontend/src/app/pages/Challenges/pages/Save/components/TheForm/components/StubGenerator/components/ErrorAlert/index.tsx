@@ -1,13 +1,11 @@
 import React from 'react';
 import Text from 'antd/lib/typography/Text';
 import { Alert } from 'antd';
+import { GenerateStubError } from 'app/api/stubGenerator/types/generateStub';
 
-import { StubGeneratorError } from 'app/api/types/stubGenerator';
-
-
-interface ErrorAlertProps {
-  error: StubGeneratorError;
-}
+type ErrorAlertProps = {
+  error: GenerateStubError;
+};
 
 export default function ErrorAlert(props: ErrorAlertProps) {
   const StubInputDetails = (): React.ReactNode => {

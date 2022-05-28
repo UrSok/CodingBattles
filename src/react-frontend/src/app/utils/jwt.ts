@@ -1,6 +1,6 @@
 import jwtDecode from 'jwt-decode';
 
-import axios from 'app/api/config/axios';
+import axios from 'app/config/api/axios';
 import { DecodedJwtToken } from './types/jwt';
 import { localStorageKey } from './types';
 

@@ -1,13 +1,11 @@
-import * as React from 'react';
 import { Alert, Button } from 'antd';
+import { selectAuth } from 'app/slices/auth/selectors';
+import { Role } from 'app/types/enums/role';
+import { translations } from 'locales/translations';
+import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-
-import { translations } from 'locales/translations';
-import { selectAuth } from 'app/slices/auth/selectors';
-
-import { Role } from 'app/api/types/auth';
 
 const StickedToHeaderAlert = styled.div`
   margin: 0 -24px;

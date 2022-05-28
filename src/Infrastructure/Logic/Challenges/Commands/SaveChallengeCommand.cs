@@ -2,8 +2,8 @@
 using Domain.Entities.Challenges;
 using Domain.Enums;
 using Domain.Enums.Errors;
-using Domain.Models.Challenges;
-using Domain.Models.Results;
+using Domain.Models.Challenges.RequestsResults;
+using Domain.Models.Common.Results;
 using FluentValidation;
 using Infrastructure.Repositories;
 using Infrastructure.Utils.Validation;
@@ -11,7 +11,7 @@ using MediatR;
 
 namespace Infrastructure.Logic.Challenges.Commands;
 
-internal record SaveChallengeCommand(string JwtToken, string ChallengeId, ChallengeSaveModel Model) : IRequest<Result<string>>;
+internal record SaveChallengeCommand(string JwtToken, string ChallengeId, ChallengeSaveRequest Model) : IRequest<Result<string>>;
 
 internal class SaveChallengeCommandValidator : AbstractValidator<SaveChallengeCommand>
 {

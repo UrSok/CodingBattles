@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { blue } from '@ant-design/colors';
 import {
   LockOutlined,
@@ -8,13 +7,14 @@ import {
 } from '@ant-design/icons';
 import ProForm, { ModalForm, ProFormText } from '@ant-design/pro-form';
 import { Button, Form, notification } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { FieldData } from 'rc-field-form/es/interface';
-
-import { SignUpModel } from 'app/api/types/auth';
-import { translations } from 'locales/translations';
-import { EMAIL_REGEX } from 'app/utils/constants';
 import { authApi } from 'app/api/auth';
+import { RegisterUserRequest } from 'app/api/auth/types/registerUser';
+import { EMAIL_REGEX } from 'app/utils/constants';
+import { translations } from 'locales/translations';
+import { FieldData } from 'rc-field-form/es/interface';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
 
 type SignUpModalFormProps = {
   textButton?: boolean;
@@ -54,7 +54,7 @@ export default function SingUpModalForm(props: SignUpModalFormProps) {
         name: 'email',
         validating: false,
         errors:
-          result.value === false
+          result.isSuccess === false
             ? [t(translations.AuthBadge.SignUpForm.validationEmailNotUnique)]
             : undefined,
       },
@@ -120,7 +120,7 @@ export default function SingUpModalForm(props: SignUpModalFormProps) {
     setSubmitDisabled(anyFieldInvalid || anyFieldNotTouched);
   };
 
-  const onSubmit = async (values: SignUpModel) => {
+  const onSubmit = async (values: RegisterUserRequest) => {
     const result = await triggerSignUp(values).unwrap();
 
     if (result.isSuccess) {
@@ -137,7 +137,7 @@ export default function SingUpModalForm(props: SignUpModalFormProps) {
   };
 
   return (
-    <ModalForm<SignUpModel>
+    <ModalForm<RegisterUserRequest>
       form={form}
       title={t(translations.SignUpModalForm.title)}
       modalProps={{
@@ -179,7 +179,7 @@ export default function SingUpModalForm(props: SignUpModalFormProps) {
               message: t(translations.SignUpModalForm.validationEmailRequired),
             },
             {
-              pattern: EMAIL_REGEX,
+              type: 'email',
               message: t(translations.SignUpModalForm.validationInvalidEmail),
             },
           ]}

@@ -1,57 +1,45 @@
+import { red } from '@ant-design/colors';
+import { DeleteTwoTone, PlusOutlined } from '@ant-design/icons';
+import ProCard from '@ant-design/pro-card';
 import ProForm, {
   ProFormInstance,
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-form';
 import { FooterToolbar } from '@ant-design/pro-layout';
-import {
-  Alert,
-  Button,
-  Form,
-  message,
-  notification,
-  Space,
-  Tooltip,
-  Typography,
-} from 'antd';
+import { Alert, Button, Form, message, Space, Typography } from 'antd';
 import { useForm, useWatch } from 'antd/lib/form/Form';
+import { NamePath } from 'antd/lib/form/interface';
+import { gameApi } from 'app/api';
 import { challengeApi } from 'app/api/challenge';
-import {
-  Challenge,
-  ChallengeResult,
-  ChallengeStatus,
-  TestPair,
-} from 'app/api/types/challenge';
+import { RunTestResult } from 'app/api/game/types/runTest';
+import { ResultValue } from 'app/api/types';
+
 import CodeEditor from 'app/components/Input/CodeEditor';
 import LanguageSelect from 'app/components/Input/LanguageSelect';
 import MultiTagSelect from 'app/pages/Challenges/components/MultiTagSelect';
 import { PATH_CHALLENGES } from 'app/routes/paths';
-import { Language } from 'app/types/global';
+import { ChallengeStatus } from 'app/types/enums/challengeStatus';
+import { ErrorCode } from 'app/types/enums/errorCode';
+import { Language } from 'app/types/enums/language';
+import { Challenge } from 'app/types/models/challenge/challenge';
+import { TestPair } from 'app/types/models/challenge/testPair';
+import { getLanguageKeyName } from 'app/utils/enumHelpers';
+import monaco from 'monaco-editor';
+import { FieldData } from 'rc-field-form/es/interface';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useBoolean, useEffectOnce } from 'usehooks-ts';
 import CardSection from '../../../../../../components/CardSection';
-import monaco from 'monaco-editor';
-import ProCard from '@ant-design/pro-card';
-import { DeleteTwoTone, PlusOutlined } from '@ant-design/icons';
-import { red } from '@ant-design/colors';
+import ChallengeStatusAlert from './components/ChallengeStatusAlert';
 import MarkdownDescriptionEditor, {
   MarkdownEditorRef,
 } from './components/MarkdownDescriptionEditor';
-
-import { useEffectOnce, useBoolean } from 'usehooks-ts';
 import StubGenerator from './components/StubGenerator';
-
-import { FieldData } from 'rc-field-form/es/interface';
-import { gameApi } from 'app/api';
 import { FormFields, FormType } from './types';
-import { getLanguageKeyName } from 'app/utils/enumHelpers';
-import ChallengeStatusAlert from './components/ChallengeStatusAlert';
-import { NamePath } from 'antd/lib/form/interface';
-import { RunTestResult } from 'app/api/types/games';
-import { ErrorCode, ResultValue } from 'app/api/types';
 
 type Props = {
-  challenge?: ChallengeResult;
+  challenge?: Challenge;
 };
 
 export default function TheForm(props: Props) {
@@ -73,16 +61,14 @@ export default function TheForm(props: Props) {
   const stubEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
   const solutionEditorRef = useRef<monaco.editor.IStandaloneCodeEditor>();
 
-  const [trigerTestSolution, { isLoading: isTesting, data: testResult }] =
+  const [trigerTestSolution, { isLoading: isTesting }] =
     gameApi.useRunTestMutation();
 
   const [triggerSaveChallenge, { isLoading: isSaving, data: savingResult }] =
     challengeApi.useSaveChallengeMutation();
 
-  const [
-    triggerPublishChallenge,
-    { isLoading: isPublishing, data: publishResult },
-  ] = challengeApi.usePublishChallengeMutation();
+  const [triggerPublishChallenge, { isLoading: isPublishing }] =
+    challengeApi.usePublishChallengeMutation();
 
   const [solutionErrorAlert, setSolutionErrorAlert] =
     useState<React.ReactNode>(undefined);
@@ -91,7 +77,6 @@ export default function TheForm(props: Props) {
     value: testSolutionButtonState,
     setFalse: disableTestSolutionButton,
     setTrue: enableTestSolutionButton,
-    setValue: changeTestSolutionButtonState,
   } = useBoolean(true);
 
   const {
@@ -178,7 +163,7 @@ export default function TheForm(props: Props) {
     saveStateEnableDecorated();
   };
 
-  const handleStubGeneratorResultChanged = (
+  const handleGenerateStubResultChanged = (
     stubInput: string | undefined,
     _: string | undefined,
     isValid: boolean,
@@ -535,7 +520,7 @@ export default function TheForm(props: Props) {
               stubCodeEditorRef={stubEditorRef}
               initialValue={initialChallenge?.stubGeneratorInput}
               onStubInputChangedDecorator={handleStubInputChangedDecorator}
-              onResultChanged={handleStubGeneratorResultChanged}
+              onResultChanged={handleGenerateStubResultChanged}
               disabled={statusIsNotDraft}
             />
           </Form.Item>
@@ -754,6 +739,7 @@ export default function TheForm(props: Props) {
           <Button
             type="primary"
             disabled={saveState}
+            loading={isPublishing}
             onClick={() => formRef.current?.submit()}
           >
             Publish

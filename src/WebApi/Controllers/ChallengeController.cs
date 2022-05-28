@@ -1,7 +1,7 @@
 ﻿using Application.Managers;
 using Domain.Entities.Users;
 using Domain.Enums;
-using Domain.Models.Challenges;
+using Domain.Models.Challenges.RequestsResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Constants;
@@ -21,9 +21,9 @@ public class ChallengeController : BaseController
 
     [AllowAnonymous]
     [HttpPost]
-    public async Task<IActionResult> Get([FromBody] ChallengeSearchModel challengeSearchModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> Get([FromBody] ChallengeSearchRequest challengeSearchRequest, CancellationToken cancellationToken)
     {
-        var result = await this.challengeManager.Get(challengeSearchModel, cancellationToken);
+        var result = await this.challengeManager.Get(challengeSearchRequest, cancellationToken);
         return this.Process(result);
     }
 
@@ -38,9 +38,9 @@ public class ChallengeController : BaseController
 
     [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
     [HttpPost("save/{challengeId?}")]
-    public async Task<IActionResult> Save([FromBody] ChallengeSaveModel challengeSaveModel, [FromRoute] string? challengeId = null, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Save([FromBody] ChallengeSaveRequest challengeSaveRequest, [FromRoute] string? challengeId = null, CancellationToken cancellationToken = default)
     {
-        var result = await this.challengeManager.Save(JwtToken, challengeId, challengeSaveModel, cancellationToken);
+        var result = await this.challengeManager.Save(JwtToken, challengeId, challengeSaveRequest, cancellationToken);
         return this.Process(result);
     }
 

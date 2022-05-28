@@ -2,8 +2,9 @@
 using AutoMapper;
 using Domain.Enums.Errors;
 using Domain.Models.Challenges;
+using Domain.Models.Challenges.RequestsResults;
 using Domain.Models.Common;
-using Domain.Models.Results;
+using Domain.Models.Common.Results;
 using FluentValidation;
 using Infrastructure.Repositories;
 using Infrastructure.Utils.Validation;
@@ -11,17 +12,17 @@ using MediatR;
 
 namespace Infrastructure.Logic.Challenges.Queries;
 
-internal record GetChallengesQuery(ChallengeSearchModel ChallengeSearchModel) : IRequest<Result<PaginatedModel<ChallengeSearchResultItem>>>;
+internal record GetChallengesQuery(ChallengeSearchRequest Model) : IRequest<Result<Paginated<ChallengeSearchItem>>>;
 
 internal class GetChallengesQueryValidator : AbstractValidator<GetChallengesQuery>
 {
     public GetChallengesQueryValidator()
     {
-        this.RuleFor(x => x.ChallengeSearchModel)
+        this.RuleFor(x => x.Model)
             .Must(this.ValidateMinMaxDifficulty).WithError(ValidationError.MinimumDifficultyIsBiggerThanMaximumDifficulty);
     }
 
-    private bool ValidateMinMaxDifficulty(ChallengeSearchModel model)
+    private bool ValidateMinMaxDifficulty(ChallengeSearchRequest model)
     {
         if (model.HasBothDifficultiesSet && model.MinimumDifficulty > model.MaximumDifficulty)
         {
@@ -32,33 +33,39 @@ internal class GetChallengesQueryValidator : AbstractValidator<GetChallengesQuer
     }
 }
 
-internal class GetChallengesHandler : IRequestHandler<GetChallengesQuery, Result<PaginatedModel<ChallengeSearchResultItem>>>
+internal class GetChallengesHandler : IRequestHandler<GetChallengesQuery, Result<Paginated<ChallengeSearchItem>>>
 {
     private readonly IChallengeRepository challengeRepository;
+    private readonly ITagRepository tagRepository;
     private readonly IMapper mapper;
 
-    public GetChallengesHandler(IChallengeRepository challengeRepository, IMapper mapper)
+    public GetChallengesHandler(IChallengeRepository challengeRepository, ITagRepository tagRepository, IMapper mapper)
     {
         this.challengeRepository = challengeRepository;
+        this.tagRepository = tagRepository;
         this.mapper = mapper;
     }
 
-    public async Task<Result<PaginatedModel<ChallengeSearchResultItem>>> Handle(GetChallengesQuery request, CancellationToken cancellationToken)
+    public async Task<Result<Paginated<ChallengeSearchItem>>> Handle(GetChallengesQuery request, CancellationToken cancellationToken)
     {
-        Guard.Against.Null(request, nameof(request));
+        var (totalPages, totalItems, challenges) =
+            await this.challengeRepository.Get(request.Model, cancellationToken);
+        
+        var tags = await this.tagRepository.GetAll(cancellationToken);
+        var challengeSearchItems = challenges.Select((challenge) =>
+        {
+            var challengesSearchItem = this.mapper.Map<ChallengeSearchItem>(challenge);
+            challengesSearchItem.Tags = tags.Where(x => challenge.TagIds.Contains(x.Id)).ToList();
+            return challengesSearchItem;
+        });
 
-        var (totalPages, totalItems, challenges) = 
-            await this.challengeRepository.Get(request.ChallengeSearchModel, cancellationToken);
-
-        var paginatedModel = new PaginatedModel<ChallengeSearchResultItem>
+        var paginatedModel = new Paginated<ChallengeSearchItem>
         {
             TotalPages = totalPages,
             TotalItems = totalItems,
-            Items = this.mapper.Map<IEnumerable<ChallengeSearchResultItem>>(challenges)
+            Items = challengeSearchItems
         };
 
-
-
-        return Result<PaginatedModel<ChallengeSearchResultItem>>.Success(paginatedModel);
+        return Result<Paginated<ChallengeSearchItem>>.Success(paginatedModel);
     }
 }

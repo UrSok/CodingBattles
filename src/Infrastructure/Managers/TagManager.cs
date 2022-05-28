@@ -1,6 +1,6 @@
 ﻿using Application.Managers;
 using Domain.Entities.Challenges;
-using Domain.Models.Results;
+using Domain.Models.Common.Results;
 using Infrastructure.Logic.Tags.Queries;
 using MediatR;
 

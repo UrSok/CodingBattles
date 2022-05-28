@@ -1,7 +1,7 @@
 import React from 'react';
 import { ProFormSelect } from '@ant-design/pro-form';
 
-import { Language } from 'app/types/global';
+import { Language } from 'app/types/enums/language';
 import { getLanguageKeyName } from 'app/utils/enumHelpers';
 
 type LanguageSelectProps = {
@@ -11,7 +11,7 @@ type LanguageSelectProps = {
   width?: number | 'sm' | 'md' | 'xl' | 'xs' | 'lg';
   defaultLanguage: Language;
   style?: React.CSSProperties;
-}
+};
 
 export default function LanguageSelect(props: LanguageSelectProps) {
   const {

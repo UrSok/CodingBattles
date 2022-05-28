@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Domain.Enums.Errors;
 using Domain.Models.Common;
-using Domain.Models.Games.Results;
-using Domain.Models.Results;
+using Domain.Models.Common.Results;
+using Domain.Models.Games;
 using Domain.Models.Users;
 using FluentValidation;
 using Infrastructure.Repositories;
@@ -40,15 +40,14 @@ internal class GetGamesByUserIdHandler : IRequestHandler<GetGamesByUserIdQuery, 
         var games = await this.gameRepository.GetGamesByUserId(request.UserId, cancellationToken);
         var userIds = games.SelectMany(x => x.UserIds).ToList();
         var users = await this.userRepository.GetByIds(userIds, cancellationToken);
-        var userModels = this.mapper.Map<List<UserModel>>(users);
+        var userDtos = this.mapper.Map<List<UserDto>>(users);
 
-        var gameSearchItemList = this.mapper.Map<List<GameSearchItem>>(games);
-
-        foreach (var gameSearchItem in gameSearchItemList)
+        var gameSearchItemList = games.Select((game) =>
         {
-            var game = games.First(x => x.Id == gameSearchItem.Id);
-            gameSearchItem.Users = userModels.Where(user => game.UserIds.Contains(user.Id)).ToList();
-        }
+            var gameSearchItem = this.mapper.Map<GameSearchItem>(game);
+            gameSearchItem.Users = userDtos.Where(user => game.UserIds.Contains(user.Id)).ToList();
+            return gameSearchItem;
+        }).ToList();
 
         return Result<List<GameSearchItem>>.Success(gameSearchItemList);
     }

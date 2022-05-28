@@ -1,5 +1,5 @@
 ﻿using Application.Managers;
-using Domain.Models.Users;
+using Domain.Models.Users.RequestsResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,9 +18,9 @@ public class UserController : BaseController
 
     [AllowAnonymous]
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] UserRegistrationModel userRegistrationModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> Register([FromBody] RegisterUserRequest registerUserRequest, CancellationToken cancellationToken)
     {
-        var response = await this.userManager.Register(userRegistrationModel, cancellationToken);
+        var response = await this.userManager.Register(registerUserRequest, cancellationToken);
         return this.Process(response);
     }
 
@@ -42,18 +42,10 @@ public class UserController : BaseController
 
     [AllowAnonymous]
     [HttpPost("auth")]
-    public async Task<IActionResult> Authenticate([FromBody] UserLoginModel userLoginModel, CancellationToken cancellationToken)
+    public async Task<IActionResult> Authenticate([FromBody] AuthUserRequest authUserRequest, CancellationToken cancellationToken)
     {
-        var response = await this.userManager.Authenticate(userLoginModel, cancellationToken);
+        var response = await this.userManager.Authenticate(authUserRequest, cancellationToken);
         return this.Process(response);
-    }
-
-    [AllowAnonymous]
-    [HttpGet("getAuth/jwt")]
-    public async Task<IActionResult> GetAuthUserByJwtToken(CancellationToken cancellationToken)
-    {
-        var result = await this.userManager.GetAuthUserByJwtToken(JwtToken, cancellationToken);
-        return this.Process(result);
     }
 
     [AllowAnonymous]

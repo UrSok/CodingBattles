@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Enums.Errors;
-using Domain.Models.Results;
+using Domain.Models.Common.Results;
 using FluentValidation;
 using Infrastructure.Repositories;
 using Infrastructure.Utils.Validation;

@@ -1,8 +1,8 @@
-import { AuthUser } from 'app/api/types/auth';
+import { UserDto } from 'app/types/models/user/userDto';
 
 export interface AuthState {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isInitialized: boolean;
-  user: AuthUser | null;
+  user: UserDto | null;
 }

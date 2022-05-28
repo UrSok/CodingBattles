@@ -1,9 +1,11 @@
 ﻿using Application.Managers;
 using AutoMapper;
+using Domain.Entities.Games;
 using Domain.Enums.Errors;
+using Domain.Models.Challenges;
 using Domain.Models.Common;
-using Domain.Models.Games.Results;
-using Domain.Models.Results;
+using Domain.Models.Common.Results;
+using Domain.Models.Games;
 using Domain.Models.Users;
 using FluentValidation;
 using Infrastructure.Repositories;
@@ -11,7 +13,7 @@ using Infrastructure.Utils.Validation;
 using MediatR;
 
 namespace Infrastructure.Logic.Games.Queries;
-internal record GetGameQuery(string GameId) : IRequest<Result<GameDetails>>;
+internal record GetGameQuery(string GameId) : IRequest<Result<GameDto>>;
 
 internal class GetGameQueryValidator : AbstractValidator<GetGameQuery>
 {
@@ -22,27 +24,36 @@ internal class GetGameQueryValidator : AbstractValidator<GetGameQuery>
     }
 }
 
-internal class GetGameHandler : IRequestHandler<GetGameQuery, Result<GameDetails>>
+internal class GetGameHandler : IRequestHandler<GetGameQuery, Result<GameDto>>
 {
     private readonly IGameRepository gameRepository;
     private readonly IUserRepository userRepository;
     private readonly IChallengeRepository challengeRepository;
+    private readonly ITagRepository tagRepository;
     private readonly IMapper mapper;
 
-    public GetGameHandler(IGameRepository gameRepository, IUserRepository userRepository, IChallengeRepository challengeRepository, IMapper mapper)
+    private IEnumerable<UserDto> userDtos;
+    private IEnumerable<ChallengeDto> challengeDtos;
+
+    public GetGameHandler(IGameRepository gameRepository,
+                          IUserRepository userRepository,
+                          IChallengeRepository challengeRepository,
+                          ITagRepository tagRepository,
+                          IMapper mapper)
     {
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.challengeRepository = challengeRepository;
+        this.tagRepository = tagRepository;
         this.mapper = mapper;
     }
 
-    public async Task<Result<GameDetails>> Handle(GetGameQuery request, CancellationToken cancellationToken)
+    public async Task<Result<GameDto>> Handle(GetGameQuery request, CancellationToken cancellationToken)
     {
         var game = await this.gameRepository.Get(request.GameId, cancellationToken);
         if (game is null)
         {
-            return Result<GameDetails>.Failure(ProcessingError.GameNotFound);
+            return Result<GameDto>.Failure(ProcessingError.GameNotFound);
         }
 
         var userIds = game.UserIds;
@@ -63,36 +74,44 @@ internal class GetGameHandler : IRequestHandler<GetGameQuery, Result<GameDetails
             challengeIds.Add(game.CurrentRound.ChallengeId);
         }
 
+        var tags = await this.tagRepository.GetAll(cancellationToken);
+        this.userDtos = this.mapper.Map<IEnumerable<UserDto>>(users);
+
         var challenges = await this.challengeRepository.GetByIds(challengeIds, cancellationToken);
-
-        var userModels = this.mapper.Map<IEnumerable<UserModel>>(users);
-
-        var gameDetails = this.mapper.Map<GameDetails>(game);
-
-        gameDetails.GameMasterUser = userModels.First(x => x.Id == game.GameMasterUserId);
-        gameDetails.Users = userModels.Where(x => game.UserIds.Contains(x.Id)).ToList();
-
-        foreach (var previousRoundDetails in gameDetails.PreviousRounds)
+        this.challengeDtos = challenges.Select((challenge) =>
         {
-            var round = game.PreviousRounds.First(x => x.Number == previousRoundDetails.Number);
-            previousRoundDetails.Challenge = challenges.First(x => x.Id == round.ChallengeId);
+            var challengeDto = this.mapper.Map<ChallengeDto>(challenge);
+            challengeDto.Tags = tags.Where(x => challenge.TagIds.Contains(x.Id)).ToList();
+            return challengeDto;
+        });
 
-            for (int i = 0; i < previousRoundDetails.RoundSummaries.Count; i++)
-            {
-                previousRoundDetails.RoundSummaries[0].User = userModels.First(x => x.Id == round.RoundSummaries[i].UserId);
-            }
+
+        var gameDto = this.mapper.Map<GameDto>(game);
+
+        gameDto.GameMasterUser = this.userDtos.First(x => x.Id == game.GameMasterUserId);
+        gameDto.Users = this.userDtos.Where(x => game.UserIds.Contains(x.Id)).ToList();
+        gameDto.PreviousRounds = game.PreviousRounds.Select(this.MapRound).ToList();
+
+        if (game.CurrentRound is not null)
+        {
+            gameDto.CurrentRound = this.MapRound(game.CurrentRound);
         }
 
-        if (gameDetails.CurrentRound is not null)
+        return Result<GameDto>.Success(gameDto);
+    }
+
+    private RoundDto MapRound(Round round)
+    {
+        var roundDto = this.mapper.Map<RoundDto>(round);
+        roundDto.Challenge = this.challengeDtos.FirstOrDefault(x => x.Id == round.ChallengeId);
+
+        roundDto.RoundSummaries = round.RoundSummaries.Select((roundSummary) =>
         {
-            gameDetails.CurrentRound.Challenge = challenges.FirstOrDefault(x => x.Id == game.CurrentRound.ChallengeId);
+            var roundSummaryDto = this.mapper.Map<RoundSummaryDto>(roundSummary);
+            roundSummaryDto.User = this.userDtos.First(x => x.Id == roundSummary.UserId);
+            return roundSummaryDto;
+        }).ToList();
 
-            for (int i = 0; i < gameDetails.CurrentRound.RoundSummaries.Count; i++)
-            {
-                gameDetails.CurrentRound.RoundSummaries[0].User = userModels.First(x => x.Id == game.CurrentRound.RoundSummaries[i].UserId);
-            }
-        }
-
-        return Result<GameDetails>.Success(gameDetails);
+        return roundDto;
     }
 }

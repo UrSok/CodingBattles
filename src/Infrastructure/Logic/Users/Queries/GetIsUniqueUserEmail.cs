@@ -1,5 +1,5 @@
 ﻿using Domain.Enums.Errors;
-using Domain.Models.Results;
+using Domain.Models.Common.Results;
 using FluentValidation;
 using Infrastructure.Repositories;
 using Infrastructure.Utils.Validation;
@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Infrastructure.Logic.Users.Queries;
 
-internal record GetIsUniqueUserEmailQuery(string Email) : IRequest<Result<bool>>;
+internal record GetIsUniqueUserEmailQuery(string Email) : IRequest<Result>;
 
 internal class GetIsUniqueUserEmailQueryValidator : AbstractValidator<GetIsUniqueUserEmailQuery>
 {
@@ -18,7 +18,7 @@ internal class GetIsUniqueUserEmailQueryValidator : AbstractValidator<GetIsUniqu
     }
 }
 
-internal class GetIsUniqueUserEmailHandler : IRequestHandler<GetIsUniqueUserEmailQuery, Result<bool>>
+internal class GetIsUniqueUserEmailHandler : IRequestHandler<GetIsUniqueUserEmailQuery, Result>
 {
     private readonly IUserRepository userRepository;
 
@@ -27,14 +27,14 @@ internal class GetIsUniqueUserEmailHandler : IRequestHandler<GetIsUniqueUserEmai
         this.userRepository = userRepository;
     }
 
-    public async Task<Result<bool>> Handle(GetIsUniqueUserEmailQuery request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(GetIsUniqueUserEmailQuery request, CancellationToken cancellationToken)
     {
         var user = await this.userRepository.GetByEmail(request.Email, cancellationToken);
         if (user is not null)
         {
-            return Result<bool>.Success(false);
+            return Result.Failure(ProcessingError.UserExists);
         }
 
-        return Result<bool>.Success(true);
+        return Result.Success();
     }
 }

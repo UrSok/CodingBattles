@@ -1,28 +1,27 @@
-import * as React from 'react';
-import { useState } from 'react';
-import { Button, Form, Input, Space, Typography } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { translations } from 'locales/translations';
+import { EditFilled, ExpandAltOutlined, PlusOutlined } from '@ant-design/icons';
 import ProCard from '@ant-design/pro-card';
-import { SortBy } from 'app/api/types/challenge';
-
-import { useSelector } from 'react-redux';
-import { selectAuth } from 'app/slices/auth/selectors';
-import { Role } from 'app/api/types/auth';
-import { useWatch } from 'antd/lib/form/Form';
 import ProForm, {
   ProFormCheckbox,
   ProFormSelect,
   ProFormSlider,
 } from '@ant-design/pro-form';
-import { useNavigate } from 'react-router-dom';
-import { PATH_CHALLENGES } from 'app/routes/paths';
-import MultiTagSelect from '../../components/MultiTagSelect';
-import Page from 'app/components/Layout/Page';
-import { ChallengeSearchFields } from './types';
-import { OrderStyle } from 'app/api/types';
-import { EditFilled, ExpandAltOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Space, Typography } from 'antd';
+import { useWatch } from 'antd/lib/form/Form';
 import ChallengeList from 'app/components/ChallengeList';
+import Page from 'app/components/Layout/Page';
+import { PATH_CHALLENGES } from 'app/routes/paths';
+import { selectAuth } from 'app/slices/auth/selectors';
+import { OrderStyle } from 'app/types/enums/orderStyle';
+import { Role } from 'app/types/enums/role';
+import { SortBy } from 'app/types/enums/sortBy';
+import { translations } from 'locales/translations';
+import * as React from 'react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import MultiTagSelect from '../../components/MultiTagSelect';
+import { ChallengeSearchFields } from './types';
 
 export default function SearchChallenges() {
   const navigate = useNavigate();

@@ -1,17 +1,15 @@
-import ProList, { GetComponentProps, ProListMeta } from '@ant-design/pro-list';
-import { Rate, Space, Tag, Typography } from 'antd';
-import {
-  ChallengeSearchRequest,
-  ChallengeSearchResultItem,
-} from 'app/api/types/challenge';
-import React, { useEffect, useState } from 'react';
-import { challengeApi, challengeTagApi } from 'app/api';
-import { useCounter } from 'usehooks-ts';
-import { OrderStyle } from 'app/api/types';
-import NoData from '../NoData';
-import useInfiniteScroll from 'react-infinite-scroll-hook';
+import ProList, { ProListMeta } from '@ant-design/pro-list';
 import { ToolBarProps } from '@ant-design/pro-table/lib/components/ToolBar';
+import { Rate, Space, Tag, Typography } from 'antd';
+import { challengeApi } from 'app/api';
+import { ChallengeSearchRequest } from 'app/api/challenge/types/challengeSearch';
+import { OrderStyle } from 'app/types/enums/orderStyle';
+import { ChallengeSearchItem } from 'app/types/models/challenge/challengeSearchItem';
+import React, { useEffect, useState } from 'react';
+import useInfiniteScroll from 'react-infinite-scroll-hook';
+import { useCounter } from 'usehooks-ts';
 import LoadingSpinner from '../LoadingSpinner';
+import NoData from '../NoData';
 
 type ChallengeListProps<T> = {
   headerTitle?: React.ReactNode;
@@ -25,11 +23,11 @@ type ChallengeListProps<T> = {
   difficultyRange?: [number, number];
   includeNoDifficulty?: boolean;
   onTagClick?: (tagId: string) => void;
-  onItem?: GetComponentProps<T>;
+  onItemClick?: (record: ChallengeSearchItem, index: number) => void;
 };
 
 export default function ChallengeList(
-  props: ChallengeListProps<ChallengeSearchResultItem>,
+  props: ChallengeListProps<ChallengeSearchItem>,
 ) {
   const {
     headerTitle,
@@ -43,7 +41,7 @@ export default function ChallengeList(
     difficultyRange,
     includeNoDifficulty,
     onTagClick,
-    onItem,
+    onItemClick,
   } = props;
 
   const {
@@ -69,8 +67,6 @@ export default function ChallengeList(
     searchQuery.maximumDifficulty = difficultyRange[1];
   }
 
-  const { isLoading: isLoadingTags, data: tagsData } =
-    challengeTagApi.useGetTagsQuery();
   const { data: challengesData, isLoading } =
     challengeApi.useGetChallengesQuery(searchQuery);
   const hasNextPage =
@@ -80,7 +76,7 @@ export default function ChallengeList(
       ? true
       : false;
 
-  const [data, setData] = useState<ChallengeSearchResultItem[]>([]);
+  const [challenges, setChallenges] = useState<ChallengeSearchItem[]>([]);
 
   const [sentryRef] = useInfiniteScroll({
     loading: isLoading,
@@ -99,16 +95,16 @@ export default function ChallengeList(
     if (!challengesData?.value) return;
 
     if (page === 1) {
-      setData(challengesData?.value?.items);
+      setChallenges(challengesData?.value?.items);
     } else {
-      setData(data.concat(challengesData?.value?.items));
+      setChallenges(challenges.concat(challengesData?.value?.items));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [challengesData]);
 
   return (
     <>
-      <ProList<ChallengeSearchResultItem>
+      <ProList<ChallengeSearchItem>
         ghost
         headerTitle={headerTitle}
         toolBarRender={toolBarRender}
@@ -117,13 +113,15 @@ export default function ChallengeList(
         locale={{
           emptyText: <NoData />,
         }}
-        dataSource={data}
+        dataSource={challenges}
         rowKey={(record, index) => record.id}
         loading={{
-          spinning: !challengesData || isLoading || isLoadingTags,
+          spinning: !challengesData || isLoading,
           indicator: <LoadingSpinner noTip />,
         }}
-        onItem={onItem}
+        onItem={(record, index) => ({
+          onClick: () => onItemClick && onItemClick(record, index),
+        })}
         metas={{
           title: {
             dataIndex: 'name',
@@ -135,13 +133,12 @@ export default function ChallengeList(
           subTitle: {
             render: (_, record) => (
               <Space size={0} wrap>
-                {record.tagIds?.map(tagId => {
-                  const tag = tagsData?.value?.find(x => x.id === tagId);
+                {record.tags?.map(tag => {
                   return (
                     tag && (
                       <Tag
-                        key={tagId}
-                        onClick={() => onTagClick && onTagClick(tagId)}
+                        key={tag.id}
+                        onClick={() => onTagClick && onTagClick(tag.id)}
                       >
                         {tag.name}
                       </Tag>
@@ -168,7 +165,9 @@ export default function ChallengeList(
       />
       {(isLoading || hasNextPage) && (
         <div ref={sentryRef}>
-          {data.length > 0 && <LoadingSpinner horizontallyCentered noTip />}
+          {challenges.length > 0 && (
+            <LoadingSpinner horizontallyCentered noTip />
+          )}
         </div>
       )}
     </>

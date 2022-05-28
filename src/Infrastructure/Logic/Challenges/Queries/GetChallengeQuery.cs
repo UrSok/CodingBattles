@@ -4,7 +4,7 @@ using Domain.Entities.Challenges;
 using Domain.Enums.Errors;
 using Domain.Models.Challenges;
 using Domain.Models.Common;
-using Domain.Models.Results;
+using Domain.Models.Common.Results;
 using Domain.Models.Users;
 using FluentValidation;
 using Infrastructure.Repositories;
@@ -13,7 +13,7 @@ using MediatR;
 
 namespace Infrastructure.Logic.Challenges.Queries;
 
-internal record GetChallengeQuery(string Id) : IRequest<Result<ChallengeResult>>;
+internal record GetChallengeQuery(string Id) : IRequest<Result<ChallengeDto>>;
 
 internal class GetChallengeQueryValidator : AbstractValidator<GetChallengeQuery>
 {
@@ -24,14 +24,17 @@ internal class GetChallengeQueryValidator : AbstractValidator<GetChallengeQuery>
     }
 }
 
-internal class GetChallengeHandler : IRequestHandler<GetChallengeQuery, Result<ChallengeResult>>
+internal class GetChallengeHandler : IRequestHandler<GetChallengeQuery, Result<ChallengeDto>>
 {
     private readonly IChallengeRepository challengeRepository;
     private readonly ITagRepository tagRepository;
     private readonly IUserRepository userRepository;
     private readonly IMapper mapper;
 
-    public GetChallengeHandler(IChallengeRepository challengeRepository, ITagRepository tagRepository, IUserRepository userRepository, IMapper mapper)
+    public GetChallengeHandler(IChallengeRepository challengeRepository,
+                               ITagRepository tagRepository,
+                               IUserRepository userRepository,
+                               IMapper mapper)
     {
         this.challengeRepository = challengeRepository;
         this.tagRepository = tagRepository;
@@ -39,28 +42,27 @@ internal class GetChallengeHandler : IRequestHandler<GetChallengeQuery, Result<C
         this.mapper = mapper;
     }
 
-    public async Task<Result<ChallengeResult>> Handle(GetChallengeQuery request, CancellationToken cancellationToken)
+    public async Task<Result<ChallengeDto>> Handle(GetChallengeQuery request, CancellationToken cancellationToken)
     {
-
         if (!MongoDB.Bson.ObjectId.TryParse(request.Id, out _))
         {
-            return Result<ChallengeResult>.Failure(ValidationError.InvalidId);
+            return Result<ChallengeDto>.Failure(ValidationError.InvalidId);
         }
 
         var challenge = await this.challengeRepository.Get(request.Id, cancellationToken);
-        var challengeResult = this.mapper.Map<ChallengeResult>(challenge);
+        var challengeDto = this.mapper.Map<ChallengeDto>(challenge);
 
         if (challenge is null)
         {
-            Result<ChallengeResult>.Failure(ProcessingError.ChallengeNotFound);
+            Result<ChallengeDto>.Failure(ProcessingError.ChallengeNotFound);
         }
 
         var tags = await this.tagRepository.GetByIds(challenge.TagIds, cancellationToken);
         var user = await this.userRepository.Get(challenge.CreatedByUserId, cancellationToken);
 
-        challengeResult.Tags = tags.ToList();
-        challengeResult.User = this.mapper.Map<UserModel>(user);
+        challengeDto.Tags = tags.ToList();
+        challengeDto.User = this.mapper.Map<UserDto>(user);
 
-        return Result<ChallengeResult>.Success(challengeResult);
+        return Result<ChallengeDto>.Success(challengeDto);
     }
 }

@@ -1,14 +1,13 @@
 import { gameApi } from 'app/api';
-import { GameStatus } from 'app/api/types/games';
 import Page from 'app/components/Layout/Page';
 import LoadingSpinner from 'app/components/LoadingSpinner';
 import { selectAuth } from 'app/slices/auth/selectors';
+import { GameStatus } from 'app/types/enums/gameStatus';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import Ide from './pages/Ide';
-import Room from './pages/Room';
-import { addMinutesToDate } from './pages/utils/date';
+import Ide from './components/Ide';
+import Room from './components/Room';
 
 export default function Lobby() {
   const { id } = useParams();
@@ -18,7 +17,7 @@ export default function Lobby() {
     pollingInterval: 1000,
   });
 
-  if (!data)
+  if (!data || !data.value)
     return (
       <Page>
         <LoadingSpinner centered />
@@ -27,12 +26,9 @@ export default function Lobby() {
 
   const { value: gameInfo } = data;
 
-  //console.log(getActiveRounds);
-  //if (gameInfo?.rounds && gameInfo.r)
-  //console.log(game)
   if (
-    !gameInfo?.currentRound ||
-    gameInfo?.status !== GameStatus.InProgress ||
+    !gameInfo.currentRound ||
+    gameInfo.status !== GameStatus.InProgress ||
     gameInfo.currentRound.roundSummaries.some(x => x.user.id === user?.id)
   ) {
     return <Room gameInfo={gameInfo} />;
