@@ -4,5 +4,5 @@ export interface AuthState {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isInitialized: boolean;
-  user: UserDto | null;
+  user?: UserDto;
 }

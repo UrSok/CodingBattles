@@ -8,7 +8,7 @@ import { OrderStyle } from 'app/types/enums/orderStyle';
 import { ChallengeSearchItem } from 'app/types/models/challenge/challengeSearchItem';
 import React, { useEffect, useState } from 'react';
 import useInfiniteScroll from 'react-infinite-scroll-hook';
-import { useCounter } from 'usehooks-ts';
+import { useCounter, useIsFirstRender, useUpdateEffect } from 'usehooks-ts';
 import LoadingSpinner from '../LoadingSpinner';
 import NoData from '../NoData';
 
@@ -84,6 +84,7 @@ export default function ChallengeList(
       : false;
 
   const [challenges, setChallenges] = useState<ChallengeSearchItem[]>([]);
+  const isFirstRender = useIsFirstRender();
 
   const [sentryRef] = useInfiniteScroll({
     loading: isLoading,
@@ -93,10 +94,10 @@ export default function ChallengeList(
     },
   });
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     setPage(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortBy, text, tagIds, difficultyRange, includeNoDifficulty]);
+  }, [sortBy, orderStyle, text, tagIds, difficultyRange, includeNoDifficulty]);
 
   useEffect(() => {
     if (!challengesData?.value) return;
@@ -123,7 +124,7 @@ export default function ChallengeList(
         dataSource={preventFetch ? staticChallenges : challenges}
         rowKey={(record, index) => record.id}
         loading={{
-          spinning: isLoading,
+          spinning: isLoading || isFirstRender,
           indicator: <LoadingSpinner noTip />,
         }}
         onItem={(record, index) => ({
@@ -170,7 +171,7 @@ export default function ChallengeList(
           extra: itemExtra,
         }}
       />
-      {(isLoading || hasNextPage) && (
+      {!isFirstRender && (isLoading || hasNextPage) && (
         <div ref={sentryRef}>
           {challenges.length > 0 && (
             <LoadingSpinner horizontallyCentered noTip />

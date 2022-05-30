@@ -8,7 +8,7 @@ import ProForm, {
 import { Button, Form, Input, Space, Typography } from 'antd';
 import { useWatch } from 'antd/lib/form/Form';
 import ChallengeList from 'app/components/ChallengeList';
-import Page from 'app/components/Layout/Page';
+import Page from 'app/components/Page';
 import { PATH_CHALLENGES } from 'app/routes/paths';
 import { selectAuth } from 'app/slices/auth/selectors';
 import { OrderStyle } from 'app/types/enums/orderStyle';
@@ -20,6 +20,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useDebounce } from 'usehooks-ts';
 import MultiTagSelect from '../../components/MultiTagSelect';
 import { ChallengeSearchFields } from './types';
 
@@ -27,7 +28,6 @@ export default function SearchChallenges() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const { t } = useTranslation();
-
   const { user } = useSelector(selectAuth);
 
   const [difficultyRange, setDifficultyRange] = useState<[number, number]>([
@@ -35,12 +35,16 @@ export default function SearchChallenges() {
   ]);
 
   const searchText: string = useWatch(ChallengeSearchFields.searchText, form);
+  const serchTextDebounced = useDebounce(searchText, 300);
+
   const sortBy: SortBy = useWatch(ChallengeSearchFields.sortBy, form);
   const orderStyle: OrderStyle = useWatch(
     ChallengeSearchFields.orderStyle,
     form,
   );
   const tagIds: string[] = useWatch(ChallengeSearchFields.tags, form);
+  const tagIdsDebounced = useDebounce(tagIds, 300);
+
   const includeNoDifficulty = useWatch(
     ChallengeSearchFields.includeNoDifficulty,
     form,
@@ -52,22 +56,22 @@ export default function SearchChallenges() {
 
   return (
     <Page ghost>
-      <ProCard ghost gutter={16}>
+      <ProCard ghost gutter={8}>
         <ProCard colSpan="30%" ghost>
           <ProForm
             layout="vertical"
             form={form}
             initialValues={{
-              [`${ChallengeSearchFields.searchText}`]: undefined,
-              [`${ChallengeSearchFields.sortBy}`]: SortBy.Name,
-              [`${ChallengeSearchFields.orderStyle}`]: OrderStyle.None,
-              [`${ChallengeSearchFields.tags}`]: [],
-              [`${ChallengeSearchFields.difficulty}`]: [1, 5],
-              [`${ChallengeSearchFields.includeNoDifficulty}`]: true,
+              [ChallengeSearchFields.searchText]: undefined,
+              [ChallengeSearchFields.sortBy]: SortBy.Name,
+              [ChallengeSearchFields.orderStyle]: OrderStyle.None,
+              [ChallengeSearchFields.tags]: [],
+              [ChallengeSearchFields.difficulty]: [1, 5],
+              [ChallengeSearchFields.includeNoDifficulty]: true,
             }}
             submitter={false}
           >
-            <ProCard ghost split="horizontal" gutter={[16, 16]}>
+            <ProCard ghost split="horizontal" gutter={[8, 8]}>
               <ProCard title="General">
                 <Form.Item name={ChallengeSearchFields.searchText}>
                   <Input.Search
@@ -169,8 +173,8 @@ export default function SearchChallenges() {
           <ChallengeList
             sortBy={sortBy}
             orderStyle={orderStyle}
-            text={searchText}
-            tagIds={tagIds}
+            text={serchTextDebounced}
+            tagIds={tagIdsDebounced}
             difficultyRange={difficultyRange}
             includeNoDifficulty={includeNoDifficulty}
             itemExtra={{
@@ -209,7 +213,7 @@ export default function SearchChallenges() {
               if (selectedTags.includes(tagId)) return;
 
               form.setFieldsValue({
-                [`${ChallengeSearchFields.tags}`]: [...selectedTags, tagId],
+                [ChallengeSearchFields.tags]: [...selectedTags, tagId],
               });
             }}
           />

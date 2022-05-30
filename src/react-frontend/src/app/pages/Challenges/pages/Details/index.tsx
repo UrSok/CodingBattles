@@ -5,7 +5,7 @@ import { challengeApi } from 'app/api/challenge';
 import UserAvatar from 'app/components/Auth/UserAvatar';
 import ChallengeDescription from 'app/components/ChallengeDescription';
 import ErrorResult from 'app/components/ErrorResult';
-import Page from 'app/components/Layout/Page';
+import Page from 'app/components/Page';
 import NoData from 'app/components/NoData';
 import { PATH_CHALLENGES, PATH_PROFILES } from 'app/routes/paths';
 import { selectAuth } from 'app/slices/auth/selectors';

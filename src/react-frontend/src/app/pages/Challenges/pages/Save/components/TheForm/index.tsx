@@ -27,7 +27,7 @@ import { TestPair } from 'app/types/models/challenge/testPair';
 import { getLanguageKeyName } from 'app/utils/enumHelpers';
 import monaco from 'monaco-editor';
 import { FieldData } from 'rc-field-form/es/interface';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBoolean, useEffectOnce, useUpdateEffect } from 'usehooks-ts';
 import CardSection from '../../../../../../components/CardSection';
@@ -99,26 +99,24 @@ export default function TheForm(props: Props) {
     saveStateEnable();
   };
 
-  const getInitialValues = () => {
-    if (!initialChallenge) {
-      form.setFields([
-        {
-          name: FormFields.name,
-          errors: ['Name is required'],
-        },
-      ]);
+  useEffectOnce(() => {
+    saveStateDisable();
+    formRef.current?.validateFields([FormFields.name]);
 
-      return {
-        [FormFields.tests]: [
+    if (!initialChallenge) {
+      formRef.current?.setFieldsValue({
+        stubLanguage: getLanguageKeyName(Language.javascript),
+        stubInput: '',
+        tests: [
           ...[1, 2, 3, 4].map(value => ({
-            [(FormFields.tests,
-            value - 1,
-            FormFields.testTitle)]: `Test ${value}`,
+            title: `Test ${value}`,
           })),
         ],
-        [FormFields.solutionStatus]: 'Empty',
-        [FormFields.solution]: getLanguageKeyName(Language.javascript),
-      };
+        solutionLanguage: getLanguageKeyName(Language.javascript),
+        solutionStatus: 'Empty',
+      });
+
+      return;
     }
 
     const {
@@ -131,22 +129,22 @@ export default function TheForm(props: Props) {
       solution,
     } = initialChallenge;
 
-    return {
-      [`${FormFields.name}`]: name,
-      [`${FormFields.tags}`]: tags.map(tag => tag.id),
-      [`${FormFields.descriptionShort}`]: descriptionShort,
-      [`${FormFields.descriptionMarkdown}`]: descriptionMarkdown,
-      [`${FormFields.stubLanguage}`]: getLanguageKeyName(Language.javascript),
-      [`${FormFields.stubInput}`]: stubGeneratorInput,
-      [`${FormFields.tests}`]: tests,
-      [`${FormFields.solution}`]: solution
+    stubEditorRef.current?.setValue(stubGeneratorInput);
+
+    formRef.current?.setFieldsValue({
+      name: name,
+      tags: tags.map(tag => tag.id),
+      descriptionShort: descriptionShort,
+      descriptionMarkdown: descriptionMarkdown,
+      stubLanguage: getLanguageKeyName(Language.javascript),
+      stubInput: stubGeneratorInput,
+      tests: tests,
+      solutionLanguage: solution
         ? getLanguageKeyName(Language[solution.language])
         : getLanguageKeyName(Language.javascript),
-      [`${FormFields.solutionStatus}`]: solution.sourceCode
-        ? 'Invalid'
-        : 'Empty',
-    };
-  };
+      solutionStatus: solution.sourceCode ? 'Invalid' : 'Empty',
+    });
+  });
 
   useUpdateEffect(() => {
     if (
@@ -478,7 +476,6 @@ export default function TheForm(props: Props) {
           scrollMode: 'always',
           behavior: 'smooth',
         }}
-        initialValues={getInitialValues()}
       >
         <CardSection title="General Information">
           <Typography.Text strong>Title</Typography.Text>
@@ -574,7 +571,6 @@ export default function TheForm(props: Props) {
                         <ProCard split="horizontal" ghost>
                           <ProFormText
                             name={[index, FormFields.testTitle]}
-                            initialValue={`Test ${index + 1}`}
                             placeholder="Test name"
                             allowClear={false}
                             disabled={statusIsNotDraft}
@@ -718,14 +714,17 @@ export default function TheForm(props: Props) {
                   defaultLanguage={Language.javascript}
                   disabled={statusIsNotDraft}
                 />
-                <Button
-                  type="primary"
-                  onClick={handleOnTestSolutionClick}
-                  loading={isTesting}
-                  disabled={!testSolutionButtonState}
-                >
-                  Test Solution
-                </Button>
+                {!initialChallenge ||
+                  (initialChallenge?.status === ChallengeStatus.Draft && (
+                    <Button
+                      type="primary"
+                      onClick={handleOnTestSolutionClick}
+                      loading={isTesting}
+                      disabled={!testSolutionButtonState}
+                    >
+                      Test Solution
+                    </Button>
+                  ))}
               </Space>
               <CodeEditor
                 editorRef={solutionEditorRef}

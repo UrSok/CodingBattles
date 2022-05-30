@@ -4,7 +4,7 @@ import SingInModalForm from 'app/components/Auth/Forms/SignInModalForm';
 import SingUpModalForm from 'app/components/Auth/Forms/SignUpModalForm';
 import UserAvatar from 'app/components/Auth/UserAvatar';
 import CardSection from 'app/components/CardSection';
-import Page from 'app/components/Layout/Page';
+import Page from 'app/components/Page';
 import { PATH_PROFILES } from 'app/routes/paths';
 import { selectAuth } from 'app/slices/auth/selectors';
 import React from 'react';

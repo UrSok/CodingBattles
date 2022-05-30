@@ -4,7 +4,7 @@ import { Alert, Button, Form, Space, Tag, Typography } from 'antd';
 import ChallengeDescription from 'app/components/ChallengeDescription';
 import CodeEditor from 'app/components/Input/CodeEditor';
 import LanguageSelect from 'app/components/Input/LanguageSelect';
-import Page from 'app/components/Layout/Page';
+import Page from 'app/components/Page';
 import { Language } from 'app/types/enums/language';
 import React, { ReactText, useEffect, useRef, useState } from 'react';
 import Play from '@2fd/ant-design-icons/lib/Play';

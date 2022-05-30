@@ -1,5 +1,5 @@
 import { gameApi } from 'app/api';
-import Page from 'app/components/Layout/Page';
+import Page from 'app/components/Page';
 import LoadingSpinner from 'app/components/LoadingSpinner';
 import { selectAuth } from 'app/slices/auth/selectors';
 import { RoundStatus } from 'app/types/enums/roundStatus';

@@ -4,7 +4,7 @@ import { Button, Rate, Space, Tag, Typography } from 'antd';
 import { gameApi } from 'app/api';
 import UserAvatar from 'app/components/Auth/UserAvatar';
 import ChallengeList from 'app/components/ChallengeList';
-import Page from 'app/components/Layout/Page';
+import Page from 'app/components/Page';
 import NoData from 'app/components/NoData';
 import { selectUser } from 'app/slices/auth/selectors';
 import { GameStatus } from 'app/types/enums/gameStatus';

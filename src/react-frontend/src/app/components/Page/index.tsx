@@ -1,7 +1,5 @@
-import ProCard from '@ant-design/pro-card';
 import { PageContainer } from '@ant-design/pro-layout';
 import { PageHeaderTabConfig } from '@ant-design/pro-layout/lib/components/PageContainer';
-import { CardProps, PageHeaderProps } from 'antd';
 import LoadingSpinner from 'app/components/LoadingSpinner';
 import React from 'react';
 

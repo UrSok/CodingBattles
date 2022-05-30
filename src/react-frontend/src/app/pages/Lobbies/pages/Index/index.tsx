@@ -2,7 +2,7 @@ import ProList from '@ant-design/pro-list';
 import { Avatar, Button, Space, Tag } from 'antd';
 import { gameApi } from 'app/api';
 import UserAvatar from 'app/components/Auth/UserAvatar';
-import Page from 'app/components/Layout/Page';
+import Page from 'app/components/Page';
 import NoData from 'app/components/NoData';
 import { PATH_LOBBY } from 'app/routes/paths';
 import { selectAuth } from 'app/slices/auth/selectors';

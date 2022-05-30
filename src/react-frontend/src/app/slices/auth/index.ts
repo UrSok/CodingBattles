@@ -13,7 +13,6 @@ export const initialState: AuthState = {
   isInitialized: false,
   isAuthenticated: false,
   isAdmin: false,
-  user: null,
 };
 
 const slice = createSlice({

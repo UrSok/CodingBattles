@@ -4,7 +4,7 @@ import { MenuDataItem } from '@ant-design/pro-layout';
 import * as React from 'react';
 import { PATH_CHALLENGES, PATH_LOBBY } from './paths';
 
-export const menuRoutes: MenuDataItem[] = [
+const menuRoutes: MenuDataItem[] = [
   {
     path: PATH_CHALLENGES.root,
     name: 'Challenges',
@@ -18,3 +18,5 @@ export const menuRoutes: MenuDataItem[] = [
     access: 'any',
   },
 ];
+
+export default menuRoutes;

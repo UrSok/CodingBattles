@@ -1,20 +1,22 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 
 import { selectUser } from 'app/slices/auth/selectors';
-import { Button, Result } from 'antd';
 import ErrorResult from 'app/components/ErrorResult';
 
 type RecordGuardProps = {
+  found?: any;
   createdByUserId?: string;
   children: React.ReactNode;
 };
 
 export default function RecordGuard(props: RecordGuardProps) {
-  const { createdByUserId, children } = props;
-
+  const { found, createdByUserId, children } = props;
   const user = useSelector(selectUser);
+
+  if (!found) {
+    return <ErrorResult status="404" title="Record not found" />;
+  }
 
   if (createdByUserId && user?.id !== createdByUserId) {
     return (

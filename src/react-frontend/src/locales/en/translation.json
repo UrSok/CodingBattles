@@ -97,7 +97,7 @@
   "Challenges": {
     "Search": {
       "Form": {
-        "searchInput": "Input name, description..",
+        "searchInput": "Name, description..",
         "difficulty": "Difficulty",
         "includeNoDifficulty": "Include no difficulty",
         "tags": "Tags",
