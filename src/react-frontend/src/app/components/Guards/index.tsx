@@ -1,9 +1,9 @@
-import MineGuard from './MineGuard';
+import RecordGuard from './RecordGuard';
 
 type GuardProps = {
-  Mine: typeof MineGuard;
-}
+  Record: typeof RecordGuard;
+};
 
-export const Guard = {
-  Mine: MineGuard,
+export const Guard: GuardProps = {
+  Record: RecordGuard,
 };

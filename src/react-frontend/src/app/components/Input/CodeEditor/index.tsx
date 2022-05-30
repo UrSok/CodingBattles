@@ -32,9 +32,8 @@ export default function CodeEditor(props: CodeEditorProps) {
     editor: monaco.editor.IStandaloneCodeEditor,
     monaco: Monaco,
   ) => {
-    if (editorRef) {
-      editorRef.current = editor;
-    }
+    if (!editorRef) return;
+    editorRef.current = editor;
   };
 
   return (
@@ -45,8 +44,7 @@ export default function CodeEditor(props: CodeEditorProps) {
         width={width}
         language={language}
         defaultValue={defaultValue}
-        className="updated-monaco-editor"
-        value={value ?? ''}
+        value={value}
         options={{
           readOnly: readOnly,
         }}

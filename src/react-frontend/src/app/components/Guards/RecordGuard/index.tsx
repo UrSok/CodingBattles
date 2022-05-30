@@ -6,17 +6,17 @@ import { selectUser } from 'app/slices/auth/selectors';
 import { Button, Result } from 'antd';
 import ErrorResult from 'app/components/ErrorResult';
 
-type MineGuardProps = {
-  createdById: string;
+type RecordGuardProps = {
+  createdByUserId?: string;
   children: React.ReactNode;
 };
 
-export default function MineGuard(props: MineGuardProps) {
-  const { createdById, children } = props;
+export default function RecordGuard(props: RecordGuardProps) {
+  const { createdByUserId, children } = props;
 
   const user = useSelector(selectUser);
 
-  if (createdById.length === 0 || user?.id !== createdById) {
+  if (createdByUserId && user?.id !== createdByUserId) {
     return (
       <ErrorResult
         status="403"

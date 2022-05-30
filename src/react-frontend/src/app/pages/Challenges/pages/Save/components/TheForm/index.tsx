@@ -29,7 +29,7 @@ import monaco from 'monaco-editor';
 import { FieldData } from 'rc-field-form/es/interface';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useBoolean, useEffectOnce } from 'usehooks-ts';
+import { useBoolean, useEffectOnce, useUpdateEffect } from 'usehooks-ts';
 import CardSection from '../../../../../../components/CardSection';
 import ChallengeStatusAlert from './components/ChallengeStatusAlert';
 import MarkdownDescriptionEditor, {
@@ -83,7 +83,7 @@ export default function TheForm(props: Props) {
     value: saveState,
     setFalse: saveStateDisable,
     setTrue: saveStateEnable,
-  } = useBoolean(true);
+  } = useBoolean(false);
 
   const saveStateEnableDecorated = () => {
     if (
@@ -99,11 +99,27 @@ export default function TheForm(props: Props) {
     saveStateEnable();
   };
 
-  useEffectOnce(() => {
-    saveStateDisable();
-    formRef.current?.validateFields([FormFields.name]);
+  const getInitialValues = () => {
+    if (!initialChallenge) {
+      form.setFields([
+        {
+          name: FormFields.name,
+          errors: ['Name is required'],
+        },
+      ]);
 
-    if (!initialChallenge) return;
+      return {
+        [FormFields.tests]: [
+          ...[1, 2, 3, 4].map(value => ({
+            [(FormFields.tests,
+            value - 1,
+            FormFields.testTitle)]: `Test ${value}`,
+          })),
+        ],
+        [FormFields.solutionStatus]: 'Empty',
+        [FormFields.solution]: getLanguageKeyName(Language.javascript),
+      };
+    }
 
     const {
       name,
@@ -115,24 +131,24 @@ export default function TheForm(props: Props) {
       solution,
     } = initialChallenge;
 
-    stubEditorRef.current?.setValue(stubGeneratorInput);
-
-    formRef.current?.setFieldsValue({
-      name: name,
-      tags: tags.map(tag => tag.id),
-      descriptionShort: descriptionShort,
-      descriptionMarkdown: descriptionMarkdown,
-      stubLanguage: getLanguageKeyName(Language.javascript),
-      stubInput: stubGeneratorInput,
-      tests: tests,
-      solutionLanguage: solution
+    return {
+      [`${FormFields.name}`]: name,
+      [`${FormFields.tags}`]: tags.map(tag => tag.id),
+      [`${FormFields.descriptionShort}`]: descriptionShort,
+      [`${FormFields.descriptionMarkdown}`]: descriptionMarkdown,
+      [`${FormFields.stubLanguage}`]: getLanguageKeyName(Language.javascript),
+      [`${FormFields.stubInput}`]: stubGeneratorInput,
+      [`${FormFields.tests}`]: tests,
+      [`${FormFields.solution}`]: solution
         ? getLanguageKeyName(Language[solution.language])
         : getLanguageKeyName(Language.javascript),
-      solutionStatus: solution.sourceCode ? 'Invalid' : 'Empty',
-    });
-  });
+      [`${FormFields.solutionStatus}`]: solution.sourceCode
+        ? 'Invalid'
+        : 'Empty',
+    };
+  };
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (
       savingResult &&
       savingResult.value !== undefined &&
@@ -145,7 +161,6 @@ export default function TheForm(props: Props) {
         });
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savingResult]);
 
   const handleMarkdownInputChanged = (value: string | undefined) => {
@@ -393,6 +408,7 @@ export default function TheForm(props: Props) {
       return;
     const data = formRef.current?.getFieldsFormatValue(true);
 
+    const stubGeneratorInput = stubEditorRef?.current?.getValue();
     const solutionInput = solutionEditorRef?.current?.getValue();
 
     triggerSaveChallenge({
@@ -403,7 +419,7 @@ export default function TheForm(props: Props) {
         descriptionMarkdown: data.descriptionMarkdown ?? '',
         tagIds: data.tags,
         tests: data.tests,
-        stubGeneratorInput: data.stubInput,
+        stubGeneratorInput: stubGeneratorInput ?? '',
         solution: {
           language: data.solutionLanguage,
           sourceCode: solutionInput,
@@ -456,13 +472,13 @@ export default function TheForm(props: Props) {
         formRef={formRef}
         submitter={false}
         onFieldsChange={handleFieldsChanged}
-        //onValuesChange={(_, values) => console.log(values)}
         onFinishFailed={handleOnPublishFailed}
         onFinish={handleOnPublish}
         scrollToFirstError={{
           scrollMode: 'always',
           behavior: 'smooth',
         }}
+        initialValues={getInitialValues()}
       >
         <CardSection title="General Information">
           <Typography.Text strong>Title</Typography.Text>
@@ -529,7 +545,7 @@ export default function TheForm(props: Props) {
         </CardSection>
 
         <CardSection title="Tests" ghost>
-          <Form.List name={FormFields.tests} initialValue={[{}, {}, {}, {}]}>
+          <Form.List name={FormFields.tests}>
             {(fields, { add, remove }) => (
               <ProCard ghost split="horizontal" gutter={[16, 16]}>
                 {fields.map((field, index) => (

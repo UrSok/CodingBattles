@@ -6,7 +6,7 @@ export type GenerateStubError = {
 
 export type GenerateStubRequest = {
   language: string;
-  input: string;
+  input?: string;
 };
 
 export type GenerateStubResult = {

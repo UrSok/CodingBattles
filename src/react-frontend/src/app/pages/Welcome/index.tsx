@@ -69,7 +69,7 @@ export default function Welcome() {
             </Space>
           </Space>
         </ProCard>
-        {isAuthenticated ? dashboard : null}
+        {isAuthenticated && dashboard}
       </ProCard>
     </Page>
   );
