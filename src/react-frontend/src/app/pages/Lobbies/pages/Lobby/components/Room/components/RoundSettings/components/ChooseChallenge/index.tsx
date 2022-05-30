@@ -1,14 +1,18 @@
+import Play from '@2fd/ant-design-icons/lib/Play';
+import { ExpandAltOutlined, PlaySquareOutlined } from '@ant-design/icons';
 import ProForm from '@ant-design/pro-form';
-import { Drawer, Form, Input } from 'antd';
+import { Button, Drawer, Form, Input, Space } from 'antd';
 import { useForm, useWatch } from 'antd/lib/form/Form';
 import { gameApi } from 'app/api';
 import ChallengeList from 'app/components/ChallengeList';
 import { ChallengeSearchFields } from 'app/pages/Challenges/pages/Index/types';
+import { PATH_CHALLENGES } from 'app/routes/paths';
 import { ChallengeSearchItem } from 'app/types/models/challenge/challengeSearchItem';
 import { translations } from 'locales/translations';
 import * as React from 'react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { useBoolean } from 'usehooks-ts';
 
 type ChooseChallengeProps = {
@@ -32,10 +36,7 @@ export default function ChooseChallenge(props: ChooseChallengeProps) {
 
   const [triggerSelectChallenge] = gameApi.useSelectChallengeMutation();
 
-  const handleOnChallengeClick = (
-    record: ChallengeSearchItem,
-    index: number,
-  ) => {
+  const handleOnPlayChallengeClick = (record: ChallengeSearchItem) => {
     setInvisible();
     triggerSelectChallenge({
       gameId,
@@ -79,7 +80,26 @@ export default function ChooseChallenge(props: ChooseChallengeProps) {
             />
           </Form.Item>
         </ProForm>
-        <ChallengeList text={searchText} onItemClick={handleOnChallengeClick} />
+        <ChallengeList
+          text={searchText}
+          itemExtra={{
+            render: (_, record) => (
+              <Space>
+                <Link
+                  to={PATH_CHALLENGES.root + `/${record.id}`}
+                  target="_blank"
+                >
+                  <Button type="dashed" icon={<ExpandAltOutlined />} />
+                </Link>
+                <Button
+                  type="primary"
+                  onClick={() => handleOnPlayChallengeClick(record)}
+                  icon={<Play />}
+                />
+              </Space>
+            ),
+          }}
+        />
       </Drawer>
       {triggerDom}
     </>

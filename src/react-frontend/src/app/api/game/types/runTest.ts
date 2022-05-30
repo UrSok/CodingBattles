@@ -1,4 +1,5 @@
 import { TestPair } from 'app/types/models/challenge/testPair';
+import { Solution } from 'app/types/models/general/solution';
 
 export type TestResult = {
   note: string;
@@ -20,8 +21,7 @@ export type TestResult = {
 
 export type RunTestRequest = {
   id: string;
-  language: string;
-  sourceCode: string;
+  solution: Solution;
   test: TestPair;
 };
 

@@ -41,16 +41,34 @@ internal class SubmitResultHandler : IRequestHandler<SubmitResultCommand, Result
             return Result.Failure(ProcessingError.GameNotFound);
         }
 
-        var challenge = await this.challengeRepository.Get(game.CurrentRound.ChallengeId, cancellationToken);
+        var currentRound = game.Rounds.First();
+
+        var challenge = await this.challengeRepository.Get(currentRound.ChallengeId, cancellationToken);
         if (challenge is null)
         {
             return Result.Failure(ProcessingError.ChallengeNotFound);
         }
 
-        var testSummaries = new ConcurrentBag<TestSummary>();
+        var submittedAt = DateTime.Now;
+
+        var roundSummary = new RoundSummary()
+        {
+            Status = RoundSummaryStatus.Submitting,
+            UserId = request.Model.UserId,
+            TimePassed = Convert.ToInt32((submittedAt.Ticks - currentRound.StartTime.Value.Ticks) / 10000),
+            Solution = request.Model.Solution,
+        };
+
+        var replaceRecordSummaryResult = await this.gameRepository.ReplaceSummaryRecord(game.Id, roundSummary, cancellationToken);
+        if (!replaceRecordSummaryResult)
+        {
+            Result.Failure(Error.InternalServerError);
+        }
+
+        var testSummariesAndIndexes = new ConcurrentBag<(TestSummary, int)>();
 
         var parallelismOptions = new ParallelOptions { MaxDegreeOfParallelism = 10 };
-        await Parallel.ForEachAsync(challenge.Tests, parallelismOptions, async (test, cancellationToken) =>
+        await Parallel.ForEachAsync(challenge.Tests.Select((test, index) => (test, index)), parallelismOptions, async (testAndIndex, cancellationToken) =>
         {
             var command = new RunTestCommand(new RunTestRequest
             {
@@ -59,18 +77,23 @@ internal class SubmitResultHandler : IRequestHandler<SubmitResultCommand, Result
                     Language = request.Model.Solution?.Language,
                     SourceCode = request.Model.Solution?.SourceCode,
                 },             
-                Test = test,
+                Test = testAndIndex.test,
             });
 
             var testResult = await this.mediator.Send(command, cancellationToken);
 
             var testSummary = new TestSummary()
             {
-                TestPair = test,
+                TestPair = testAndIndex.test,
                 Status = TestSummaryStatus.Valid,
             };
 
-            if (testResult.Errors.Any(x => x.Name == ProcessingError.ValidatorNotPassed.Name))
+            if (testResult.Errors.Any(x => x.Name == ProcessingError.BuildError.Name))
+            {
+                testSummary.Status = TestSummaryStatus.BuildError;
+                testSummary.Reason = testResult.Value.OutputError;
+            }
+            else if (testResult.Errors.Any(x => x.Name == ProcessingError.ValidatorNotPassed.Name))
             {
                 testSummary.Status = TestSummaryStatus.ValidatorFailed;
                 testSummary.Reason = testResult.Value.OutputError;
@@ -81,18 +104,19 @@ internal class SubmitResultHandler : IRequestHandler<SubmitResultCommand, Result
                 testSummary.Reason = testResult.Value.OutputError;
             }
 
-            testSummaries.Add(testSummary);
+            testSummariesAndIndexes.Add((testSummary, testAndIndex.index));
         });
 
-        var roundSummary = new RoundSummary()
-        {
-            UserId = request.Model.UserId,
-            Solution = request.Model.Solution,
-            TestSummaries = testSummaries.ToList(),
-        };
+        var testSummaries = testSummariesAndIndexes.OrderBy(x => x.Item2).Select(x => x.Item1);
 
-        var result = await this.gameRepository.AddRecordSummary(game.Id, roundSummary, cancellationToken);
-        if (!result)
+        var validTestsCount = testSummaries.Count(x => x.Status == TestSummaryStatus.Valid);
+
+        roundSummary.Status = RoundSummaryStatus.Submitted;
+        roundSummary.Score = validTestsCount > 0 ? (testSummariesAndIndexes.Count * 100 / validTestsCount) : 0;
+        roundSummary.TestSummaries = testSummaries.ToList();
+
+        var isSubmitted = await this.gameRepository.ReplaceSummaryRecord(game.Id, roundSummary, cancellationToken);
+        if (!isSubmitted)
         {
             Result.Failure(Error.InternalServerError);
         }

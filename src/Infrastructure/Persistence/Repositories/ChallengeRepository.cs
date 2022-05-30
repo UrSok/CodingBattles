@@ -6,6 +6,7 @@ using Infrastructure.DbDocuments.Challenges;
 using Infrastructure.Persistence;
 using Infrastructure.Utils;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace Infrastructure.Repositories;
 
@@ -18,6 +19,7 @@ internal interface IChallengeRepository
     Task<bool> Publish(Challenge challenge, CancellationToken cancellationToken);
     Task<bool> Unpublish(string id, string statusReason, CancellationToken cancellationToken);
     Task<IEnumerable<Challenge>> GetByIds(IEnumerable<string> enumerable, CancellationToken cancellationToken);
+    Task<string> GetRandomId(CancellationToken cancellationToken);
 }
 
 internal class ChallengeRepository : BaseRepository, IChallengeRepository
@@ -155,5 +157,12 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
         var challengeDocumnts = (await this.challenges.FindAsync(filter, cancellationToken: cancellationToken))
             .ToEnumerable(cancellationToken: cancellationToken);
         return this.mapper.Map<IEnumerable<Challenge>>(challengeDocumnts);
+    }
+
+    public async Task<string> GetRandomId(CancellationToken cancellationToken)
+    {
+        var challenge = await this.challenges.AsQueryable().Sample(1).FirstOrDefaultAsync();
+
+        return this.mapper.Map<Challenge>(challenge).Id;
     }
 }

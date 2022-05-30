@@ -339,8 +339,10 @@ export default function TheForm(props: Props) {
       const runResult = await trigerTestSolution({
         id: index.toString(),
         test: test,
-        language: solutionLanguage,
-        sourceCode: solutionEditorRef.current?.getValue() ?? '',
+        solution: {
+          language: solutionLanguage,
+          sourceCode: solutionEditorRef.current?.getValue() ?? '',
+        },
       }).unwrap();
 
       if (runResult.isSuccess === false) {

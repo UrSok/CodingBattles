@@ -1,5 +1,6 @@
 import ProList, { ProListMeta } from '@ant-design/pro-list';
 import { ToolBarProps } from '@ant-design/pro-table/lib/components/ToolBar';
+import { skipToken } from '@reduxjs/toolkit/dist/query';
 import { Rate, Space, Tag, Typography } from 'antd';
 import { challengeApi } from 'app/api';
 import { ChallengeSearchRequest } from 'app/api/challenge/types/challengeSearch';
@@ -12,6 +13,9 @@ import LoadingSpinner from '../LoadingSpinner';
 import NoData from '../NoData';
 
 type ChallengeListProps<T> = {
+  preventFetch?: boolean;
+  emptyElement?: React.ReactNode;
+  staticChallenges?: ChallengeSearchItem[];
   headerTitle?: React.ReactNode;
   toolBarRender?: ToolBarProps<T>['toolBarRender'] | false;
   itemExtra?: ProListMeta<T>;
@@ -30,6 +34,9 @@ export default function ChallengeList(
   props: ChallengeListProps<ChallengeSearchItem>,
 ) {
   const {
+    preventFetch,
+    emptyElement,
+    staticChallenges,
     headerTitle,
     toolBarRender,
     itemExtra,
@@ -68,7 +75,7 @@ export default function ChallengeList(
   }
 
   const { data: challengesData, isLoading } =
-    challengeApi.useGetChallengesQuery(searchQuery);
+    challengeApi.useGetChallengesQuery(preventFetch ? skipToken : searchQuery);
   const hasNextPage =
     challengesData?.value &&
     challengesData?.value?.totalPages > 0 &&
@@ -111,12 +118,12 @@ export default function ChallengeList(
         itemLayout="vertical"
         split
         locale={{
-          emptyText: <NoData />,
+          emptyText: emptyElement ? emptyElement : <NoData />,
         }}
-        dataSource={challenges}
+        dataSource={preventFetch ? staticChallenges : challenges}
         rowKey={(record, index) => record.id}
         loading={{
-          spinning: !challengesData || isLoading,
+          spinning: isLoading,
           indicator: <LoadingSpinner noTip />,
         }}
         onItem={(record, index) => ({

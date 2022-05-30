@@ -50,7 +50,7 @@ internal class RunTestHandler : IRequestHandler<RunTestCommand, Result<RunTestRe
         }
 
         var validatorResult = await this.paizaService.Execute(request.Model.Solution?.SourceCode, request.Model.Solution?.Language, request.Model.Test.Validator.Input, cancellationToken);
-        testSolutionResult.Test = this.mapper.Map<TestResult>(validatorResult);
+        testSolutionResult.Validator = this.mapper.Map<TestResult>(validatorResult);
 
         var (validatorValidationCode, validatorErrorString) = this.ValidateTestAndGetResult(validatorResult, request.Model.Test.Validator.ExpectedOutput);
 

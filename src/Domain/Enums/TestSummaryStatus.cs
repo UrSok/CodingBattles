@@ -3,6 +3,7 @@
 public enum TestSummaryStatus
 {
     Valid = 0,
-    TestFailed = 1,
-    ValidatorFailed = 2,
+    BuildError = 1,
+    TestFailed = 2,
+    ValidatorFailed = 3,
 }

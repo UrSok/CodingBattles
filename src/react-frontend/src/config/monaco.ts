@@ -31,7 +31,7 @@ export const stubLangDefinitions: languages.IMonarchLanguage = {
       ['', 'identifier', '@popall'],
     ],
     variable: [
-      [/\:/, 'identifier', '@variableType'],
+      [/:/, 'identifier', '@variableType'],
       [/(_|[a-z])+[a-z0-9_$]*/, 'attribute'],
       [/.*$/, 'invalid', '@popall'],
       ['', 'identifier', '@popall'],

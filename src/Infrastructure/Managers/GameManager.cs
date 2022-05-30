@@ -38,6 +38,18 @@ public class GameManager : BaseManager, IGameManager
         return await this.SendCommand(query, cancellationToken);
     }
 
+    public async Task<Result> CreateRound(string gameId, CancellationToken cancellationToken)
+    {
+        var command = new CreateRoundCommand(gameId);
+        return await this.SendCommand(command, cancellationToken);
+    }
+
+    public async Task<Result> UpdateCurrentRoundSettings(string gameId, UpdateCurrentRoundSettingsRequest updateCurrentRoundSettingsRequest, CancellationToken cancellationToken)
+    {
+        var command = new UpdateCurrentRoundSettingsCommand(gameId, updateCurrentRoundSettingsRequest);
+        return await this.SendCommand(command, cancellationToken);
+    }
+
     public async Task<Result> StartRound(string gameId, CancellationToken cancellationToken)
     {
         var command = new StartRoundCommand(gameId);
@@ -71,6 +83,12 @@ public class GameManager : BaseManager, IGameManager
     public async Task<Result> SelectChallenge(string gameId, string challengeId, CancellationToken cancellationToken)
     {
         var command = new SelectChallengeCommand(gameId, challengeId);
+        return await this.SendCommand(command, cancellationToken);
+    }
+
+    public async Task<Result> ShareSolution(string gameId, int roundNumber, string userId, CancellationToken cancellationToken)
+    {
+        var command = new ShareSolutionCommand(gameId, roundNumber, userId);
         return await this.SendCommand(command, cancellationToken);
     }
 }

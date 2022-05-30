@@ -14,8 +14,10 @@ public interface IGameManager
     Task<Result> SubmitResult(SubmitResultRequest submitResultRequest, CancellationToken cancellationToken);
     Task<Result<List<GameSearchItem>>> GetGamesByUserId(string userId, CancellationToken cancellationToken);
     Task<Result> LeaveGame(string userId, string gameId, CancellationToken cancellationToken);
-
     Task<Result> StartRound(string gameId, CancellationToken cancellationToken);
     Task<Result> SelectChallenge(string gameId, string challengeId, CancellationToken cancellationToken);
+    Task<Result> ShareSolution(string gameId, int roundNumber, string userId, CancellationToken cancellationToken);
+    Task<Result> CreateRound(string gameId, CancellationToken cancellationToken);
+    Task<Result> UpdateCurrentRoundSettings(string gameId, UpdateCurrentRoundSettingsRequest updateCurrentRoundSettingsRequest, CancellationToken cancellationToken);
 }
 

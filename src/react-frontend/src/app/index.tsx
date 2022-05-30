@@ -1,25 +1,20 @@
-import * as React from 'react';
 import { useMonaco } from '@monaco-editor/react';
 import { notification } from 'antd';
+import { translations } from 'locales/translations';
+import * as React from 'react';
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
-import styled from 'styled-components';
-
-import { stubInputLanguage, stubLangDefinitions } from '../config/monaco';
-import { selectAuth } from './slices/auth/selectors';
-import { selectLayout } from './slices/layout/selectors';
-import { useAuthSlice } from './slices/auth';
-import { useLayoutSlice } from './slices/layout';
-import { translations } from 'locales/translations';
-
-import LoadingSpinner from './components/LoadingSpinner';
-import Layout from './components/Layout';
-
 import { useEffectOnce } from 'usehooks-ts';
-
+import { stubInputLanguage, stubLangDefinitions } from '../config/monaco';
+import Layout from './components/Layout';
+import LoadingSpinner from './components/LoadingSpinner';
+import { useAuthSlice } from './slices/auth';
+import { selectAuth } from './slices/auth/selectors';
+import { useLayoutSlice } from './slices/layout';
+import { selectLayout } from './slices/layout/selectors';
 import './styles/index.less';
 
 export default function App() {

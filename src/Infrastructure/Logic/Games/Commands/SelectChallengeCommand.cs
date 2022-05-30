@@ -3,13 +3,9 @@ using Domain.Enums.Errors;
 using Domain.Models.Common.Results;
 using Infrastructure.Repositories;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Logic.Games.Commands;
+
 internal record SelectChallengeCommand(string GameId, string ChallengeId) : IRequest<Result>;
 
 internal class SelectChallengeHandle : IRequestHandler<SelectChallengeCommand, Result>
@@ -38,18 +34,11 @@ internal class SelectChallengeHandle : IRequestHandler<SelectChallengeCommand, R
             return Result.Failure(ProcessingError.ChallengeNotFound);
         }
 
-        if (game.CurrentRound is null)
-        {
-            var lastRoundNumber = game?.PreviousRounds.LastOrDefault()?.Number ?? 0;
+        var currentRound = game.Rounds.First();
 
-            game.CurrentRound = new Round()
-            {
-                Number = lastRoundNumber + 1
-            };
-        }
-        game.CurrentRound.ChallengeId = challenge.Id;
+        currentRound.ChallengeId = challenge.Id;
 
-        var result = await this.gameRepository.UpdateCurrentRound(game.Id, game.CurrentRound, cancellationToken);
+        var result = await this.gameRepository.UpdateCurrentRound(game.Id, currentRound, cancellationToken);
         if (!result)
         {
             return Result.Failure(Error.InternalServerError);

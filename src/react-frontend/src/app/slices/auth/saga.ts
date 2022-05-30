@@ -11,7 +11,6 @@ import {
 import { put, takeLatest } from 'redux-saga/effects';
 import { authActions } from '.';
 
-
 function* initialize() {
   const accessToken = getTokenFromLocalStorage();
   if (accessToken == null || !isTokenValid(accessToken)) {

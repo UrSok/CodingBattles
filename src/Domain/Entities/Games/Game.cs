@@ -16,7 +16,5 @@ public class Game : EntityWithId
 
     public List<string> UserIds { get; set; }
 
-    public Round CurrentRound { get; set; }
-
-    public List<Round> PreviousRounds { get; set; }
+    public List<Round> Rounds { get; set; }
 }

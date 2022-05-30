@@ -2,7 +2,8 @@ import { gameApi } from 'app/api';
 import Page from 'app/components/Layout/Page';
 import LoadingSpinner from 'app/components/LoadingSpinner';
 import { selectAuth } from 'app/slices/auth/selectors';
-import { GameStatus } from 'app/types/enums/gameStatus';
+import { RoundStatus } from 'app/types/enums/roundStatus';
+import { RoundSummaryStatus } from 'app/types/enums/roundSummaryStatus';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -27,9 +28,13 @@ export default function Lobby() {
   const { value: gameInfo } = data;
 
   if (
-    !gameInfo.currentRound ||
-    gameInfo.status !== GameStatus.InProgress ||
-    gameInfo.currentRound.roundSummaries.some(x => x.user.id === user?.id)
+    gameInfo.currentRound?.status !== RoundStatus.InProgress ||
+    gameInfo.currentRound?.roundSummaries.some(
+      x =>
+        x.user.id === user?.id &&
+        (x.status === RoundSummaryStatus.Submitted ||
+          x.status === RoundSummaryStatus.Submitting),
+    )
   ) {
     return <Room gameInfo={gameInfo} />;
   }

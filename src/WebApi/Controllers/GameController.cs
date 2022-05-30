@@ -25,15 +25,12 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
-    // pooling game status
-
     [HttpGet("{gameId}")]
     public async Task<IActionResult> Get([FromRoute] string gameId, CancellationToken cancellationToken)
     {
         var result = await this.gameManager.Get(gameId, cancellationToken);
         return this.Process(result);
     }
-    // pooling game status
 
     [HttpGet("gamesByUser/{userId}")]
     public async Task<IActionResult> GetGamesByUserId([FromRoute] string userId, CancellationToken cancellationToken)
@@ -42,16 +39,12 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
-    // create game
-
     [HttpPost("createGame/{userId}/{name}/{isPrivate}")]
     public async Task<IActionResult> CreateGame([FromRoute] string userId, [FromRoute] string name, [FromRoute] bool isPrivate, CancellationToken cancellationToken)
     {
         var result = await this.gameManager.CreateGame(userId, name,isPrivate, cancellationToken);
         return this.Process(result);
     }
-
-    // join game
 
     [HttpPost("joinGame/{userId}/{code}")]
     public async Task<IActionResult> JoinGame([FromRoute] string userId, [FromRoute] string Code, CancellationToken cancellationToken)
@@ -60,8 +53,6 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
-    // leave game
-
     [HttpPost("leaveGame/{userId}/{gameId}")]
     public async Task<IActionResult> LeaveGame([FromRoute] string userId, [FromRoute] string gameId, CancellationToken cancellationToken)
     {
@@ -69,16 +60,26 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
-    // start round
+    [HttpPost("{gameId}/currentRound/create")]
+    public async Task<IActionResult> CreateRound([FromRoute] string gameId, CancellationToken cancellationToken)
+    {
+        var result = await this.gameManager.CreateRound(gameId, cancellationToken);
+        return this.Process(result);
+    }
 
-    [HttpPost("{gameId}/startRound")]
+    [HttpPost("{gameId}/currentRound/update/settings")]
+    public async Task<IActionResult> UpdateCurrentRoundSettings([FromRoute] string gameId, [FromBody] UpdateCurrentRoundSettingsRequest updateCurrentRoundSettings, CancellationToken cancellationToken)
+    {
+        var result = await this.gameManager.UpdateCurrentRoundSettings(gameId, updateCurrentRoundSettings, cancellationToken);
+        return this.Process(result);
+    }
+
+    [HttpPost("{gameId}/currentRound/start")]
     public async Task<IActionResult> StartRound([FromRoute] string gameId, CancellationToken cancellationToken)
     {
         var result = await this.gameManager.StartRound(gameId, cancellationToken);
         return this.Process(result);
     }
-
-    // submit result
 
     [HttpPost("submitResult")]
     public async Task<IActionResult> SubmitResult([FromBody] SubmitResultRequest submitResultRequest, CancellationToken cancellationToken)
@@ -87,7 +88,6 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
-
     [HttpPost("runTest")]
     public async Task<IActionResult> RunTest([FromBody] RunTestRequest runTestModel, CancellationToken cancellationToken)
     {
@@ -95,11 +95,17 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
-
     [HttpPost("{gameId}/selectChallenge/{challengeId}")]
     public async Task<IActionResult> SelectChallenge([FromRoute] string gameId, [FromRoute] string challengeId, CancellationToken cancellationToken)
     {
         var result = await this.gameManager.SelectChallenge(gameId, challengeId, cancellationToken);
+        return this.Process(result);
+    }
+
+    [HttpPost("{gameId}/shareSolution/{roundNumber}/{userId}")]
+    public async Task<IActionResult> ShareSolution([FromRoute] string gameId, [FromRoute] int roundNumber, [FromRoute] string userId, CancellationToken cancellationToken)
+    {
+        var result = await this.gameManager.ShareSolution(gameId, roundNumber, userId,cancellationToken);
         return this.Process(result);
     }
 }

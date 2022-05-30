@@ -141,12 +141,14 @@ export default function Ide(props: IdeProps) {
     await triggerTestRun({
       id: index.toString(),
       test: value,
-      language: solutionLanguage,
-      sourceCode: solutionText,
+      solution: {
+        language: solutionLanguage,
+        sourceCode: solutionText,
+      },
     });
   };
 
-  const handleRuntAllTests = async () => {
+  const handleRunAllTests = async () => {
     if (!currentRound) return;
     const solutionText = solutionEditorRef.current?.getValue();
     if (!solutionText) return;
@@ -157,8 +159,10 @@ export default function Ide(props: IdeProps) {
       var result = await triggerTestRun({
         id: i.toString(),
         test: currentRound.challenge.tests[i],
-        language: solutionLanguage,
-        sourceCode: solutionText,
+        solution: {
+          language: solutionLanguage,
+          sourceCode: solutionText,
+        },
       }).unwrap();
 
       if (!result.isSuccess) {
@@ -176,7 +180,7 @@ export default function Ide(props: IdeProps) {
       direction="column"
       bodyStyle={{ ...autoResizeStyle, ...lowerRowMaxSize }}
       extra={
-        <Button size="small" disabled={isTesting} onClick={handleRuntAllTests}>
+        <Button size="small" disabled={isTesting} onClick={handleRunAllTests}>
           RUN ALL
         </Button>
       }

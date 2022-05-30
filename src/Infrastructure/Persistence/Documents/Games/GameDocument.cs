@@ -25,9 +25,6 @@ internal class GameDocument : MongoDocumentWithId
     [BsonElement("UserIds")]
     public List<string> UserIds { get; set; }
 
-    [BsonElement("CurrentRound")]
-    public RoundDocument CurrentRound { get; set; }
-
-    [BsonElement("PreviousRounds")]
-    public List<RoundDocument> PreviousRounds { get; set; }
+    [BsonElement("Rounds")]
+    public List<RoundDocument> Rounds { get; set; }
 }

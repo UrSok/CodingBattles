@@ -1,5 +1,5 @@
 import ProCard from '@ant-design/pro-card';
-import { Button, Space, Typography } from 'antd';
+import { Space, Typography } from 'antd';
 import SingInModalForm from 'app/components/Auth/Forms/SignInModalForm';
 import SingUpModalForm from 'app/components/Auth/Forms/SignUpModalForm';
 import UserAvatar from 'app/components/Auth/UserAvatar';

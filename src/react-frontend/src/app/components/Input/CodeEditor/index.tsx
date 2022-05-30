@@ -8,7 +8,8 @@ import LoadingSpinner from '../../LoadingSpinner';
 type CodeEditorProps = {
   editorRef?: MutableRefObject<monaco.editor.IStandaloneCodeEditor | undefined>;
   language: string;
-  height?: number;
+  width?: string | number;
+  height?: string | number;
   defaultValue?: string;
   value?: string;
   readOnly?: boolean;
@@ -19,6 +20,7 @@ export default function CodeEditor(props: CodeEditorProps) {
   const {
     editorRef,
     language,
+    width,
     height,
     defaultValue,
     value,
@@ -40,12 +42,13 @@ export default function CodeEditor(props: CodeEditorProps) {
       <Editor
         loading={<LoadingSpinner />}
         height={height ?? 300}
+        width={width}
         language={language}
         defaultValue={defaultValue}
         className="updated-monaco-editor"
         value={value ?? ''}
         options={{
-          readOnly: readOnly
+          readOnly: readOnly,
         }}
         onMount={onMount}
         onChange={onModelChange}

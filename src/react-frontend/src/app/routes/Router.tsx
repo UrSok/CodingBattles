@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-import { PATH_CHALLENGES, PATH_IDE, PATH_LOBBY, PATH_PROFILES } from './paths';
+import { PATH_CHALLENGES, PATH_LOBBY, PATH_PROFILES } from './paths';
 
 import ChallengePages from 'app/pages/Challenges';
 import ErrorResult from 'app/components/ErrorResult';
