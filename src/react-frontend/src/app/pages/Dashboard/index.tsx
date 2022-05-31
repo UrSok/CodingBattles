@@ -7,12 +7,11 @@ import { challengeApi, gameApi } from 'app/api';
 import SingInModalForm from 'app/components/Auth/Forms/SignInModalForm';
 import SingUpModalForm from 'app/components/Auth/Forms/SignUpModalForm';
 import UserAvatar from 'app/components/Auth/UserAvatar';
-import CardSection from 'app/components/CardSection';
 import ChallengeList from 'app/components/ChallengeList';
 import LoadingSpinner from 'app/components/LoadingSpinner';
 import NoData from 'app/components/NoData';
 import Page from 'app/components/Page';
-import { PATH_CHALLENGES, PATH_LOBBY, PATH_PROFILES } from 'app/routes/paths';
+import { PATH_CHALLENGES, PATH_LOBBY } from 'app/routes/paths';
 import { selectAuth } from 'app/slices/auth/selectors';
 import { ChallengeStatus } from 'app/types/enums/challengeStatus';
 import { GameStatus } from 'app/types/enums/gameStatus';
@@ -20,7 +19,7 @@ import { Role } from 'app/types/enums/role';
 import { GameSearchItem } from 'app/types/models/game/gameSearchItem';
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import CreateLobbyModal from '../Lobbies/pages/Index/components/CreateLobbyModal';
 import JoinLobbyModal from '../Lobbies/pages/Index/components/JoinLobbyModal';
 
@@ -96,11 +95,12 @@ export default function Dashboard() {
           )
         }
         gutter={[8, 8]}
-        loading={
-          isChallengesResultLoading ? <LoadingSpinner noTip /> : undefined
-        }
       >
-        <ProCard collapsible title="Current">
+        <ProCard
+          collapsible
+          title="Current"
+          loading={isGamesResultLoading ? <LoadingSpinner noTip /> : undefined}
+        >
           <ProList<GameSearchItem>
             ghost
             locale={{
@@ -156,7 +156,12 @@ export default function Dashboard() {
             }}
           />
         </ProCard>
-        <ProCard collapsible defaultCollapsed title="History">
+        <ProCard
+          collapsible
+          defaultCollapsed
+          title="History"
+          loading={isGamesResultLoading ? <LoadingSpinner noTip /> : undefined}
+        >
           <ProList<GameSearchItem>
             ghost
             locale={{
@@ -230,7 +235,14 @@ export default function Dashboard() {
           }
           gutter={[8, 8]}
         >
-          <ProCard collapsible title="Draft" defaultCollapsed>
+          <ProCard
+            collapsible
+            title="Draft"
+            defaultCollapsed
+            loading={
+              isChallengesResultLoading ? <LoadingSpinner noTip /> : undefined
+            }
+          >
             <ChallengeList
               preventFetch
               staticChallenges={draftChallenges}
@@ -256,7 +268,14 @@ export default function Dashboard() {
               }}
             />
           </ProCard>
-          <ProCard collapsible title="Upublished" defaultCollapsed>
+          <ProCard
+            collapsible
+            title="Upublished"
+            defaultCollapsed
+            loading={
+              isChallengesResultLoading ? <LoadingSpinner noTip /> : undefined
+            }
+          >
             <ChallengeList
               preventFetch
               staticChallenges={unpublishedChallenges}
@@ -282,7 +301,14 @@ export default function Dashboard() {
               }}
             />
           </ProCard>
-          <ProCard collapsible title="Published" defaultCollapsed>
+          <ProCard
+            collapsible
+            title="Published"
+            defaultCollapsed
+            loading={
+              isChallengesResultLoading ? <LoadingSpinner noTip /> : undefined
+            }
+          >
             <ChallengeList
               preventFetch
               staticChallenges={publishedChallenges}
