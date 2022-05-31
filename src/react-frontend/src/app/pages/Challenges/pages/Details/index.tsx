@@ -139,15 +139,6 @@ export default function DetailsChallenge() {
                   (feedbacks.length === 0 && 'Not enough feedbacks')}
                 {feedbacks.length > 0 && (
                   <ProForm submitter={false}>
-                    <Typography.Text
-                      style={{
-                        marginBottom: 10,
-                      }}
-                    >
-                      Based on
-                      {feedbacks.length}
-                      {feedbacks.length > 1 ? ' feedbacks' : ' feedback'}
-                    </Typography.Text>
                     <ProFormRate
                       label="Difficulty"
                       name="difficulty"
