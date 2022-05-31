@@ -6,6 +6,7 @@ using Domain.Models.Common;
 using Domain.Models.Common.Results;
 using Infrastructure.Logic.Challenges.Commands;
 using Infrastructure.Logic.Challenges.Queries;
+using Infrastructure.Logic.Games.Queries;
 using MediatR;
 
 namespace Infrastructure.Managers;
@@ -50,5 +51,11 @@ public class ChallengeManager : BaseManager, IChallengeManager
     {
         var command = new SendFeedbackCommand(challengeId, feedback);
         return await this.SendCommand(command, cancellationToken);
+    }
+
+    public async Task<Result<List<ChallengeSearchItem>>> GetByUserId(string userId, CancellationToken cancellationToken)
+    {
+        var query = new GetChallengesByUserIdQuery(userId);
+        return await this.SendCommand(query, cancellationToken);
     }
 }

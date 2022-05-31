@@ -37,6 +37,23 @@ export const challengeApi = createApi({
           : ['Challenge'],
     }),
 
+    getByUserId: build.query<ResultValue<ChallengeSearchItem[]>, string>({
+      query: userId => ({
+        url: `getByUserId/${userId}`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, request) =>
+        result && result.value
+          ? [
+              ...result?.value?.map(({ id }) => ({
+                type: 'Challenge' as const,
+                id,
+              })),
+              'Challenge',
+            ]
+          : ['Challenge'],
+    }),
+
     getChallenge: build.query<ResultValue<Challenge>, string>({
       query: (id: string) => ({
         url: id,

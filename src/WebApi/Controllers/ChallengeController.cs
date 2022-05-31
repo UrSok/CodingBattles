@@ -68,4 +68,12 @@ public class ChallengeController : BaseController
         var response = await this.challengeManager.SendFeedback(challengeId, feedback, cancellationToken);
         return this.Process(response);
     }
+
+    [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
+    [HttpGet("getByUserId/{userId}")]
+    public async Task<IActionResult> GetByUserId([FromRoute] string userId, CancellationToken cancellationToken)
+    {
+        var response = await this.challengeManager.GetByUserId(userId, cancellationToken);
+        return this.Process(response);
+    }
 }

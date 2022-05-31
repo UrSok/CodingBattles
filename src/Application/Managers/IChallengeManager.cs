@@ -14,4 +14,5 @@ public interface IChallengeManager
     Task<Result> Unpublish(string challengeId, string statusReason, CancellationToken cancellationToken);
     Task<Result<ChallengeDto>> Get(string challengeId, CancellationToken cancellationToken);
     Task<Result> SendFeedback(string challengeId, Feedback feedback, CancellationToken cancellationToken);
+    Task<Result<List<ChallengeSearchItem>>> GetByUserId(string userId, CancellationToken cancellationToken);
 }

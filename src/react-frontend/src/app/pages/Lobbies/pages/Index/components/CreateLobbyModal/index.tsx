@@ -34,7 +34,7 @@ export default function CreateLobbyModal(props: CreateLobbyModalProps) {
 
   return (
     <ModalForm
-      trigger={<Button type="dashed">Create lobby</Button>}
+      trigger={<Button type="ghost">Create</Button>}
       initialValues={{
         isPrivate: false,
       }}

@@ -194,6 +194,7 @@ export default function RoundSettings(props: RoundSettingsProps) {
                         descriptionShort:
                           currentRound?.challenge.descriptionShort,
                         difficulty: currentRound?.challenge.difficulty,
+                        status: currentRound.challenge.status,
                         tags: currentRound?.challenge.tags,
                       },
                     ]

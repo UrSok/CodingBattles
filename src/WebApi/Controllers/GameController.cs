@@ -4,6 +4,7 @@ using Domain.Models.Games.RequestsResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using WebApi.Constants;
 
 namespace WebApi.Controllers;
 
@@ -19,6 +20,7 @@ public class GameController : BaseController
         this.gameManager = gamesManager;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
@@ -33,6 +35,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
     [HttpGet("getGamesByUser/{userId}")]
     public async Task<IActionResult> GetGamesByUserId([FromRoute] string userId, CancellationToken cancellationToken)
     {
@@ -40,6 +43,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
     [HttpPost("createGame/{userId}/{name}/{isPrivate}")]
     public async Task<IActionResult> CreateGame([FromRoute] string userId, [FromRoute] string name, [FromRoute] bool isPrivate, CancellationToken cancellationToken)
     {
@@ -61,6 +65,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
     [HttpPost("{gameId}/currentRound/create")]
     public async Task<IActionResult> CreateRound([FromRoute] string gameId, CancellationToken cancellationToken)
     {
@@ -68,6 +73,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
     [HttpPost("{gameId}/currentRound/update/settings")]
     public async Task<IActionResult> UpdateCurrentRoundSettings([FromRoute] string gameId, [FromBody] UpdateCurrentRoundSettingsRequest updateCurrentRoundSettings, CancellationToken cancellationToken)
     {
@@ -75,6 +81,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
     [HttpPost("{gameId}/currentRound/start")]
     public async Task<IActionResult> StartRound([FromRoute] string gameId, CancellationToken cancellationToken)
     {
@@ -82,6 +89,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
     [HttpPost("{gameId}/currentRound/end")]
     public async Task<IActionResult> EndRound([FromRoute] string gameId, CancellationToken cancellationToken)
     {
@@ -103,6 +111,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
     [HttpPost("{gameId}/selectChallenge/{challengeId}")]
     public async Task<IActionResult> SelectChallenge([FromRoute] string gameId, [FromRoute] string challengeId, CancellationToken cancellationToken)
     {

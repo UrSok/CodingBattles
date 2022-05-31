@@ -32,7 +32,7 @@ export default function JoinLobbyModal(props: JoinLobbyModalProps) {
 
   return (
     <ModalForm
-      trigger={<Button type="primary">Join lobby</Button>}
+      trigger={<Button type="primary">Join</Button>}
       initialValues={{
         isPrivate: false,
       }}

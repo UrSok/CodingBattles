@@ -161,12 +161,13 @@ export default function SearchChallenges() {
           }}
           title="Challenges"
           extra={
-            (user?.role === Role.Member || user?.role === Role.Admin) && (
+            (user?.role === Role.Admin || user?.role === Role.Member) && (
               <Button
                 type="primary"
                 onClick={() => navigate(PATH_CHALLENGES.save)}
-                icon={<PlusOutlined />}
-              />
+              >
+                Create
+              </Button>
             )
           }
         >

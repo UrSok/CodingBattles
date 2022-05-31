@@ -192,11 +192,11 @@ export default function DetailsChallenge() {
       title={data?.value?.name}
       extra={
         <>
-          {/* {isAuthenticated &&
+          {isAuthenticated &&
             user?.role === Role.Admin &&
             data.value?.status === ChallengeStatus.Published && (
               <UnPublishModal challengeId={data.value!.id} />
-            )} */}
+            )}
           {isAuthenticated && user?.id && user?.id === data?.value?.user.id && (
             <Button onClick={() => navigate(PATH_CHALLENGES.save + `/${id}`)}>
               Edit
