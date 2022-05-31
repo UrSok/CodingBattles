@@ -1,4 +1,5 @@
 ﻿using Application.Managers;
+using Domain.Entities.Challenges;
 using Domain.Entities.Users;
 using Domain.Enums;
 using Domain.Models.Challenges.RequestsResults;
@@ -58,5 +59,13 @@ public class ChallengeController : BaseController
     {
         var result = await this.challengeManager.Unpublish(challengeId, statusReason, cancellationToken);
         return this.Process(result);
+    }
+
+    [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
+    [HttpPost("sendFeedback/{challengeId}")]
+    public async Task<IActionResult> SendFeedback([FromRoute] string challengeId, [FromBody] Feedback feedback, CancellationToken cancellationToken)
+    {
+        var response = await this.challengeManager.SendFeedback(challengeId, feedback, cancellationToken);
+        return this.Process(response);
     }
 }

@@ -20,6 +20,9 @@ internal interface IChallengeRepository
     Task<bool> Unpublish(string id, string statusReason, CancellationToken cancellationToken);
     Task<IEnumerable<Challenge>> GetByIds(IEnumerable<string> enumerable, CancellationToken cancellationToken);
     Task<string> GetRandomId(CancellationToken cancellationToken);
+    Task<bool> UpdateFeedback(string challengeId, Feedback feedback, CancellationToken cancellationToken);
+    Task<bool> AddFeedback(string challengeId, Feedback feedback, CancellationToken cancellationToken);
+    Task<bool> UpdateDificulty(string challengeId, float difficulty, CancellationToken cancellationToken);
 }
 
 internal class ChallengeRepository : BaseRepository, IChallengeRepository
@@ -28,7 +31,7 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
 
     public ChallengeRepository(IMongoDbContext mongoDbContext, IMapper mapper) : base(mapper)
     {
-        this.challenges = mongoDbContext.Challenges;
+        challenges = mongoDbContext.Challenges;
     }
 
     public async Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> Get(ChallengeSearchRequest challengeSearchRequest, CancellationToken cancellationToken)
@@ -78,42 +81,42 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
                 Builders<ChallengeDocument>.Filter.All(x => x.TagIds, challengeSearchRequest.TagIds));
         }
 
-        var filterDefinition = filters.Count > 0 
-            ? Builders<ChallengeDocument>.Filter.And(filters) 
+        var filterDefinition = filters.Count > 0
+            ? Builders<ChallengeDocument>.Filter.And(filters)
             : FilterDefinition<ChallengeDocument>.Empty;
 
-        var (totalPages, totalPageItems, data) = 
-            await this.challenges.AggregateByPage(
+        var (totalPages, totalPageItems, data) =
+            await challenges.AggregateByPage(
             filterDefinition,
             challengeSearchRequest.SortBy,
             challengeSearchRequest.OrderStyle,
             challengeSearchRequest.Page,
             challengeSearchRequest.PageSize);
 
-        return (totalPages, totalPageItems, this.mapper.Map<IEnumerable<Challenge>>(data));
+        return (totalPages, totalPageItems, mapper.Map<IEnumerable<Challenge>>(data));
     }
 
     public async Task<Challenge> Get(string id, CancellationToken cancellationToken)
     {
-        var challenge = (await this.challenges
+        var challenge = (await challenges
             .FindAsync(x => x.Id == id, cancellationToken: cancellationToken))
             .FirstOrDefault(cancellationToken);
 
-        return this.mapper.Map<Challenge>(challenge);
+        return mapper.Map<Challenge>(challenge);
     }
 
     public async Task<string> Create(Challenge challenge, CancellationToken cancellationToken)
     {
-        var challengeDocument = this.mapper.Map<ChallengeDocument>(challenge);
-        await this.challenges.InsertOneAsync(challengeDocument, cancellationToken: cancellationToken);
+        var challengeDocument = mapper.Map<ChallengeDocument>(challenge);
+        await challenges.InsertOneAsync(challengeDocument, cancellationToken: cancellationToken);
         return challengeDocument.Id;
     }
 
     public async Task<bool> Update(Challenge challenge, CancellationToken cancellationToken)
     {
-        var challengeDocument = this.mapper.Map<ChallengeDocument>(challenge);
+        var challengeDocument = mapper.Map<ChallengeDocument>(challenge);
 
-         var filter = Builders<ChallengeDocument>.Filter.Eq(x => x.Id, challenge.Id);
+        var filter = Builders<ChallengeDocument>.Filter.Eq(x => x.Id, challenge.Id);
         var update = Builders<ChallengeDocument>.Update
             .Set(x => x.Name, challenge.Name)
             .Set(x => x.DescriptionShort, challenge.DescriptionShort)
@@ -124,7 +127,7 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
             .Set(x => x.Status, challenge.Status)
             .Set(x => x.TagIds, challenge.TagIds);
 
-        var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        var result = await challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         return result.ModifiedCount == 1 || result.MatchedCount == 1;
     }
 
@@ -135,7 +138,7 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
             .Set(x => x.Status, challenge.Status)
             .Set(x => x.LastModifiedOn, challenge.LastModifiedOn);
 
-        var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        var result = await challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         return result.ModifiedCount == 1 || result.MatchedCount == 1;
     }
 
@@ -147,22 +150,65 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
             .Set(x => x.StatusReason, statusReason)
             .Set(x => x.LastModifiedOn, DateTime.Now);
 
-        var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        var result = await challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         return result.ModifiedCount == 1 || result.MatchedCount == 1;
     }
 
     public async Task<IEnumerable<Challenge>> GetByIds(IEnumerable<string> challengeIds, CancellationToken cancellationToken)
     {
         var filter = Builders<ChallengeDocument>.Filter.In(x => x.Id, challengeIds);
-        var challengeDocumnts = (await this.challenges.FindAsync(filter, cancellationToken: cancellationToken))
+        var challengeDocumnts = (await challenges.FindAsync(filter, cancellationToken: cancellationToken))
             .ToEnumerable(cancellationToken: cancellationToken);
-        return this.mapper.Map<IEnumerable<Challenge>>(challengeDocumnts);
+        return mapper.Map<IEnumerable<Challenge>>(challengeDocumnts);
     }
 
     public async Task<string> GetRandomId(CancellationToken cancellationToken)
     {
-        var challenge = await this.challenges.AsQueryable().Sample(1).FirstOrDefaultAsync();
+        var challenge = await challenges.AsQueryable().Sample(1).FirstOrDefaultAsync();
 
-        return this.mapper.Map<Challenge>(challenge).Id;
+        return mapper.Map<Challenge>(challenge).Id;
+    }
+
+    public async Task<bool> AddFeedback(string challengeId, Feedback feedback, CancellationToken cancellationToken)
+    {
+        var feedbackDocument = mapper.Map<FeedbackDocument>(feedback);
+
+        var filter = Builders<ChallengeDocument>.Filter.Eq(x => x.Id, challengeId);
+        var update = Builders<ChallengeDocument>.Update
+            .AddToSet(x => x.Feedbacks, feedbackDocument);
+
+
+        var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        return result.ModifiedCount == 1 || result.MatchedCount == 1;
+    }
+
+    public async Task<bool> UpdateFeedback(string challengeId, Feedback feedback, CancellationToken cancellationToken)
+    {
+        var feedbackDocument = mapper.Map<FeedbackDocument>(feedback);
+
+        var filter = Builders<ChallengeDocument>.Filter
+            .Where(x => x.Id == challengeId);
+
+        filter &=
+            Builders<ChallengeDocument>.Filter.ElemMatch(x => x.Feedbacks,
+            y => y.UserId == feedback.UserId);
+
+        var update = Builders<ChallengeDocument>.Update
+            .Set(x => x.Feedbacks[-1], feedbackDocument);
+
+        var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        return result.ModifiedCount == 1 || result.MatchedCount == 1;
+    }
+
+    public async Task<bool> UpdateDificulty(string challengeId, float difficulty, CancellationToken cancellationToken)
+    {
+        var filter = Builders<ChallengeDocument>.Filter
+            .Where(x => x.Id == challengeId);
+
+        var update = Builders<ChallengeDocument>.Update
+            .Set(x => x.Difficulty, difficulty);
+
+        var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        return result.ModifiedCount == 1 || result.MatchedCount == 1;
     }
 }

@@ -8,6 +8,7 @@ import { Challenge } from 'app/types/models/challenge/challenge';
 import { ChallengeSaveRequestWithParameters } from './types/challengeSave';
 import { UpublishChallengeParameters } from './types/unpublishChallenge';
 import { Paginated } from 'app/types/models/general/paginated';
+import { SendFeedbackWithParameters } from './types/sendFeedback';
 
 export const challengeApi = createApi({
   reducerPath: 'challengeApi',
@@ -73,6 +74,20 @@ export const challengeApi = createApi({
       query: request => ({
         url: `unpublish/${request.challengeId}/${request.statusReason}`,
         method: 'POST',
+      }),
+      invalidatesTags: (result, error, arg) => [
+        { type: 'Challenge', id: arg.challengeId },
+      ],
+    }),
+
+    sendFeedback: build.mutation<
+      ResultValue<string>,
+      SendFeedbackWithParameters
+    >({
+      query: (request: SendFeedbackWithParameters) => ({
+        url: `sendFeedback/${request.challengeId}`,
+        method: 'POST',
+        data: request.feedback,
       }),
       invalidatesTags: (result, error, arg) => [
         { type: 'Challenge', id: arg.challengeId },

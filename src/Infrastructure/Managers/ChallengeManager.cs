@@ -45,4 +45,10 @@ public class ChallengeManager : BaseManager, IChallengeManager
         var command = new UnpublishCommand(challengeId, statusReason);
         return await this.SendCommand(command, cancellationToken);
     }
+
+    public async Task<Result> SendFeedback(string challengeId, Feedback feedback, CancellationToken cancellationToken)
+    {
+        var command = new SendFeedbackCommand(challengeId, feedback);
+        return await this.SendCommand(command, cancellationToken);
+    }
 }

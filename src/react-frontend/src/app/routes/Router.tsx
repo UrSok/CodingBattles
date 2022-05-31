@@ -8,6 +8,7 @@ import ErrorResult from 'app/components/ErrorResult';
 import LobbiesPage from 'app/pages/Lobbies/pages/Index';
 import Lobby from 'app/pages/Lobbies/pages/Lobby';
 import Welcome from 'app/pages/Welcome';
+import ActivateProfile from 'app/components/Auth/ActivateProfile';
 
 export default function Router() {
   return (
@@ -20,6 +21,10 @@ export default function Router() {
           <Route
             path={PATH_PROFILES.ME.settings}
             element={<p>my profile settings</p>}
+          />
+          <Route
+            path={PATH_PROFILES.ME.activate}
+            element={<ActivateProfile />}
           />
         </Route>
       </Route>

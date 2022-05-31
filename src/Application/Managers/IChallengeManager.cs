@@ -1,4 +1,5 @@
-﻿using Domain.Models.Challenges;
+﻿using Domain.Entities.Challenges;
+using Domain.Models.Challenges;
 using Domain.Models.Challenges.RequestsResults;
 using Domain.Models.Common;
 using Domain.Models.Common.Results;
@@ -12,4 +13,5 @@ public interface IChallengeManager
     Task<Result> Publish(string jwtToken, string challengeId, CancellationToken cancellationToken);
     Task<Result> Unpublish(string challengeId, string statusReason, CancellationToken cancellationToken);
     Task<Result<ChallengeDto>> Get(string challengeId, CancellationToken cancellationToken);
+    Task<Result> SendFeedback(string challengeId, Feedback feedback, CancellationToken cancellationToken);
 }

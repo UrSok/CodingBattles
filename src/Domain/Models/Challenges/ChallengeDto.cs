@@ -31,6 +31,10 @@ public class ChallengeDto
 
     public float Difficulty { get; set; }
 
+    public float Fun { get; set; }
+
+    public float TestCasesRelvancy { get; set; }
+
     public UserDto User { get; set; }
 
     public DateTime LastModifiedOn { get; set; }

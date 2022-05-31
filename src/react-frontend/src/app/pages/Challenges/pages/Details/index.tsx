@@ -16,6 +16,8 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import UnPublishModal from '../../components/UnPublishModal';
+import FeedbackModalForm from 'app/components/FeedbackModalForm';
+import ProForm, { ProFormRate } from '@ant-design/pro-form';
 
 export default function DetailsChallenge() {
   const { id } = useParams();
@@ -23,7 +25,7 @@ export default function DetailsChallenge() {
 
   const { isAuthenticated, user } = useSelector(selectAuth);
 
-  const { isLoading, data, error } = challengeApi.useGetChallengeQuery(id!);
+  const { isLoading, data } = challengeApi.useGetChallengeQuery(id!);
 
   let pageContent: React.ReactNode = '';
 
@@ -36,7 +38,16 @@ export default function DetailsChallenge() {
   }
 
   if (data?.value) {
-    const { tags, descriptionMarkdown, tests, user, feedbacks } = data.value;
+    const {
+      tags,
+      descriptionMarkdown,
+      tests,
+      user,
+      feedbacks,
+      difficulty,
+      fun,
+      testCasesRelevancy,
+    } = data.value;
 
     pageContent = (
       <>
@@ -77,7 +88,7 @@ export default function DetailsChallenge() {
                 </ProCard>
               </ProCard>
 
-              <ProCard title="Feedbacks">
+              {/* <ProCard title="Feedbacks">
                 <ProList<Feedback>
                   ghost
                   rowKey={entity => entity.userId}
@@ -88,7 +99,7 @@ export default function DetailsChallenge() {
                     emptyText: <NoData />,
                   }}
                 />
-              </ProCard>
+              </ProCard> */}
             </ProCard>
 
             <ProCard colSpan={8} ghost direction="column" gutter={[16, 16]}>
@@ -118,11 +129,53 @@ export default function DetailsChallenge() {
                 }
               </ProCard>
 
-              <ProCard title="Statistics">
-                {!feedbacks || feedbacks.length === 0 ? (
-                  'Not enough feedbacks'
-                ) : (
-                  <div>{feedbacks.length}</div>
+              <ProCard
+                title="Statistics"
+                subTitle={`(${feedbacks.length} ${
+                  feedbacks.length > 1 ? 'feedbacks' : 'feedback'
+                })`}
+              >
+                {!feedbacks ||
+                  (feedbacks.length === 0 && 'Not enough feedbacks')}
+                {feedbacks.length > 0 && (
+                  <ProForm submitter={false}>
+                    <Typography.Text
+                      style={{
+                        marginBottom: 10,
+                      }}
+                    >
+                      Based on
+                      {feedbacks.length}
+                      {feedbacks.length > 1 ? ' feedbacks' : ' feedback'}
+                    </Typography.Text>
+                    <ProFormRate
+                      label="Difficulty"
+                      name="difficulty"
+                      initialValue={difficulty ?? 0}
+                      fieldProps={{
+                        allowHalf: true,
+                      }}
+                      readonly
+                    />
+                    <ProFormRate
+                      label="Fun"
+                      name="fun"
+                      initialValue={fun ?? 0}
+                      fieldProps={{
+                        allowHalf: true,
+                      }}
+                      readonly
+                    />
+                    <ProFormRate
+                      label="Test Cases Relvancy"
+                      name="testCasesRelvancy"
+                      initialValue={testCasesRelevancy ?? 0}
+                      fieldProps={{
+                        allowHalf: true,
+                      }}
+                      readonly
+                    />
+                  </ProForm>
                 )}
               </ProCard>
             </ProCard>
@@ -148,19 +201,23 @@ export default function DetailsChallenge() {
       title={data?.value?.name}
       extra={
         <>
-          {isAuthenticated &&
+          {/* {isAuthenticated &&
             user?.role === Role.Admin &&
             data.value?.status === ChallengeStatus.Published && (
               <UnPublishModal challengeId={data.value!.id} />
-            )}
+            )} */}
           {isAuthenticated && user?.id && user?.id === data?.value?.user.id && (
             <Button onClick={() => navigate(PATH_CHALLENGES.save + `/${id}`)}>
               Edit
             </Button>
           )}
-          {data.value?.status === ChallengeStatus.Published && (
+          {/* {data.value?.status === ChallengeStatus.Published && (
             <Button type="primary">Play</Button>
-          )}
+          )} */}
+          {data.value &&
+            data.value.feedbacks.some(x => x.userId === user?.id) && (
+              <FeedbackModalForm challenge={data.value} />
+            )}
         </>
       }
       subTitle={subTitle}

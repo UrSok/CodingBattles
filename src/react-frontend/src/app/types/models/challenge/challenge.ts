@@ -18,6 +18,8 @@ export type Challenge = {
   tags: ChallengeTag[];
   feedbacks: Feedback[];
   difficulty: number;
+  fun: number;
+  testCasesRelevancy: number;
   user: UserDto;
   lastModifiedOn: Date;
 };

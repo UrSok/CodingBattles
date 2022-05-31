@@ -4,13 +4,11 @@ public class Feedback : EntityWithId
 {
     public string UserId { get; set; }
 
-    public int Difficulty { get; set; }
+    public float Difficulty { get; set; }
 
-    public int Fun { get; set; }
+    public float Fun { get; set; }
 
-    public int TestCasesRelvancy { get; set; }
+    public float TestCasesRelvancy { get; set; }
 
     public string Text { get; set; }
-
-    public bool HasIssues { get; set; }
 }

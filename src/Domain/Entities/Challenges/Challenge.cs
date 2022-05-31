@@ -27,6 +27,10 @@ public class Challenge : EntityWithId
 
     public float Difficulty { get; set; }
 
+    public float Fun { get; set; }
+
+    public float TestCasesRelvancy { get; set; }
+
     public string CreatedByUserId { get; set; }
 
     public DateTime LastModifiedOn { get; set; }

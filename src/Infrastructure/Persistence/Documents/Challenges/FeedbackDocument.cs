@@ -8,21 +8,14 @@ internal class FeedbackDocument : MongoDocumentWithId
     public string UserId { get; set; }
 
     [BsonElement("Difficulty")]
-    public int Difficulty { get; set; }
+    public float Difficulty { get; set; }
 
     [BsonElement("Fun")]
-    public int Fun { get; set; }
+    public float Fun { get; set; }
 
     [BsonElement("TestCasesRelvancy")]
-    public int TestCasesRelvancy { get; set; }
+    public float TestCasesRelvancy { get; set; }
 
     [BsonElement("Text")]
     public string Text { get; set; }
-
-    [BsonElement("HasIssues")]
-    public bool HasIssues { get; set; }
-
-    [BsonElement("PostedOn")]
-    [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
-    public DateTime PostedOn { get; set; }
 }

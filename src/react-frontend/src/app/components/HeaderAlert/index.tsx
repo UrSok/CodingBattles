@@ -1,4 +1,5 @@
-import { Alert, Button } from 'antd';
+import { Alert, Button, message, notification } from 'antd';
+import { authApi } from 'app/api';
 import { Role } from 'app/types/enums/role';
 import { UserDto } from 'app/types/models/user/userDto';
 import { translations } from 'locales/translations';
@@ -53,6 +54,19 @@ export default function HeaderAlert(props: HeaderAlertProps) {
   const { user } = props;
 
   let alert: React.ReactNode;
+  
+  const [triggerResend] = authApi.useResendActivationCodeMutation();
+
+  const handleOnResendClick = async () => {
+    if (!user) return;
+    await triggerResend(user.id);
+
+    notification['success']({
+      message: 'The email was sent!',
+      description: 'Please check your inbox',
+      duration: 10,
+    });
+  }
 
   if (user?.role === Role.UnverifiedMember) {
     alert = (
@@ -61,7 +75,7 @@ export default function HeaderAlert(props: HeaderAlertProps) {
         banner
         closable
         action={
-          <Button size="small" type="primary">
+          <Button size="small" type="primary" onClick={handleOnResendClick}>
             {t(translations.Alerts.UnverifiedMember.resendButton)}
           </Button>
         }

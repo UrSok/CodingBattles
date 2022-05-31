@@ -2,6 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { authActions } from 'app/slices/auth';
 import { axiosBaseQuery } from '../../config';
 import { Result, ResultValue } from '../types';
+import { ActivateUserParameters } from './types/activateUser';
 import { AuthUserRequest, AuthUserResult } from './types/authUser';
 import { RegisterUserRequest } from './types/registerUser';
 
@@ -31,6 +32,26 @@ export const authApi = createApi({
           dispatch(authActions.signIn(data.value));
         }
       },
+    }),
+
+    activateUser: build.mutation<Result, ActivateUserParameters>({
+      query: params => ({
+        url: `${params.userId}/activate/${params.verificationCode}`,
+        method: 'POST',
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        const { data } = await queryFulfilled;
+        if (data.isSuccess) {
+          dispatch(authActions.signOut());
+        }
+      },
+    }),
+
+    resendActivationCode: build.mutation<Result, string>({
+      query: userId => ({
+        url: `${userId}/activate/resend`,
+        method: 'POST',
+      }),
     }),
 
     isUniqueEmail: build.query<Result, string>({

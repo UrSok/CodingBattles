@@ -18,6 +18,7 @@ export const PATH_PAGE = {
 const PATH_PROFILES_ME = {
   root: ROOTS_PROFILES_ME,
   settings: combinePath(ROOTS_PROFILES_ME, '/settings'),
+  activate: combinePath(ROOTS_PROFILES_ME, '/:userId/activate/:code'),
 };
 
 export const PATH_PROFILES = {
