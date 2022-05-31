@@ -7,6 +7,8 @@ import RoundSummaryItem from './components/RoundSummaryItem';
 import TimerSand from '@2fd/ant-design-icons/lib/TimerSand';
 import Countdown from 'antd/lib/statistic/Countdown';
 import FeedbackModalForm from 'app/components/FeedbackModalForm';
+import { useSelector } from 'react-redux';
+import { selectUser } from 'app/slices/auth/selectors';
 
 type RoundItemProps = {
   round: Round;
@@ -17,8 +19,9 @@ type RoundItemProps = {
 
 export default function RoundItem(props: RoundItemProps) {
   const { round, defaultNotCollapsed, gameId, isCurrent } = props;
+  const authUser = useSelector(selectUser);
 
-  const title = isCurrent ? 'Current Round' : `Round ${round.number}`;
+  const title = isCurrent ? 'Latest Round' : `Round ${round.number}`;
 
   const deadLine = round.startTime
     ? new Date(round.startTime).getTime() + 1800000
@@ -48,7 +51,9 @@ export default function RoundItem(props: RoundItemProps) {
               </Avatar>
             </Space>
           )}
-          {<FeedbackModalForm challenge={round.challenge} />}
+          {round.roundSummaries.some(x => x.user.id === authUser?.id) && (
+            <FeedbackModalForm challenge={round.challenge} />
+          )}
         </Space>
       }
     >

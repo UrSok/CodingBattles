@@ -11,7 +11,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-export default function Welcome() {
+export default function Dashboard() {
   const { isAuthenticated, user } = useSelector(selectAuth);
 
   const dashboard = (

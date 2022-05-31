@@ -23,10 +23,18 @@ export default function Room(props: RoomProps) {
   const isGameMaster = gameInfo.gameMasterUser.id === authUser?.id;
 
   const [triggerLeaveGame] = gameApi.useLeaveGameMutation();
+  const [triggerJoinGame] = gameApi.useJoinGameMutation();
 
   const handleOnLeaveGame = () => {
     triggerLeaveGame({
       gameId: gameInfo.id,
+      userId: authUser!.id,
+    });
+  };
+
+  const handleOnJoinGame = () => {
+    triggerJoinGame({
+      code: gameInfo.code,
       userId: authUser!.id,
     });
   };
@@ -51,11 +59,17 @@ export default function Room(props: RoomProps) {
               Close Game
             </Button>
           )}
-          {!isGameMaster && (
+          {!isGameMaster && gameInfo.users.some(x => x.id === authUser?.id) && (
             <Button danger type="primary" onClick={handleOnLeaveGame}>
               Leave Game
             </Button>
           )}
+          {!gameInfo.users.some(x => x.id === authUser?.id) &&
+            gameInfo.status === GameStatus.NotStarted && (
+              <Button type="primary" onClick={handleOnJoinGame}>
+                Join Game
+              </Button>
+            )}
         </>
       }
     >

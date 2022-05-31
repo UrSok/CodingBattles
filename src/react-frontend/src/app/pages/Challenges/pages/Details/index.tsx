@@ -132,7 +132,7 @@ export default function DetailsChallenge() {
               <ProCard
                 title="Statistics"
                 subTitle={`(${feedbacks.length} ${
-                  feedbacks.length > 1 ? 'feedbacks' : 'feedback'
+                  feedbacks.length === 1 ? 'feedback' : 'feedbacks'
                 })`}
               >
                 {!feedbacks ||

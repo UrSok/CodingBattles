@@ -32,7 +32,7 @@ internal class LeaveGameHandler : IRequestHandler<LeaveGameCommand, Result>
 
     public async Task<Result> Handle(LeaveGameCommand request, CancellationToken cancellationToken)
     {
-        var result = await this.gameRepository.RemoveFromGame(request.UserId, request.GameId, cancellationToken);
+        var result = await this.gameRepository.RemoveFromGame(request.GameId, request.UserId, cancellationToken);
         
         if (!result)
         {

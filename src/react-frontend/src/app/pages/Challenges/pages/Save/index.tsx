@@ -13,7 +13,6 @@ import TheForm from './components/TheForm';
 
 export default function Save() {
   const { id: paramId } = useParams();
-  const user = useSelector(selectUser);
 
   const { isLoading, data } = challengeApi.useGetChallengeQuery(
     paramId ?? skipToken,

@@ -1,5 +1,5 @@
 import { ModalForm, ProFormRate, ProFormTextArea } from '@ant-design/pro-form';
-import { Button, notification, Result } from 'antd';
+import { Button, notification, Result, Tooltip } from 'antd';
 import { challengeApi } from 'app/api';
 import { PATH_CHALLENGES } from 'app/routes/paths';
 import { selectUser } from 'app/slices/auth/selectors';
@@ -44,7 +44,7 @@ export default function FeedbackModalForm(props: FeedbackModalFormProps) {
       trigger={
         challenge.user.id !== authUser?.id &&
         (authUser?.role === Role.Member || authUser?.role === Role.Admin) ? (
-          <Button type="primary">Send Feedback</Button>
+          <Button type="primary">Feedback</Button>
         ) : undefined
       }
       modalProps={{

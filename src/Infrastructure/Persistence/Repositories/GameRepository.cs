@@ -19,7 +19,7 @@ internal interface IGameRepository
     Task<IEnumerable<Game>> Get(CancellationToken cancellationToken);
     Task<IEnumerable<Game>> GetGamesByUserId(string userId, CancellationToken cancellationToken);
     Task<bool> ReplaceSummaryRecord(string gameId, RoundSummary roundSummary, CancellationToken cancellationToken);
-    Task<bool> RemoveFromGame(string userId, string gameId, CancellationToken cancellationToken);
+    Task<bool> RemoveFromGame(string gameId, string userId, CancellationToken cancellationToken);
     Task<bool> UpdateGameStatus(string gameId, GameStatus status, CancellationToken cancellationToken);
     Task<bool> ShareSolution(string gameId, int roundNumber, string userId, CancellationToken cancellationToken);
 }
@@ -125,11 +125,11 @@ internal class GameRepository : BaseRepository, IGameRepository
         return result.ModifiedCount == 1 || result.MatchedCount == 1;
     }
 
-    public async Task<bool> RemoveFromGame(string userId, string gameId, CancellationToken cancellationToken)
+    public async Task<bool> RemoveFromGame(string gameId, string userId, CancellationToken cancellationToken)
     {
         var filter = Builders<GameDocument>.Filter.Eq(x => x.Id, gameId);
         var update = Builders<GameDocument>.Update
-            .Pull(x => x.UserIds, gameId);
+            .Pull(x => x.UserIds, userId);
 
         var result = await this.games.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         return result.ModifiedCount == 1 || result.MatchedCount == 1;

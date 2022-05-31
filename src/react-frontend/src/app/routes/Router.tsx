@@ -7,13 +7,13 @@ import ChallengePages from 'app/pages/Challenges';
 import ErrorResult from 'app/components/ErrorResult';
 import LobbiesPage from 'app/pages/Lobbies/pages/Index';
 import Lobby from 'app/pages/Lobbies/pages/Lobby';
-import Welcome from 'app/pages/Welcome';
+import Dashboard from 'app/pages/Dashboard';
 import ActivateProfile from 'app/components/Auth/ActivateProfile';
 
 export default function Router() {
   return (
     <Routes>
-      <Route index element={<Welcome />} />
+      <Route index element={<Dashboard />} />
       <Route path={PATH_PROFILES.root}>
         <Route index element={<p>profiles</p>} />
         <Route path={PATH_PROFILES.ME.root}>

@@ -12,27 +12,22 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import CreateLobbyModal from './components/CreateLobbyModal';
 import JoinLobbyModal from './components/JoinLobbyModal';
+import { GameSearchItem } from 'app/types/models/game/gameSearchItem';
 
 export default function GamesPage() {
-  const { isAuthenticated, user } = useSelector(selectAuth);
+  const { isAuthenticated, user: authUser } = useSelector(selectAuth);
   const navigate = useNavigate();
 
   const { isLoading: isLoadingGames, data: gamesResult } =
     gameApi.useGetAllQuery();
 
-  const myLobbies = gamesResult?.value?.filter(x =>
-    x.users.some(x => user && x.id === user.id),
-  );
-
-  const otherLobbies = gamesResult?.value?.filter(x => !myLobbies?.includes(x));
-
   const [triggerJoinLobby] = gameApi.useJoinGameMutation();
 
   const handleJoin = async (code: string) => {
-    if (!user?.id) return;
+    if (!authUser?.id) return;
 
     const result = await triggerJoinLobby({
-      userId: user.id,
+      userId: authUser.id,
       code: code,
     }).unwrap();
 
@@ -43,7 +38,7 @@ export default function GamesPage() {
 
   return (
     <Page loading={isLoadingGames}>
-      <ProList
+      <ProList<GameSearchItem>
         ghost
         locale={{
           emptyText: <NoData />,
@@ -51,15 +46,18 @@ export default function GamesPage() {
         grid={{ gutter: 16, column: 4 }}
         toolBarRender={() => {
           const actions: React.ReactNode[] = [];
-          if (isAuthenticated && user) {
-            actions.push(<CreateLobbyModal userId={user.id} />);
-            actions.push(<JoinLobbyModal userId={user.id} />);
+          if (isAuthenticated && authUser) {
+            actions.push(<CreateLobbyModal userId={authUser.id} />);
+            actions.push(<JoinLobbyModal userId={authUser.id} />);
           }
 
           return actions;
         }}
-        headerTitle="Joined/My lobbies"
-        dataSource={myLobbies}
+        headerTitle="Lobbies"
+        dataSource={gamesResult?.value}
+        onItem={record => ({
+          onClick: () => navigate(PATH_LOBBY.root + `/${record.id}`),
+        })}
         metas={{
           title: {
             dataIndex: 'name',
@@ -68,88 +66,36 @@ export default function GamesPage() {
             dataIndex: 'code',
           },
           content: {
-            render: (dom, value, index) => {
-              let tag: React.ReactNode = [];
-
-              if (value.status === GameStatus.NotStarted) {
-                tag = <Tag color="green">Not Started</Tag>;
-              }
-              if (value.status === GameStatus.InProgress) {
-                tag = <Tag color="warning">In Progress</Tag>;
-              }
-
+            render: (dom, record, index) => {
               return (
-                <Space direction="vertical">
-                  <Avatar.Group maxCount={5}>
-                    {value.users.map(user => (
-                      <UserAvatar userName={user.username} size="large" />
-                    ))}
-                  </Avatar.Group>
-                  {tag}
-                </Space>
-              );
-            },
-          },
-          actions: {
-            render: (dom, value, index) => {
-              return [
-                <Button
-                  type="primary"
-                  onClick={() => navigate(PATH_LOBBY.root + `/${value.id}`)}
+                <Space
+                  direction="horizontal"
+                  style={{
+                    width: '97%',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
                 >
-                  Open
-                </Button>,
-              ];
-            },
-            cardActionProps: 'extra',
-          },
-        }}
-      />
-      <ProList
-        ghost
-        locale={{
-          emptyText: <NoData />,
-        }}
-        grid={{ gutter: 16, column: 4 }}
-        headerTitle="Other lobbies"
-        dataSource={otherLobbies}
-        metas={{
-          title: {
-            dataIndex: 'name',
-          },
-          subTitle: {
-            dataIndex: 'code',
-          },
-          content: {
-            render: (dom, value, index) => {
-              let tag: React.ReactNode = [];
-
-              if (value.status === GameStatus.NotStarted) {
-                tag = <Tag color="green">Not Started</Tag>;
-              }
-              if (value.status === GameStatus.InProgress) {
-                tag = <Tag color="warning">In Progress</Tag>;
-              }
-
-              return (
-                <Space direction="vertical">
                   <Avatar.Group maxCount={5}>
-                    {value.users.map(user => (
+                    {record.users.map(user => (
                       <UserAvatar userName={user.username} size="large" />
                     ))}
                   </Avatar.Group>
-                  {tag}
+                  {record.users.some(x => x.id === authUser?.id) && (
+                    <Tag color="cyan">Joined</Tag>
+                  )}
                 </Space>
               );
             },
           },
           actions: {
             render: (dom, value, index) => {
-              return [
-                <Button type="primary" onClick={() => handleJoin(value.code)}>
-                  Join
-                </Button>,
-              ];
+              let tag = <Tag color="green">Not Started</Tag>;
+
+              if (value.status === GameStatus.InProgress) {
+                tag = <Tag color="warning">In Progress</Tag>;
+              }
+              return [tag];
             },
             cardActionProps: 'extra',
           },
