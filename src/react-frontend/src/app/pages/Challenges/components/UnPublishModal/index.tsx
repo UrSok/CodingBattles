@@ -1,5 +1,5 @@
 import { ModalForm, ProFormTextArea } from '@ant-design/pro-form';
-import { Button } from 'antd';
+import { Button, Result } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import { challengeApi } from 'app/api';
 import React from 'react';
@@ -25,10 +25,15 @@ export default function UnPublishModal(props: UnPublishModalProps) {
   });
 
   const handleSubmit = async (values: ModalFormProps) => {
-    await triggerUpublishChallenge({
+    const result = await triggerUpublishChallenge({
       challengeId: challengeId,
       statusReason: values.statusReason,
-    });
+    }).unwrap();
+
+    if (result.isSuccess) {
+      return true;
+    }
+    return false;
   };
 
   return (
@@ -43,7 +48,7 @@ export default function UnPublishModal(props: UnPublishModalProps) {
         },
       }}
       modalProps={{
-        okText: 'UnPublish',
+        okText: 'Send',
         destroyOnClose: true,
         cancelText: 'Cancel',
       }}

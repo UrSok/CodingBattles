@@ -1,4 +1,5 @@
-﻿using Domain.Enums;
+﻿using Domain.Entities.Users;
+using Domain.Enums;
 using Domain.Enums.Errors;
 using Domain.Models.Common;
 using Domain.Models.Common.Results;
@@ -25,11 +26,13 @@ internal class LeaveGameCommandValidator : AbstractValidator<LeaveGameCommand>
 internal class LeaveGameHandler : IRequestHandler<LeaveGameCommand, Result>
 {
     private readonly IGameRepository gameRepository;
+    private readonly IUserRepository userRepository;
     private readonly IMediator mediator;
 
-    public LeaveGameHandler(IGameRepository gameRepository, IMediator mediator)
+    public LeaveGameHandler(IGameRepository gameRepository, IUserRepository userRepository,  IMediator mediator)
     {
         this.gameRepository = gameRepository;
+        this.userRepository = userRepository;
         this.mediator = mediator;
     }
 
@@ -49,8 +52,9 @@ internal class LeaveGameHandler : IRequestHandler<LeaveGameCommand, Result>
 
         if (game.GameMasterUserId == request.UserId)
         {
-            var firstUserId = game.UserIds.FirstOrDefault();
-            if (firstUserId is null)
+            var users = await userRepository.GetByIds(game.UserIds, cancellationToken);
+            var firstUser = users.FirstOrDefault(x => x.Role is Role.Member or Role.Admin);
+            if (firstUser is null)
             {
                 var currentRound = game.Rounds.FirstOrDefault(x => x.Status is not RoundStatus.Finished);
                 
@@ -63,7 +67,7 @@ internal class LeaveGameHandler : IRequestHandler<LeaveGameCommand, Result>
                 return Result.Success();
             }
 
-            var result2 = await this.gameRepository.MakeGameMaster(request.GameId, firstUserId, cancellationToken);
+            var result2 = await this.gameRepository.MakeGameMaster(request.GameId, firstUser.Id, cancellationToken);
             if (!result2)
             {
                 return Result.Failure(Error.InternalServerError);

@@ -41,7 +41,9 @@ export default function SingInModalForm(props: SingInModalFormProps) {
         ),
         duration: 5,
       });
+      return true;
     }
+    return false;
   };
 
   const validateFields = (

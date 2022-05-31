@@ -28,6 +28,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.All)]
     [HttpGet("{gameId}")]
     public async Task<IActionResult> Get([FromRoute] string gameId, CancellationToken cancellationToken)
     {
@@ -35,7 +36,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
-    [Authorize(Roles = AuthorizeConsts.MemberOrAdmin)]
+    [Authorize(Roles = AuthorizeConsts.All)]
     [HttpGet("getGamesByUser/{userId}")]
     public async Task<IActionResult> GetGamesByUserId([FromRoute] string userId, CancellationToken cancellationToken)
     {
@@ -51,6 +52,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.All)]
     [HttpPost("joinGame/{userId}/{code}")]
     public async Task<IActionResult> JoinGame([FromRoute] string userId, [FromRoute] string Code, CancellationToken cancellationToken)
     {
@@ -58,6 +60,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.All)]
     [HttpPost("leaveGame/{userId}/{gameId}")]
     public async Task<IActionResult> LeaveGame([FromRoute] string userId, [FromRoute] string gameId, CancellationToken cancellationToken)
     {
@@ -97,6 +100,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.All)]
     [HttpPost("submitResult")]
     public async Task<IActionResult> SubmitResult([FromBody] SubmitResultRequest submitResultRequest, CancellationToken cancellationToken)
     {
@@ -104,6 +108,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.All)]
     [HttpPost("runTest")]
     public async Task<IActionResult> RunTest([FromBody] RunTestRequest runTestModel, CancellationToken cancellationToken)
     {
@@ -119,6 +124,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.All)]
     [HttpPost("{gameId}/{roundNumber}/{userId}/shareSolution")]
     public async Task<IActionResult> ShareSolution([FromRoute] string gameId, [FromRoute] int roundNumber, [FromRoute] string userId, CancellationToken cancellationToken)
     {
@@ -126,6 +132,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [Authorize(Roles = AuthorizeConsts.All)]
     [HttpPost("{gameId}/{userId}/saveSolution")]
     public async Task<IActionResult> SaveSolution([FromRoute] string gameId, [FromRoute] string userId, [FromBody] Solution solution, CancellationToken cancellationToken)
     {

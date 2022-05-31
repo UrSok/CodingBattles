@@ -6,7 +6,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import ProForm, { ModalForm, ProFormText } from '@ant-design/pro-form';
-import { Button, Form, notification } from 'antd';
+import { Alert, Button, Form, notification, Typography } from 'antd';
 import { authApi } from 'app/api/auth';
 import { RegisterUserRequest } from 'app/api/auth/types/registerUser';
 import { EMAIL_REGEX } from 'app/utils/constants';
@@ -14,7 +14,7 @@ import { translations } from 'locales/translations';
 import { FieldData } from 'rc-field-form/es/interface';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
+import { useNavigate } from 'react-router-dom';
 
 type SignUpModalFormProps = {
   textButton?: boolean;
@@ -26,6 +26,7 @@ export default function SingUpModalForm(props: SignUpModalFormProps) {
   const [form] = Form.useForm();
   const { t } = useTranslation();
   const [submitDisabled, setSubmitDisabled] = useState(true);
+  const navigate = useNavigate();
 
   const [triggerSignUp] = authApi.useSignUpMutation();
   const [triggerIsUniqueEmail] = authApi.useLazyIsUniqueEmailQuery();
@@ -133,7 +134,9 @@ export default function SingUpModalForm(props: SignUpModalFormProps) {
         ),
         duration: 5,
       });
+      return true;
     }
+    return false;
   };
 
   return (
@@ -185,6 +188,7 @@ export default function SingUpModalForm(props: SignUpModalFormProps) {
           ]}
         />
       </ProForm.Group>
+
       <ProForm.Group>
         <ProFormText
           width="lg"

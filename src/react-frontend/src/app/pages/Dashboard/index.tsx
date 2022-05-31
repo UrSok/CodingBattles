@@ -96,7 +96,9 @@ export default function Dashboard() {
           )
         }
         gutter={[8, 8]}
-        loading={isChallengesResultLoading && <LoadingSpinner noTip />}
+        loading={
+          isChallengesResultLoading ? <LoadingSpinner noTip /> : undefined
+        }
       >
         <ProCard collapsible title="Current">
           <ProList<GameSearchItem>
@@ -227,7 +229,6 @@ export default function Dashboard() {
             )
           }
           gutter={[8, 8]}
-          loading={isChallengesResultLoading && <LoadingSpinner noTip />}
         >
           <ProCard collapsible title="Draft" defaultCollapsed>
             <ChallengeList

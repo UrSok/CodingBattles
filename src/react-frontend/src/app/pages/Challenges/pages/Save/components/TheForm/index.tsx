@@ -679,7 +679,11 @@ export default function TheForm(props: Props) {
                   <Button
                     type="dashed"
                     disabled={statusIsNotDraft}
-                    onClick={() => add()}
+                    onClick={() =>
+                      add({
+                        [FormFields.testTitle]: `New Test`,
+                      })
+                    }
                     style={{ width: '100%' }}
                     icon={<PlusOutlined />}
                   >
@@ -714,17 +718,19 @@ export default function TheForm(props: Props) {
                   defaultLanguage={Language.javascript}
                   disabled={statusIsNotDraft}
                 />
-                {!initialChallenge ||
-                  (initialChallenge?.status === ChallengeStatus.Draft && (
-                    <Button
-                      type="primary"
-                      onClick={handleOnTestSolutionClick}
-                      loading={isTesting}
-                      disabled={!testSolutionButtonState}
-                    >
-                      Test Solution
-                    </Button>
-                  ))}
+
+                <Button
+                  type="primary"
+                  onClick={handleOnTestSolutionClick}
+                  loading={isTesting}
+                  disabled={
+                    !testSolutionButtonState ||
+                    (initialChallenge &&
+                      initialChallenge.status !== ChallengeStatus.Draft)
+                  }
+                >
+                  Test Solution
+                </Button>
               </Space>
               <CodeEditor
                 editorRef={solutionEditorRef}

@@ -35,7 +35,9 @@ export default function FeedbackModalForm(props: FeedbackModalFormProps) {
         message: 'Feedback has been sent!',
         duration: 5,
       });
+      return true;
     }
+    return false;
   };
 
   return (
