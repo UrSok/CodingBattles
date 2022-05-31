@@ -105,8 +105,10 @@ internal class GameRepository : BaseRepository, IGameRepository
 
     public async Task<IEnumerable<Game>> GetGamesByUserId(string userId, CancellationToken cancellationToken)
     {
-        var gameDocuments = (await this.games.FindAsync(x => x.GameMasterUserId == userId || x.UserIds.Contains(userId), cancellationToken: cancellationToken))
-            .ToEnumerable(cancellationToken: cancellationToken);
+        var gameDocuments = (await this.games.FindAsync(x => x.GameMasterUserId == userId || x.UserIds.Contains(userId) 
+         || x.Rounds.Any(round => 
+            round.RoundSummaries.Any(summary => summary.UserId == userId)), cancellationToken: cancellationToken))
+                .ToEnumerable(cancellationToken: cancellationToken);
         return this.mapper.Map<IEnumerable<Game>>(gameDocuments);
     }
 

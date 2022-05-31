@@ -1,5 +1,4 @@
 ﻿using Domain.Entities.Common;
-using Domain.Entities.Games;
 using Domain.Enums;
 using Domain.Enums.Errors;
 using Domain.Models.Common.Results;
@@ -66,7 +65,7 @@ internal class EndRoundHandler : IRequestHandler<EndRoundCommand, Result>
                         }
                     });
 
-                    await this.mediator.Send(command);
+                    var result = await mediator.Send(command);
                 });
         }
 

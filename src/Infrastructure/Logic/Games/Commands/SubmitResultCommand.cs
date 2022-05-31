@@ -1,10 +1,12 @@
-﻿using Domain.Entities.Common;
+﻿using Domain.Entities.Challenges;
+using Domain.Entities.Common;
 using Domain.Entities.Games;
 using Domain.Enums;
 using Domain.Enums.Errors;
 using Domain.Models.Common.Results;
 using Domain.Models.Games.RequestsResults;
 using FluentValidation;
+using Infrastructure.Logic.Challenges.Commands;
 using Infrastructure.Repositories;
 using MediatR;
 using System.Collections.Concurrent;
@@ -35,7 +37,7 @@ internal class SubmitResultHandler : IRequestHandler<SubmitResultCommand, Result
 
     public async Task<Result> Handle(SubmitResultCommand request, CancellationToken cancellationToken)
     {
-        var game = await this.gameRepository.Get(request.Model.GameId, cancellationToken);
+        var game = await gameRepository.Get(request.Model.GameId, cancellationToken);
         if (game is null)
         {
             return Result.Failure(ProcessingError.GameNotFound);
@@ -43,7 +45,7 @@ internal class SubmitResultHandler : IRequestHandler<SubmitResultCommand, Result
 
         var currentRound = game.Rounds.First();
 
-        var challenge = await this.challengeRepository.Get(currentRound.ChallengeId, cancellationToken);
+        var challenge = await challengeRepository.Get(currentRound.ChallengeId, cancellationToken);
         if (challenge is null)
         {
             return Result.Failure(ProcessingError.ChallengeNotFound);
@@ -59,7 +61,7 @@ internal class SubmitResultHandler : IRequestHandler<SubmitResultCommand, Result
             Solution = request.Model.Solution,
         };
 
-        var replaceRecordSummaryResult = await this.gameRepository.ReplaceSummaryRecord(game.Id, roundSummary, cancellationToken);
+        var replaceRecordSummaryResult = await gameRepository.ReplaceSummaryRecord(game.Id, roundSummary, cancellationToken);
         if (!replaceRecordSummaryResult)
         {
             Result.Failure(Error.InternalServerError);
@@ -76,11 +78,11 @@ internal class SubmitResultHandler : IRequestHandler<SubmitResultCommand, Result
                 {
                     Language = request.Model.Solution?.Language,
                     SourceCode = request.Model.Solution?.SourceCode,
-                },             
+                },
                 Test = testAndIndex.test,
             });
 
-            var testResult = await this.mediator.Send(command, cancellationToken);
+            var testResult = await mediator.Send(command, cancellationToken);
 
             var testSummary = new TestSummary()
             {
@@ -115,7 +117,36 @@ internal class SubmitResultHandler : IRequestHandler<SubmitResultCommand, Result
         roundSummary.Score = validTestsCount > 0 ? (testSummariesAndIndexes.Count * 100 / validTestsCount) : 0;
         roundSummary.TestSummaries = testSummaries.ToList();
 
-        var isSubmitted = await this.gameRepository.ReplaceSummaryRecord(game.Id, roundSummary, cancellationToken);
+        if (!challenge.Feedbacks.Any(x => x.UserId == roundSummary.UserId))
+        {
+            var calculatedDifficulty = challenge.Difficulty;
+
+            if (roundSummary.Score > 90)
+            {
+                calculatedDifficulty = 1;
+            }
+            else if (roundSummary.Score > 70)
+            {
+                calculatedDifficulty = 2;
+            }
+            else if (roundSummary.Score > 50)
+            {
+                calculatedDifficulty = 3;
+            }
+            else if (roundSummary.Score > 20)
+            {
+                calculatedDifficulty = 4;
+            }
+            else
+            {
+                calculatedDifficulty = 5;
+            }
+
+            var command = new SendFeedbackCommand(challenge.Id, new Feedback { UserId = roundSummary.UserId, Difficulty = calculatedDifficulty }, true);
+            await mediator.Send(command, cancellationToken);
+        }
+
+        var isSubmitted = await gameRepository.ReplaceSummaryRecord(game.Id, roundSummary, cancellationToken);
         if (!isSubmitted)
         {
             Result.Failure(Error.InternalServerError);
@@ -124,7 +155,7 @@ internal class SubmitResultHandler : IRequestHandler<SubmitResultCommand, Result
         if (!currentRound.RoundSummaries.Any(x => x.Status is RoundSummaryStatus.NotSubmitted && x.UserId != request.Model.UserId))
         {
             var command = new EndRoundCommand(game.Id, true);
-            await this.mediator.Send(command);
+            await mediator.Send(command);
         }
 
         return Result.Success();

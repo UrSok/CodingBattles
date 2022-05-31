@@ -32,7 +32,16 @@ internal class EndRoundOnTimeHandler : IRequestHandler<EndRoundOnTimeCommand, in
         var parallelismOptions = new ParallelOptions { MaxDegreeOfParallelism = 10 };
         await Parallel.ForEachAsync(games, parallelismOptions, async (game, cancellationToken) =>
         {
-            var currentRounds = game.Rounds.FirstOrDefault(x => x.Status == RoundStatus.InProgress);
+            var currentRound = game.Rounds.FirstOrDefault(x => x.Status == RoundStatus.InProgress);
+
+            if (!currentRound.StartTime.HasValue) return;
+            var remainingTime = currentRound.StartTime.Value.AddMinutes(currentRound.DurationMinutes) - DateTime.Now;
+
+            if (remainingTime.TotalSeconds <= 60 && remainingTime.TotalSeconds >= 1)
+            {
+                await Task.Delay(remainingTime);
+            }
+
             var command = new EndRoundCommand(game.Id, true);
             await this.mediator.Send(command);
         });
