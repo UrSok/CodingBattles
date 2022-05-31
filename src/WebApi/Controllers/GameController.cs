@@ -1,4 +1,5 @@
 ﻿using Application.Managers;
+using Domain.Entities.Common;
 using Domain.Models.Games.RequestsResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -81,6 +82,13 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
+    [HttpPost("{gameId}/currentRound/end")]
+    public async Task<IActionResult> EndRound([FromRoute] string gameId, CancellationToken cancellationToken)
+    {
+        var result = await this.gameManager.EndRound(gameId, cancellationToken);
+        return this.Process(result);
+    }
+
     [HttpPost("submitResult")]
     public async Task<IActionResult> SubmitResult([FromBody] SubmitResultRequest submitResultRequest, CancellationToken cancellationToken)
     {
@@ -102,10 +110,17 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
-    [HttpPost("{gameId}/shareSolution/{roundNumber}/{userId}")]
+    [HttpPost("{gameId}/{roundNumber}/{userId}/shareSolution")]
     public async Task<IActionResult> ShareSolution([FromRoute] string gameId, [FromRoute] int roundNumber, [FromRoute] string userId, CancellationToken cancellationToken)
     {
         var result = await this.gameManager.ShareSolution(gameId, roundNumber, userId,cancellationToken);
+        return this.Process(result);
+    }
+
+    [HttpPost("{gameId}/{userId}/saveSolution")]
+    public async Task<IActionResult> SaveSolution([FromRoute] string gameId, [FromRoute] string userId, [FromBody] Solution solution, CancellationToken cancellationToken)
+    {
+        var result = await this.gameManager.SaveSolution(gameId, userId, solution, cancellationToken);
         return this.Process(result);
     }
 }

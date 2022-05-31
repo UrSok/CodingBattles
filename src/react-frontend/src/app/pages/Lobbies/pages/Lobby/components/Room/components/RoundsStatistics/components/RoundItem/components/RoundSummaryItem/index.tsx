@@ -40,7 +40,7 @@ export default function RoundSummaryItem(props: RoundSummaryItemProps) {
     >
       {shouldShowContent && (
         <RoundSummaryContent
-          solution={summary.solution}
+          solution={summary.solution!}
           roundNumber={roundNumer}
           wasSolutionShared={summary.solutionShared}
           gameId={gameId}

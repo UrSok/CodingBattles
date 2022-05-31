@@ -1,22 +1,16 @@
 import ProCard from '@ant-design/pro-card';
 import ProList from '@ant-design/pro-list';
-import { Button, Rate, Space, Tag, Typography } from 'antd';
+import { Button, Space, Tag } from 'antd';
 import { gameApi } from 'app/api';
 import UserAvatar from 'app/components/Auth/UserAvatar';
-import ChallengeList from 'app/components/ChallengeList';
 import Page from 'app/components/Page';
-import NoData from 'app/components/NoData';
 import { selectUser } from 'app/slices/auth/selectors';
 import { GameStatus } from 'app/types/enums/gameStatus';
 import { RoundStatus } from 'app/types/enums/roundStatus';
-import { Challenge } from 'app/types/models/challenge/challenge';
 import { Game } from 'app/types/models/game/game';
-import { Round } from 'app/types/models/game/round';
 import * as React from 'react';
-import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import RoundSettings from './components/RoundSettings';
-import ChooseChallenge from './components/RoundSettings/components/ChooseChallenge';
 import RoundsStatistics from './components/RoundsStatistics';
 
 export type RoomProps = {
@@ -27,6 +21,15 @@ export default function Room(props: RoomProps) {
   const { gameInfo } = props;
   const authUser = useSelector(selectUser);
   const isGameMaster = gameInfo.gameMasterUser.id === authUser?.id;
+
+  const [triggerLeaveGame] = gameApi.useLeaveGameMutation();
+
+  const handleOnLeaveGame = () => {
+    triggerLeaveGame({
+      gameId: gameInfo.id,
+      userId: authUser!.id,
+    });
+  };
 
   return (
     <Page
@@ -49,7 +52,7 @@ export default function Room(props: RoomProps) {
             </Button>
           )}
           {!isGameMaster && (
-            <Button danger type="primary">
+            <Button danger type="primary" onClick={handleOnLeaveGame}>
               Leave Game
             </Button>
           )}

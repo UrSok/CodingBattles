@@ -96,7 +96,7 @@ export default function RoundSummaryExtra(props: RoundSummaryExtraProps) {
             fontSize: 20,
           }}
         >
-          {Language[solution.language]}
+          {Language[solution!.language]}
         </Typography.Text>
         <Avatar
           size="small"

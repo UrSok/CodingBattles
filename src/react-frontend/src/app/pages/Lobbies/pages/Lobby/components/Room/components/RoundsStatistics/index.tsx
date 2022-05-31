@@ -1,3 +1,4 @@
+import ProCard from '@ant-design/pro-card';
 import ProList from '@ant-design/pro-list';
 import NoData from 'app/components/NoData';
 import { Game } from 'app/types/models/game/game';
@@ -18,18 +19,27 @@ export default function RoundsStatistics(props: RoundsStatiscticsProps) {
   return (
     <ProList<Round>
       ghost
+      split
       rowKey={(record, _) => record.number}
       locale={{
         emptyText: <NoData />,
       }}
-      dataSource={rounds.some(x => x.roundSummaries?.length > 0) ? rounds : []}
+      dataSource={rounds.filter(x => x.roundSummaries?.length > 0)}
       renderItem={(round, index) => {
         return (
-          <RoundItem
-            round={round}
-            gameId={gameInfo.id}
-            isCurrent={gameInfo.currentRound?.number === round.number}
-          />
+          <ProCard
+            ghost
+            style={{
+              marginBottom: 8,
+            }}
+          >
+            <RoundItem
+              round={round}
+              gameId={gameInfo.id}
+              defaultNotCollapsed={index === 0}
+              isCurrent={gameInfo.currentRound?.number === round.number}
+            />
+          </ProCard>
         );
       }}
     />

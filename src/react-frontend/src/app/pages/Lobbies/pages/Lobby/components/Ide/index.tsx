@@ -1,18 +1,24 @@
 import ProCard from '@ant-design/pro-card';
 import ProList from '@ant-design/pro-list';
-import { Alert, Button, Form, Space, Tag, Typography } from 'antd';
+import { Alert, Button, Form, message, Space, Tag, Typography } from 'antd';
 import ChallengeDescription from 'app/components/ChallengeDescription';
 import CodeEditor from 'app/components/Input/CodeEditor';
 import LanguageSelect from 'app/components/Input/LanguageSelect';
 import Page from 'app/components/Page';
 import { Language } from 'app/types/enums/language';
-import React, { ReactText, useEffect, useRef, useState } from 'react';
+import React, { ReactText, useRef, useState } from 'react';
 import Play from '@2fd/ant-design-icons/lib/Play';
 import monaco from 'monaco-editor';
-import { useEffectOnce, useMap } from 'usehooks-ts';
+import {
+  useDebounce,
+  useEffectOnce,
+  useInterval,
+  useMap,
+  useUpdateEffect,
+} from 'usehooks-ts';
 import { gameApi, stubGeneratorApi } from 'app/api';
 import { useForm, useWatch } from 'antd/lib/form/Form';
-import { getLanguageKeyName } from 'app/utils/enumHelpers';
+import { getGameModeKeyName, getLanguageKeyName } from 'app/utils/enumHelpers';
 import UserAvatar from 'app/components/Auth/UserAvatar';
 import Countdown from 'antd/lib/statistic/Countdown';
 import {
@@ -26,6 +32,10 @@ import { useSelector } from 'react-redux';
 import { Game } from 'app/types/models/game/game';
 import { TestPair } from 'app/types/models/challenge/testPair';
 import { ErrorCode } from 'app/types/enums/errorCode';
+import { GameMode } from 'app/types/enums/gameMode';
+import { RoundSummaryStatus } from 'app/types/enums/roundSummaryStatus';
+import { UserDto } from 'app/types/models/user/userDto';
+import LoadingSpinner from 'app/components/LoadingSpinner';
 
 type TestState = 'None' | 'Validating' | 'Passed' | 'Failed' | 'Unvalidated';
 
@@ -36,12 +46,16 @@ type IdeProps = {
 export default function Ide(props: IdeProps) {
   const { gameInfo } = props;
   const { currentRound } = gameInfo!;
-  const user = useSelector(selectUser);
+  const authUser = useSelector(selectUser);
 
-  const deadLine =
-    currentRound && currentRound.startTime
-      ? new Date(currentRound.startTime).getTime() + 1800000
-      : 0;
+  const authUserRoundSummary = currentRound?.roundSummaries.find(
+    x => x.user.id === authUser?.id,
+  );
+
+  // const deadLine =
+  //   currentRound && currentRound.startTime
+  //     ? new Date(currentRound.startTime).getTime() + 1800000
+  //     : 0;
 
   const [form] = useForm();
   const solutionLanguage: Language = useWatch('solutionLang', form);
@@ -57,13 +71,15 @@ export default function Ide(props: IdeProps) {
 
   const [
     triggerStubGenerator,
-    { isLoading: isGenerating, data: GenerateStubResult },
+    { isLoading: isGenerating, data: generateStubResult },
   ] = stubGeneratorApi.useLazyGenerateStubQuery();
+
+  const [triggerSaveSolution] = gameApi.useSaveSolutionMutation();
 
   const [triggerTestRun, { isLoading: isTesting, data: testResult }] =
     gameApi.useRunTestMutation();
 
-  const [triggerSubmitResult, { isLoading: isSubmiting, data: submitResult }] =
+  const [triggerSubmitResult, { isLoading: isSubmiting }] =
     gameApi.useSubmitResultMutation();
 
   useEffectOnce(() => {
@@ -81,14 +97,38 @@ export default function Ide(props: IdeProps) {
     });
   });
 
-  useEffect(() => {
+  useInterval(async () => {
+    if (!authUserRoundSummary) return;
+
+    const solutionText = solutionEditorRef.current?.getValue();
+    if (!solutionText || solutionText.length === 0) return;
+
+    if (
+      solutionText !== authUserRoundSummary.solution?.sourceCode ||
+      solutionLanguage !== authUserRoundSummary.solution?.language
+    ) {
+      const result = await triggerSaveSolution({
+        gameId: gameInfo.id,
+        userId: authUser!.id,
+        solution: {
+          language: solutionLanguage,
+          sourceCode: solutionText,
+        },
+      }).unwrap();
+
+      if (!result.isSuccess) return;
+      message.success('Solution saved!', 3);
+    }
+  }, 10000);
+
+  useUpdateEffect(() => {
     triggerStubGenerator({
       input: currentRound?.challenge.stubGeneratorInput ?? '',
       language: solutionLanguage ?? getLanguageKeyName(Language.javascript),
     });
   }, [solutionLanguage]);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (!testResult || !testResult.value) return;
 
     if (testResult.isSuccess) {
@@ -98,22 +138,25 @@ export default function Ide(props: IdeProps) {
     }
   }, [testResult]);
 
-  useEffect(() => {
-    console.log(GenerateStubResult);
+  useUpdateEffect(() => {
     if (
-      GenerateStubResult?.isSuccess &&
-      GenerateStubResult &&
-      GenerateStubResult.value
+      generateStubResult?.isSuccess &&
+      generateStubResult &&
+      generateStubResult.value
     ) {
-      solutionEditorRef.current?.setValue(GenerateStubResult.value.stub);
+      solutionEditorRef.current?.setValue(generateStubResult.value.stub);
     }
-  }, [GenerateStubResult]);
+  }, [generateStubResult]);
 
   const upperRowMaxSize: React.CSSProperties = {
     height: '42vh',
   };
   const lowerRowMaxSize: React.CSSProperties = {
     height: '35vh',
+  };
+
+  const spanRowMaxSize: React.CSSProperties = {
+    height: '84vh',
   };
 
   const autoResizeStyle: React.CSSProperties = {
@@ -153,12 +196,12 @@ export default function Ide(props: IdeProps) {
     const solutionText = solutionEditorRef.current?.getValue();
     if (!solutionText) return;
 
-    for (let i = 0; i < currentRound.challenge.tests.length; i++) {
-      testsMapActions.set(i.toString(), 'Validating');
+    var promises = currentRound.challenge.tests.map(async (test, index) => {
+      testsMapActions.set(index.toString(), 'Validating');
 
       var result = await triggerTestRun({
-        id: i.toString(),
-        test: currentRound.challenge.tests[i],
+        id: index.toString(),
+        test,
         solution: {
           language: solutionLanguage,
           sourceCode: solutionText,
@@ -166,21 +209,52 @@ export default function Ide(props: IdeProps) {
       }).unwrap();
 
       if (!result.isSuccess) {
-        testsMapActions.set(i.toString(), 'Failed');
+        testsMapActions.set(index.toString(), 'Failed');
         return;
       }
 
-      testsMapActions.set(i.toString(), 'Passed');
-    }
+      testsMapActions.set(index.toString(), 'Passed');
+    });
+
+    await Promise.all(promises);
+
+    // for (let i = 0; i < currentRound.challenge.tests.length; i++) {
+    //   testsMapActions.set(i.toString(), 'Validating');
+
+    //   var result = await triggerTestRun({
+    //     id: i.toString(),
+    //     test: currentRound.challenge.tests[i],
+    //     solution: {
+    //       language: solutionLanguage,
+    //       sourceCode: solutionText,
+    //     },
+    //   }).unwrap();
+
+    //   if (!result.isSuccess) {
+    //     testsMapActions.set(i.toString(), 'Failed');
+    //     return;
+    //   }
+
+    //   testsMapActions.set(i.toString(), 'Passed');
+    // }
   };
 
   const TestsCard = (
     <ProCard
       title="Tests"
       direction="column"
-      bodyStyle={{ ...autoResizeStyle, ...lowerRowMaxSize }}
+      bodyStyle={
+        currentRound?.gameMode === getGameModeKeyName(GameMode.reverse)
+          ? { ...autoResizeStyle, ...spanRowMaxSize }
+          : { ...autoResizeStyle, ...lowerRowMaxSize }
+      }
       extra={
-        <Button size="small" disabled={isTesting} onClick={handleRunAllTests}>
+        <Button
+          size="small"
+          type="primary"
+          disabled={isTesting}
+          onClick={handleRunAllTests}
+        >
           RUN ALL
         </Button>
       }
@@ -315,7 +389,7 @@ export default function Ide(props: IdeProps) {
 
     triggerSubmitResult({
       gameId: gameInfo.id,
-      userId: user!.id,
+      userId: authUser!.id,
       solution: {
         language: solutionLanguage,
         sourceCode: solutionText ?? '',
@@ -323,34 +397,50 @@ export default function Ide(props: IdeProps) {
     });
   };
 
+  // const handleReGenerateStub = () => {
+  //   triggerStubGenerator({
+  //     language: solutionLanguage,
+  //     input: gameInfo.currentRound?.challenge.stubGeneratorInput,
+  //   });
+  // };
+
   const SolutionEditorCard = (
     <ProCard
       title="Solution"
       bodyStyle={{ ...autoResizeStyle, ...upperRowMaxSize }}
+      // subTitle={
+
+      //     <Button
+      //       danger
+      //       type="primary"
+      //       size="small"
+      //       onClick={handleReGenerateStub}
+      //       loading={isGenerating}
+      //     >
+      //       Re-generate stub
+      //     </Button>
+      // }
       extra={
-        <Space>
-          <Form form={form}>
-            <LanguageSelect
-              antdFieldName="solutionLang"
-              width="sm"
-              defaultLanguage={Language.javascript}
-              placeholder="Solution Language"
-            />
-          </Form>
-          <Button
-            type="primary"
-            icon={<Play />}
-            onClick={handleSubmit}
-            loading={isSubmiting}
-          >
-            SUBMIT
-          </Button>
-        </Space>
+        <Form form={form}>
+          <LanguageSelect
+            antdFieldName="solutionLang"
+            width="sm"
+            defaultLanguage={
+              authUserRoundSummary?.solution
+                ? Language[authUserRoundSummary.solution.language]
+                : generateStubResult?.value?.stub
+            }
+            placeholder="Solution Language"
+          />
+        </Form>
       }
     >
       <CodeEditor
         editorRef={solutionEditorRef}
-        defaultValue={GenerateStubResult?.value?.stub}
+        defaultValue={
+          authUserRoundSummary?.solution?.sourceCode ??
+          generateStubResult?.value?.stub
+        }
         language={solutionLanguage}
         onModelChange={handleSolutionInputChanged}
       />
@@ -425,24 +515,35 @@ export default function Ide(props: IdeProps) {
       direction="column"
       bodyStyle={{ ...autoResizeStyle, ...lowerRowMaxSize }}
     >
-      <ProList
+      <ProList<UserDto>
         ghost
         split
         metas={{
           title: {
-            render: (dom, value, index) => {
+            render: (dom, user, index) => {
               return (
                 <Space>
-                  <UserAvatar userName={value.username} size="large" />
-                  <Typography.Text>{value.username}</Typography.Text>
+                  <UserAvatar userName={user.username} size="large" />
+                  <Typography.Text>{user.username}</Typography.Text>
                 </Space>
               );
             },
           },
-          actions: {
-            render: (dom, value, index) => {
-              return null;
-              <Tag color="error">Error</Tag>;
+          extra: {
+            render: (dom, user, index) => {
+              const roundSummary = currentRound?.roundSummaries.find(
+                x => x.user.id === user.id,
+              );
+
+              if (roundSummary?.status === RoundSummaryStatus.Submitting) {
+                return <Tag color="warning">Submitting</Tag>;
+              }
+
+              if (roundSummary?.status === RoundSummaryStatus.Submitted) {
+                return <Tag color="success">Submitted</Tag>;
+              }
+
+              return undefined;
             },
           },
         }}
@@ -451,35 +552,49 @@ export default function Ide(props: IdeProps) {
     </ProCard>
   );
 
-  const handleOnCountdownFinish = () => {};
-
   return (
     <Page
       title={currentRound?.challenge.name}
+      // extra={
+      //   <Space>
+      //     <Typography.Text
+      //       strong
+      //       style={{
+      //         fontSize: 20,
+      //       }}
+      //     >
+      //       Time Left:
+      //     </Typography.Text>
+      //     <Countdown
+      //       valueStyle={{
+      //         fontSize: 20,
+      //       }}
+      //       value={deadLine}
+      //       onFinish={handleOnCountdownFinish}
+      //     />
+      //   </Space>
+      // }
+      subTitle={
+        currentRound && (
+          <Tag color="cyan">{GameMode[currentRound?.gameMode]}</Tag>
+        )
+      }
       extra={
-        <Space>
-          <Typography.Text
-            strong
-            style={{
-              fontSize: 20,
-            }}
-          >
-            Time Left:
-          </Typography.Text>
-          <Countdown
-            valueStyle={{
-              fontSize: 20,
-            }}
-            value={deadLine}
-            onFinish={handleOnCountdownFinish}
-          />
-        </Space>
+        <Button
+          type="primary"
+          icon={<Play />}
+          onClick={handleSubmit}
+          loading={isSubmiting}
+        >
+          SUBMIT
+        </Button>
       }
     >
       <ProCard direction="column" ghost gutter={[16, 16]}>
         <ProCard gutter={16} ghost>
           <ProCard ghost colSpan={10} direction="column" gutter={[16, 16]}>
-            {TaskCard}
+            {currentRound?.gameMode !== getGameModeKeyName(GameMode.reverse) &&
+              TaskCard}
             {TestsCard}
           </ProCard>
           <ProCard ghost colSpan={14} direction="column" gutter={[16, 16]}>

@@ -1,4 +1,5 @@
 ﻿using Application.Managers;
+using Domain.Entities.Common;
 using Domain.Models.Common.Results;
 using Domain.Models.Games;
 using Domain.Models.Games.RequestsResults;
@@ -56,6 +57,12 @@ public class GameManager : BaseManager, IGameManager
         return await this.SendCommand(command, cancellationToken);
     }
 
+    public async Task<Result> EndRound(string gameId, CancellationToken cancellationToken)
+    {
+        var command = new EndRoundCommand(gameId, true);
+        return await this.SendCommand(command, cancellationToken);
+    }
+
     public async Task<Result<List<GameSearchItem>>> Get(CancellationToken cancellationToken)
     {
         var query = new GetGamesQuery();
@@ -83,6 +90,12 @@ public class GameManager : BaseManager, IGameManager
     public async Task<Result> SelectChallenge(string gameId, string challengeId, CancellationToken cancellationToken)
     {
         var command = new SelectChallengeCommand(gameId, challengeId);
+        return await this.SendCommand(command, cancellationToken);
+    }
+
+    public async Task<Result> SaveSolution(string gameId, string userId, Solution solution, CancellationToken cancellationToken)
+    {
+        var command = new SaveSolutionCommand(gameId, userId, solution);
         return await this.SendCommand(command, cancellationToken);
     }
 

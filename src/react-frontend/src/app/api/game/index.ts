@@ -7,6 +7,7 @@ import { CreateGameParameters } from './types/createGame';
 import { JoinGameParameters } from './types/joinGame';
 import { LeaveGameParameters } from './types/leaveGame';
 import { RunTestRequest, RunTestResult } from './types/runTest';
+import { SaveSolutionWithParameters } from './types/saveSolution';
 import { SelectChallengeParameters } from './types/selectChallenge';
 import { ShareSolutionParameters } from './types/shareSolution';
 import { SubmitResultRequest } from './types/submitResult';
@@ -122,9 +123,19 @@ export const gameApi = createApi({
       ],
     }),
 
-    startRound: build.mutation<ResultValue<number>, string>({
+    startRound: build.mutation<Result, string>({
       query: gameId => ({
         url: `${gameId}/currentRound/start`,
+        method: 'POST',
+      }),
+      invalidatesTags: (result, error, request) => [
+        { type: 'Game', id: request },
+      ],
+    }),
+
+    endRound: build.mutation<Result, string>({
+      query: gameId => ({
+        url: `${gameId}/currentRound/end`,
         method: 'POST',
       }),
       invalidatesTags: (result, error, request) => [
@@ -145,8 +156,19 @@ export const gameApi = createApi({
 
     shareSolution: build.mutation<Result, ShareSolutionParameters>({
       query: parameters => ({
-        url: `${parameters.gameId}/shareSolution/${parameters.roundNumber}/${parameters.userId}`,
+        url: `${parameters.gameId}/${parameters.roundNumber}/${parameters.userId}/shareSolution`,
         method: 'POST',
+      }),
+      invalidatesTags: (result, error, request) => [
+        { type: 'Game', id: request.gameId },
+      ],
+    }),
+
+    saveSolution: build.mutation<Result, SaveSolutionWithParameters>({
+      query: parameters => ({
+        url: `${parameters.gameId}/${parameters.userId}/saveSolution`,
+        method: 'POST',
+        data: parameters.solution,
       }),
       invalidatesTags: (result, error, request) => [
         { type: 'Game', id: request.gameId },

@@ -1,4 +1,5 @@
-﻿using Domain.Models.Common.Results;
+﻿using Domain.Entities.Common;
+using Domain.Models.Common.Results;
 using Domain.Models.Games;
 using Domain.Models.Games.RequestsResults;
 
@@ -19,5 +20,7 @@ public interface IGameManager
     Task<Result> ShareSolution(string gameId, int roundNumber, string userId, CancellationToken cancellationToken);
     Task<Result> CreateRound(string gameId, CancellationToken cancellationToken);
     Task<Result> UpdateCurrentRoundSettings(string gameId, UpdateCurrentRoundSettingsRequest updateCurrentRoundSettingsRequest, CancellationToken cancellationToken);
+    Task<Result> EndRound(string gameId, CancellationToken cancellationToken);
+    Task<Result> SaveSolution(string gameId, string userId, Solution solution, CancellationToken cancellationToken);
 }
 

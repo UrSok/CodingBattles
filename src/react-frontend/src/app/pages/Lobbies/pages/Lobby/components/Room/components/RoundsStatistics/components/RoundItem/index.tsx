@@ -6,16 +6,21 @@ import RoundSummaryItem from './components/RoundSummaryItem';
 type RoundItemProps = {
   round: Round;
   gameId: string;
+  defaultNotCollapsed?: boolean;
   isCurrent?: boolean;
 };
 
 export default function RoundItem(props: RoundItemProps) {
-  const { round, gameId, isCurrent } = props;
+  const { round, defaultNotCollapsed, gameId, isCurrent } = props;
 
   const title = isCurrent ? 'Current Round' : `Round ${round.number}`;
 
   return (
-    <ProCard title={title} collapsible defaultCollapsed={!isCurrent}>
+    <ProCard
+      title={title}
+      collapsible
+      defaultCollapsed={!isCurrent || !defaultNotCollapsed}
+    >
       <ProCard split="horizontal" ghost>
         {round.roundSummaries.map((roundSummary, index) => (
           <ProCard ghost>

@@ -18,7 +18,7 @@ internal interface IGameRepository
     Task<bool> UpdateCurrentRound(string gameId, Round round, CancellationToken cancellationToken);
     Task<IEnumerable<Game>> Get(CancellationToken cancellationToken);
     Task<IEnumerable<Game>> GetGamesByUserId(string userId, CancellationToken cancellationToken);
-    Task<bool> ReplaceSummaryRecord(string id, RoundSummary roundSummary, CancellationToken cancellationToken);
+    Task<bool> ReplaceSummaryRecord(string gameId, RoundSummary roundSummary, CancellationToken cancellationToken);
     Task<bool> RemoveFromGame(string userId, string gameId, CancellationToken cancellationToken);
     Task<bool> UpdateGameStatus(string gameId, GameStatus status, CancellationToken cancellationToken);
     Task<bool> ShareSolution(string gameId, int roundNumber, string userId, CancellationToken cancellationToken);

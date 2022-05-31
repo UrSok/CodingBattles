@@ -11,7 +11,7 @@ type LanguageSelectProps = {
   placeholder?: string;
   disabled?: boolean;
   width?: number | 'sm' | 'md' | 'xl' | 'xs' | 'lg';
-  defaultLanguage?: Language;
+  defaultLanguage?: Language | string;
   style?: React.CSSProperties;
 };
 

@@ -121,6 +121,12 @@ internal class SubmitResultHandler : IRequestHandler<SubmitResultCommand, Result
             Result.Failure(Error.InternalServerError);
         }
 
+        if (!currentRound.RoundSummaries.Any(x => x.Status is RoundSummaryStatus.NotSubmitted))
+        {
+            var command = new EndRoundCommand(game.Id, false);
+            await this.mediator.Send(command);
+        }
+
         return Result.Success();
     }
 }

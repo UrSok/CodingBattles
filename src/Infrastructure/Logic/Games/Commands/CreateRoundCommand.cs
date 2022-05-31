@@ -39,7 +39,7 @@ internal class CreateRoundHandler : IRequestHandler<CreateRoundCommand, Result>
 
         var newRound = new Round
         {
-            Number = game.Rounds.Count > 0 ? game.Rounds.Count : 1,
+            Number = game.Rounds.Count > 0 ? game.Rounds.Count + 1 : 1,
             Status = RoundStatus.NotStarted,
             GameMode = GameMode.Classic.Name,
             ChallengeSelectorType = ChallengeSelectorType.Specific.Name,

@@ -29,6 +29,7 @@ export default function RoundSettings(props: RoundSettingsProps) {
   const [triggerCreateRound] = gameApi.useCreateRoundMutation();
   const [triggerUpdateRound] = gameApi.useUpdateCurrentRoundSettingsMutation();
   const [triggerStartRound] = gameApi.useStartRoundMutation();
+  const [triggerEndRound] = gameApi.useEndRoundMutation();
 
   const handleOnNewRound = () => {
     triggerCreateRound(gameId);
@@ -38,7 +39,20 @@ export default function RoundSettings(props: RoundSettingsProps) {
     triggerStartRound(gameId);
   };
 
-  const handleOnForceEndRound = () => {};
+  const handleOnForceEndRound = () => {
+    triggerEndRound(gameId);
+  };
+
+  const handleOnSettingsChange = (changedValues, values) => {
+    triggerUpdateRound({
+      gameId,
+      request: {
+        restrictedLanguages: values.restrictedLanguages,
+        gameMode: values.gamemode,
+        challengeSelectorType: values.challengeSelectorType,
+      },
+    });
+  };
 
   useEffect(() => {
     if (!currentRound) return;
@@ -55,17 +69,6 @@ export default function RoundSettings(props: RoundSettingsProps) {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRound]);
-
-  const handleOnSettingsChange = (changedValues, values) => {
-    triggerUpdateRound({
-      gameId,
-      request: {
-        restrictedLanguages: values.restrictedLanguages,
-        gameMode: values.gamemode,
-        challengeSelectorType: values.challengeSelectorType,
-      },
-    });
-  };
 
   return (
     <>
@@ -123,13 +126,13 @@ export default function RoundSettings(props: RoundSettingsProps) {
                   valueEnum={GameMode}
                   initialValue={GameMode.classic}
                 />
-                <LanguageSelect
+                {/* <LanguageSelect
                   label="Languages"
                   disabled={!isGameMaster}
                   placeholder="All"
                   antdFieldName={RoundSettingsFields.restrictedLanguages}
                   multi
-                />
+                /> */}
               </ProCard>
               <ProCard title="Challenge">
                 {isGameMaster && (

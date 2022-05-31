@@ -9,6 +9,6 @@ export type RoundSummary = {
   score: number;
   timePassed: number;
   solutionShared: boolean;
-  solution: Solution;
+  solution?: Solution;
   testSummaries: TestSummary[];
 };

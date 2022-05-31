@@ -1,6 +1,6 @@
 export enum GameMode {
   classic = 'Classic',
   reverse = 'Reverse',
-  shortest = 'Shortest',
-  fastestComputation = 'Fastest Computation',
+  //shortest = 'Shortest',
+  //fastestComputation = 'Fastest Computation',
 }
