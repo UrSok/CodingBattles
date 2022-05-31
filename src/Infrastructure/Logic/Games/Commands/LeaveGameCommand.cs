@@ -1,4 +1,5 @@
-﻿using Domain.Enums.Errors;
+﻿using Domain.Enums;
+using Domain.Enums.Errors;
 using Domain.Models.Common;
 using Domain.Models.Common.Results;
 using FluentValidation;
@@ -24,19 +25,49 @@ internal class LeaveGameCommandValidator : AbstractValidator<LeaveGameCommand>
 internal class LeaveGameHandler : IRequestHandler<LeaveGameCommand, Result>
 {
     private readonly IGameRepository gameRepository;
+    private readonly IMediator mediator;
 
-    public LeaveGameHandler(IGameRepository gameRepository)
+    public LeaveGameHandler(IGameRepository gameRepository, IMediator mediator)
     {
         this.gameRepository = gameRepository;
+        this.mediator = mediator;
     }
 
     public async Task<Result> Handle(LeaveGameCommand request, CancellationToken cancellationToken)
     {
+        var game = await this.gameRepository.Get(request.GameId, cancellationToken); 
+        if (game is null)
+        {
+            return Result.Failure(ProcessingError.GameNotFound);
+        }
+
         var result = await this.gameRepository.RemoveFromGame(request.GameId, request.UserId, cancellationToken);
-        
         if (!result)
         {
             return Result.Failure(Error.InternalServerError);
+        }
+
+        if (game.GameMasterUserId == request.UserId)
+        {
+            var firstUserId = game.UserIds.FirstOrDefault();
+            if (firstUserId is null)
+            {
+                var currentRound = game.Rounds.FirstOrDefault(x => x.Status is not RoundStatus.Finished);
+                
+                if (currentRound is not null)
+                {
+                    var command = new EndRoundCommand(game.Id, true);
+                    await this.mediator.Send(command, cancellationToken);
+                }
+                await this.gameRepository.UpdateGameStatus(request.GameId, GameStatus.Finished, cancellationToken);
+                return Result.Success();
+            }
+
+            var result2 = await this.gameRepository.MakeGameMaster(request.GameId, firstUserId, cancellationToken);
+            if (!result2)
+            {
+                return Result.Failure(Error.InternalServerError);
+            }
         }
 
         return Result.Success();

@@ -46,6 +46,7 @@ internal class UpdateCurrentRoundSettingsHandler : IRequestHandler<UpdateCurrent
 
         var round = game.Rounds.First();
         round.GameMode = request.Model.GameMode;
+        round.DurationMinutes = request.Model.Duration;
         round.RestrictedLanguages = request.Model.RestrictedLanguages;
 
         if (round.ChallengeSelectorType != request.Model.ChallengeSelectorType)
@@ -56,6 +57,12 @@ internal class UpdateCurrentRoundSettingsHandler : IRequestHandler<UpdateCurrent
                 || round.ChallengeSelectorType == ChallengeSelectorType.RandomNotPassed.Name)
             {
                 round.ChallengeId = await this.challengeRepository.GetRandomId(cancellationToken);
+            } else if (round.ChallengeSelectorType == ChallengeSelectorType.RandomNotPassed.Name)
+            {
+                while (game.Rounds.Any(x => x.Number != round.Number && x.ChallengeId == round.ChallengeId))
+                {
+                    round.ChallengeId = await this.challengeRepository.GetRandomId(cancellationToken);
+                };
             }
         }
 

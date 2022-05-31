@@ -123,7 +123,7 @@ internal class SubmitResultHandler : IRequestHandler<SubmitResultCommand, Result
 
         if (!currentRound.RoundSummaries.Any(x => x.Status is RoundSummaryStatus.NotSubmitted && x.UserId != request.Model.UserId))
         {
-            var command = new EndRoundCommand(game.Id, false);
+            var command = new EndRoundCommand(game.Id, true);
             await this.mediator.Send(command);
         }
 

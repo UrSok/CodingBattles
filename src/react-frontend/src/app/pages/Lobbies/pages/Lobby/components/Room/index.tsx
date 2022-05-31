@@ -54,22 +54,15 @@ export default function Room(props: RoomProps) {
       }
       extra={
         <>
-          {gameInfo.status === GameStatus.NotStarted && isGameMaster && (
-            <Button danger type="primary">
-              Close Game
-            </Button>
-          )}
-          {!isGameMaster && gameInfo.users.some(x => x.id === authUser?.id) && (
+          {gameInfo.users.some(x => x.id === authUser?.id) ? (
             <Button danger type="primary" onClick={handleOnLeaveGame}>
               Leave Game
             </Button>
-          )}
-          {!gameInfo.users.some(x => x.id === authUser?.id) &&
-            gameInfo.status === GameStatus.NotStarted && (
-              <Button type="primary" onClick={handleOnJoinGame}>
-                Join Game
-              </Button>
-            )}
+          ) : gameInfo.status === GameStatus.NotStarted ? (
+            <Button type="primary" onClick={handleOnJoinGame}>
+              Join Game
+            </Button>
+          ) : undefined}
         </>
       }
     >

@@ -12,7 +12,7 @@ namespace Infrastructure.Repositories;
 
 internal interface IChallengeRepository
 {
-    Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> Get(ChallengeSearchRequest challengeSearchRequest, CancellationToken cancellationToken);
+    Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> GetPublished(ChallengeSearchRequest challengeSearchRequest, CancellationToken cancellationToken);
     Task<Challenge> Get(string id, CancellationToken cancellationToken);
     Task<string> Create(Challenge challenge, CancellationToken cancellationToken);
     Task<bool> Update(Challenge challenge, CancellationToken cancellationToken);
@@ -22,7 +22,7 @@ internal interface IChallengeRepository
     Task<string> GetRandomId(CancellationToken cancellationToken);
     Task<bool> UpdateFeedback(string challengeId, Feedback feedback, CancellationToken cancellationToken);
     Task<bool> AddFeedback(string challengeId, Feedback feedback, CancellationToken cancellationToken);
-    Task<bool> UpdateDificulty(string challengeId, float difficulty, CancellationToken cancellationToken);
+    Task<bool> UpdateAverages(string challengeId, float difficulty, float fun, float testCasesRelevancy, CancellationToken cancellationToken);
 }
 
 internal class ChallengeRepository : BaseRepository, IChallengeRepository
@@ -34,10 +34,10 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
         challenges = mongoDbContext.Challenges;
     }
 
-    public async Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> Get(ChallengeSearchRequest challengeSearchRequest, CancellationToken cancellationToken)
+    public async Task<(int totalPages, int totalItems, IEnumerable<Challenge>)> GetPublished(ChallengeSearchRequest challengeSearchRequest, CancellationToken cancellationToken)
     {
         var filters = new List<FilterDefinition<ChallengeDocument>>();
-        //filters.Add(Builders<ChallengeDocument>.Filter.Eq(x => x.Status, ChallengeStatus.Published));
+        filters.Add(Builders<ChallengeDocument>.Filter.Eq(x => x.Status, ChallengeStatus.Published));
 
         if (!string.IsNullOrEmpty(challengeSearchRequest.Text))
         {
@@ -200,13 +200,15 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
         return result.ModifiedCount == 1 || result.MatchedCount == 1;
     }
 
-    public async Task<bool> UpdateDificulty(string challengeId, float difficulty, CancellationToken cancellationToken)
+    public async Task<bool> UpdateAverages(string challengeId, float difficulty, float fun, float testCasesRelevancy, CancellationToken cancellationToken)
     {
         var filter = Builders<ChallengeDocument>.Filter
             .Where(x => x.Id == challengeId);
 
         var update = Builders<ChallengeDocument>.Update
-            .Set(x => x.Difficulty, difficulty);
+            .Set(x => x.Difficulty, difficulty)
+            .Set(x => x.Fun, fun)
+            .Set(x => x.TestCasesRelvancy, testCasesRelevancy);
 
         var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         return result.ModifiedCount == 1 || result.MatchedCount == 1;

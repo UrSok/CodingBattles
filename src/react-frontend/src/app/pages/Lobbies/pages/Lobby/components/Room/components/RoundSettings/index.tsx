@@ -1,5 +1,5 @@
 import ProCard from '@ant-design/pro-card';
-import ProForm, { ProFormSelect } from '@ant-design/pro-form';
+import ProForm, { ProFormDigit, ProFormSelect } from '@ant-design/pro-form';
 import { Alert, Button, Typography } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import { gameApi } from 'app/api';
@@ -47,6 +47,7 @@ export default function RoundSettings(props: RoundSettingsProps) {
     triggerUpdateRound({
       gameId,
       request: {
+        duraiton: values.duration,
         restrictedLanguages: values.restrictedLanguages,
         gameMode: values.gamemode,
         challengeSelectorType: values.challengeSelectorType,
@@ -58,6 +59,7 @@ export default function RoundSettings(props: RoundSettingsProps) {
     if (!currentRound) return;
 
     form.setFieldsValue({
+      [`${RoundSettingsFields.duration}`]: 20,
       [`${RoundSettingsFields.gamemode}`]: currentRound.gameMode,
       [`${RoundSettingsFields.restrictedLanguages}`]:
         currentRound.restrictedLanguages,
@@ -118,6 +120,13 @@ export default function RoundSettings(props: RoundSettingsProps) {
           >
             <ProCard ghost gutter={[8, 8]}>
               <ProCard title="General">
+                <ProFormDigit 
+                  allowClear={false}
+                  disabled={!isGameMaster}
+                  min={1}
+                  label="Duration(minutes)"
+                  name={RoundSettingsFields.duration}
+                />
                 <ProFormSelect
                   allowClear={false}
                   disabled={!isGameMaster}

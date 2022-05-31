@@ -132,20 +132,20 @@ export default function App() {
           pathname,
         }}
         onMenuHeaderClick={() => navigate('/')}
-        menuDataRender={(menuData: MenuDataItem[]): MenuDataItem[] => {
-          // TODO: REFACTOR THIS LOGIC AS IT DOESN'T WORK AS EXPECTED
-          if (!isAuthenticated) {
-            return menuData.filter(x => x.access === 'any');
-          }
+        // menuDataRender={(menuData: MenuDataItem[]): MenuDataItem[] => {
+        //   // TODO: REFACTOR THIS LOGIC AS IT DOESN'T WORK AS EXPECTED
+        //   if (!isAuthenticated) {
+        //     return menuData.filter(x => x.access === 'any');
+        //   }
 
-          if (user?.role === Role.Admin) return menuData;
+        //   if (user?.role === Role.Admin) return menuData;
 
-          if (user?.role !== Role.Member) {
-            menuData = menuData.filter(x => x.access !== Role.Member);
-          }
+        //   if (user?.role !== Role.Member) {
+        //     menuData = menuData.filter(x => x.access !== Role.Member);
+        //   }
 
-          return menuData;
-        }}
+        //   return menuData;
+        // }}
         menuItemRender={(item: MenuDataItem, dom) => (
           <Link to={item.path!}>{dom}</Link>
         )}
@@ -156,14 +156,14 @@ export default function App() {
           }
 
           return [
-            <Link
-              to={PATH_PROFILES.ME.settings}
-              style={{
-                color: 'inherit',
-              }}
-            >
-              <SettingOutlined />
-            </Link>,
+            // <Link
+            //   to={PATH_PROFILES.ME.settings}
+            //   style={{
+            //     color: 'inherit',
+            //   }}
+            // >
+            //   <SettingOutlined />
+            // </Link>,
             <LogoutOutlined onClick={signOut} />,
           ];
         }}

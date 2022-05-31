@@ -22,5 +22,6 @@ public interface IGameManager
     Task<Result> UpdateCurrentRoundSettings(string gameId, UpdateCurrentRoundSettingsRequest updateCurrentRoundSettingsRequest, CancellationToken cancellationToken);
     Task<Result> EndRound(string gameId, CancellationToken cancellationToken);
     Task<Result> SaveSolution(string gameId, string userId, Solution solution, CancellationToken cancellationToken);
+    Task<int> EndRoundsWithTimeInPast(CancellationToken cancellationToken);
 }
 

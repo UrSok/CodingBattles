@@ -16,12 +16,14 @@ internal interface IGameRepository
     Task<Game> Get(string gameId, CancellationToken cancellationToken);
     Task<bool> CreateCurrentRound(string gameId, Round round, CancellationToken cancellationToken);
     Task<bool> UpdateCurrentRound(string gameId, Round round, CancellationToken cancellationToken);
-    Task<IEnumerable<Game>> Get(CancellationToken cancellationToken);
+    Task<IEnumerable<Game>> GetPublic(CancellationToken cancellationToken);
     Task<IEnumerable<Game>> GetGamesByUserId(string userId, CancellationToken cancellationToken);
     Task<bool> ReplaceSummaryRecord(string gameId, RoundSummary roundSummary, CancellationToken cancellationToken);
     Task<bool> RemoveFromGame(string gameId, string userId, CancellationToken cancellationToken);
+    Task<bool> MakeGameMaster(string gameId, string userId, CancellationToken cancellationToken);
     Task<bool> UpdateGameStatus(string gameId, GameStatus status, CancellationToken cancellationToken);
     Task<bool> ShareSolution(string gameId, int roundNumber, string userId, CancellationToken cancellationToken);
+    Task<List<Game>> GetAllGamesWithRoundsInProgress(CancellationToken cancellationToken);
 }
 
 internal class GameRepository : BaseRepository, IGameRepository
@@ -94,9 +96,9 @@ internal class GameRepository : BaseRepository, IGameRepository
         return result.ModifiedCount == 1 || result.MatchedCount == 1;
     }
 
-    public async Task<IEnumerable<Game>> Get(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Game>> GetPublic(CancellationToken cancellationToken)
     {
-        var gameDocuments = (await this.games.FindAsync(x => true, cancellationToken: cancellationToken))
+        var gameDocuments = (await this.games.FindAsync(x => x.IsPrivate == false, cancellationToken: cancellationToken))
             .ToEnumerable(cancellationToken: cancellationToken);
         return this.mapper.Map<IEnumerable<Game>>(gameDocuments);
     }
@@ -162,5 +164,24 @@ internal class GameRepository : BaseRepository, IGameRepository
         var updateOptions = new UpdateOptions { ArrayFilters = arrayFilters };
         var result = await this.games.UpdateOneAsync(filter, update, updateOptions, cancellationToken: cancellationToken);
         return result.ModifiedCount == 1 || result.MatchedCount == 1;
+    }
+
+    public async Task<bool> MakeGameMaster(string gameId, string userId, CancellationToken cancellationToken)
+    {
+        var filter = Builders<GameDocument>.Filter.Eq(x => x.Id, gameId);
+        var update = Builders<GameDocument>.Update
+            .Set(x => x.GameMasterUserId, userId);
+
+        var result = await this.games.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+        return result.ModifiedCount == 1 || result.MatchedCount == 1;
+    }
+
+    public async Task<List<Game>> GetAllGamesWithRoundsInProgress(CancellationToken cancellationToken)
+    {
+        var gameDocuments = (await this.games
+            .FindAsync(x => x.Rounds.Any(round => round.Status == RoundStatus.InProgress), cancellationToken: cancellationToken))
+            .ToList();
+
+        return this.mapper.Map<List<Game>>(gameDocuments);
     }
 }

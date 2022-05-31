@@ -1,4 +1,5 @@
 type UpdateCurrentRoundSettingsRequest = {
+  duraiton: number;
   gameMode: string;
   restrictedLanguages: string[];
   challengeSelectorType: string;

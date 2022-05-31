@@ -33,7 +33,7 @@ public class GameController : BaseController
         return this.Process(result);
     }
 
-    [HttpGet("gamesByUser/{userId}")]
+    [HttpGet("getGamesByUser/{userId}")]
     public async Task<IActionResult> GetGamesByUserId([FromRoute] string userId, CancellationToken cancellationToken)
     {
         var result = await this.gameManager.GetGamesByUserId(userId, cancellationToken);

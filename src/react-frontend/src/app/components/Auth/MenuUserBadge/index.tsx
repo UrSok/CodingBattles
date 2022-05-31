@@ -25,16 +25,16 @@ export default function MenuUserBadge(props: MenuUserBadgeProps) {
 
   return {
     title: (
-      <Link to={PATH_PROFILES.ME.root}>
-        <Typography.Text strong>{userName}</Typography.Text>
-      </Link>
+      //<Link to={PATH_PROFILES.ME.root}>
+      <Typography.Text strong>{userName}</Typography.Text>
+      //</Link>
     ),
     size: 'large',
     style: style,
     children: (
-      <Link to={PATH_PROFILES.ME.root}>
-        <UserAvatar userName={userName} />
-      </Link>
+      //<Link to={PATH_PROFILES.ME.root}>
+      <UserAvatar userName={userName} />
+      //</Link>
     ),
   };
 }

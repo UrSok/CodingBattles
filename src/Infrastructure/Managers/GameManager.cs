@@ -104,4 +104,8 @@ public class GameManager : BaseManager, IGameManager
         var command = new ShareSolutionCommand(gameId, roundNumber, userId);
         return await this.SendCommand(command, cancellationToken);
     }
+    public async Task<int> EndRoundsWithTimeInPast(CancellationToken cancellationToken)
+    {
+        return await this.mediator.Send(new EndRoundOnTimeCommand(), cancellationToken);
+    }
 }

@@ -5,6 +5,7 @@ export type GameSearchItem = {
   id: string;
   code: string;
   name: string;
+  isPrivate: boolean;
   status: GameStatus;
   users: UserDto[];
 };

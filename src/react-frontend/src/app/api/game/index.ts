@@ -36,9 +36,9 @@ export const gameApi = createApi({
           : ['Game'],
     }),
 
-    getByUserId: build.query<ResultValue<GameSearchItem[]>, string>({
+    getGamesByUserId: build.query<ResultValue<GameSearchItem[]>, string>({
       query: userId => ({
-        url: `gamesByUser/${userId}`,
+        url: `getGamesByUser/${userId}`,
         method: 'GET',
       }),
       providesTags: (result, error, request) =>

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Logic\Games\Commands\StartRoundCommand.cs~RF88ebf0e.TMP" />
+    <None Remove="Logic\Games\Queries\GetGamesQuery.cs~RF1183cd07.TMP" />
     <None Remove="Persistence\Documents\Challenges\ChallengeDocument.cs~RF7cd70b.TMP" />
     <None Remove="Persistence\Documents\Challenges\ProgrammingProblemDocument.cs~RFb0dc5.TMP" />
     <None Remove="Persistence\Documents\Challenges\ProgrammingProblemDocument.cs~RFfa781.TMP" />

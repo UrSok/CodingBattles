@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using WebApi.Jobs;
+using WebApi.Schedulers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +51,12 @@ builder.Services.AddSwaggerGen(opt =>
             new string[] {}
         }
     });
+});
+
+builder.Services.AddCronScheduler<EndRoundProcessor>(c =>
+{
+    c.CronExpression = "*/1 * * * *";
+    c.TimeZoneInfo = TimeZoneInfo.Local;
 });
 
 #region Add Jwt Auth

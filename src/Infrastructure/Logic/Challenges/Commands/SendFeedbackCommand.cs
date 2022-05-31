@@ -42,6 +42,8 @@ internal class SendFeedbackHandler : IRequestHandler<SendFeedbackCommand, Result
         var feedback = challenge.Feedbacks.FirstOrDefault(x => x.UserId == request.Feedback.UserId);
         if (feedback is not null)
         {
+            feedback.Fun = request.Feedback.Fun;
+            feedback.TestCasesRelvancy = request.Feedback.TestCasesRelvancy;
             feedback.Difficulty = request.Feedback.Difficulty;
             var result = await challengeRepository.UpdateFeedback(
                 request.ChallengeId,
@@ -64,7 +66,9 @@ internal class SendFeedbackHandler : IRequestHandler<SendFeedbackCommand, Result
         }
 
         var newDifficulty = challenge.Feedbacks.Average(x => x.Difficulty);
-        var resultUpdateDifficulty = await challengeRepository.UpdateDificulty(request.ChallengeId, newDifficulty, cancellationToken);
+        var newFun = challenge.Feedbacks.Average(x => x.Fun);
+        var newTestCasesRelevancy = challenge.Feedbacks.Average(x => x.TestCasesRelvancy);
+        var resultUpdateDifficulty = await challengeRepository.UpdateAverages(request.ChallengeId, newDifficulty, newFun, newTestCasesRelevancy, cancellationToken);
         if (!resultUpdateDifficulty)
         {
             return Result.Failure(Error.InternalServerError);

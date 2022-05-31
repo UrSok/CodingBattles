@@ -49,7 +49,7 @@ internal class GetChallengesHandler : IRequestHandler<GetChallengesQuery, Result
     public async Task<Result<Paginated<ChallengeSearchItem>>> Handle(GetChallengesQuery request, CancellationToken cancellationToken)
     {
         var (totalPages, totalItems, challenges) =
-            await this.challengeRepository.Get(request.Model, cancellationToken);
+            await this.challengeRepository.GetPublished(request.Model, cancellationToken);
         
         var tags = await this.tagRepository.GetAll(cancellationToken);
         var challengeSearchItems = challenges.Select((challenge) =>

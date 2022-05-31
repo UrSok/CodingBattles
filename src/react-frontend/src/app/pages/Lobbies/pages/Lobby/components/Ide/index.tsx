@@ -1,6 +1,15 @@
 import ProCard from '@ant-design/pro-card';
 import ProList from '@ant-design/pro-list';
-import { Alert, Button, Form, message, Space, Tag, Typography } from 'antd';
+import {
+  Alert,
+  Avatar,
+  Button,
+  Form,
+  message,
+  Space,
+  Tag,
+  Typography,
+} from 'antd';
 import ChallengeDescription from 'app/components/ChallengeDescription';
 import CodeEditor from 'app/components/Input/CodeEditor';
 import LanguageSelect from 'app/components/Input/LanguageSelect';
@@ -9,6 +18,7 @@ import { Language } from 'app/types/enums/language';
 import React, { ReactText, useRef, useState } from 'react';
 import Play from '@2fd/ant-design-icons/lib/Play';
 import monaco from 'monaco-editor';
+import TimerSand from '@2fd/ant-design-icons/lib/TimerSand';
 import {
   useDebounce,
   useEffectOnce,
@@ -52,10 +62,10 @@ export default function Ide(props: IdeProps) {
     x => x.user.id === authUser?.id,
   );
 
-  // const deadLine =
-  //   currentRound && currentRound.startTime
-  //     ? new Date(currentRound.startTime).getTime() + 1800000
-  //     : 0;
+  const deadLine =
+    currentRound && currentRound.startTime
+      ? new Date(currentRound.startTime).getTime() + 1800000
+      : 0;
 
   const [form] = useForm();
   const solutionLanguage: Language = useWatch('solutionLang', form);
@@ -428,7 +438,7 @@ export default function Ide(props: IdeProps) {
             defaultLanguage={
               authUserRoundSummary?.solution
                 ? Language[authUserRoundSummary.solution.language]
-                : generateStubResult?.value?.stub
+                : Language.javascript
             }
             placeholder="Solution Language"
           />
@@ -555,39 +565,38 @@ export default function Ide(props: IdeProps) {
   return (
     <Page
       title={currentRound?.challenge.name}
-      // extra={
-      //   <Space>
-      //     <Typography.Text
-      //       strong
-      //       style={{
-      //         fontSize: 20,
-      //       }}
-      //     >
-      //       Time Left:
-      //     </Typography.Text>
-      //     <Countdown
-      //       valueStyle={{
-      //         fontSize: 20,
-      //       }}
-      //       value={deadLine}
-      //       onFinish={handleOnCountdownFinish}
-      //     />
-      //   </Space>
-      // }
       subTitle={
         currentRound && (
           <Tag color="cyan">{GameMode[currentRound?.gameMode]}</Tag>
         )
       }
       extra={
-        <Button
-          type="primary"
-          icon={<Play />}
-          onClick={handleSubmit}
-          loading={isSubmiting}
-        >
-          SUBMIT
-        </Button>
+        <Space>
+          <Space size={4}>
+            <Countdown
+              valueStyle={{
+                fontSize: 20,
+              }}
+              value={deadLine}
+            />
+            <Avatar
+              style={{
+                backgroundColor: 'darkgray',
+                fontSize: '1.2em',
+              }}
+            >
+              <TimerSand />
+            </Avatar>
+          </Space>
+          <Button
+            type="primary"
+            icon={<Play />}
+            onClick={handleSubmit}
+            loading={isSubmiting}
+          >
+            SUBMIT
+          </Button>
+        </Space>
       }
     >
       <ProCard direction="column" ghost gutter={[16, 16]}>

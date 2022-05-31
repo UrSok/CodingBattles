@@ -35,7 +35,7 @@ internal class GetGamesHandler : IRequestHandler<GetGamesQuery, Result<List<Game
 
     public async Task<Result<List<GameSearchItem>>> Handle(GetGamesQuery request, CancellationToken cancellationToken)
     {
-        var games = await this.gameRepository.Get(cancellationToken);
+        var games = await this.gameRepository.GetPublic(cancellationToken);
         var userIds = games.SelectMany(x => x.UserIds).ToList();
         var users = await this.userRepository.GetByIds(userIds, cancellationToken);
         var userDtos = this.mapper.Map<List<UserDto>>(users);
