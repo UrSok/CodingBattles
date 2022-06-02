@@ -24,7 +24,7 @@ export default function RoundItem(props: RoundItemProps) {
   const title = isCurrent ? 'Latest Round' : `Round ${round.number}`;
 
   const deadLine = round.startTime
-    ? new Date(round.startTime).getTime() + 1800000
+    ? new Date(round.startTime).getTime() + round.durationMinutes * 60000
     : 0;
 
   return (

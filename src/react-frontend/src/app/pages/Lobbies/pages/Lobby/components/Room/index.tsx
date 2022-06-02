@@ -81,18 +81,19 @@ export default function Room(props: RoomProps) {
               </Space>
             </ProCard>
           </ProCard>
-          {(isGameMaster ||
-            gameInfo.currentRound?.status === RoundStatus.NotStarted) && (
+          {(isGameMaster || gameInfo.currentRound?.status === RoundStatus.NotStarted) && (
             <RoundSettings
               gameId={gameInfo.id}
               isGameMaster={isGameMaster}
-              currentRound={gameInfo.currentRound}
+                currentRound={gameInfo.currentRound}
             />
           )}
         </ProCard>
-        <ProCard title="Results" ghost>
-          <RoundsStatistics gameInfo={gameInfo} />
-        </ProCard>
+        {(gameInfo.previousRounds.length > 0 || gameInfo.currentRound) && (
+          <ProCard title="Results" ghost>
+            <RoundsStatistics gameInfo={gameInfo} />
+          </ProCard>
+        )}
       </ProCard>
     </Page>
   );

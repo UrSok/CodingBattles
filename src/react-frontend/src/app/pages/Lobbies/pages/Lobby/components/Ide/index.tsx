@@ -64,7 +64,8 @@ export default function Ide(props: IdeProps) {
 
   const deadLine =
     currentRound && currentRound.startTime
-      ? new Date(currentRound.startTime).getTime() + 1800000
+      ? new Date(currentRound.startTime).getTime() +
+        currentRound.durationMinutes * 60000
       : 0;
 
   const [form] = useForm();
@@ -84,7 +85,7 @@ export default function Ide(props: IdeProps) {
     { isLoading: isGenerating, data: generateStubResult },
   ] = stubGeneratorApi.useLazyGenerateStubQuery();
 
-  const [triggerSaveSolution] = gameApi.useSaveSolutionMutation();
+  //const [triggerSaveSolution] = gameApi.useSaveSolutionMutation();
 
   const [triggerTestRun, { isLoading: isTesting, data: testResult }] =
     gameApi.useRunTestMutation();
@@ -107,29 +108,29 @@ export default function Ide(props: IdeProps) {
     });
   });
 
-  useInterval(async () => {
-    if (!authUserRoundSummary) return;
+  // useInterval(async () => {
+  //   if (!authUserRoundSummary) return;
 
-    const solutionText = solutionEditorRef.current?.getValue();
-    if (!solutionText || solutionText.length === 0) return;
+  //   const solutionText = solutionEditorRef.current?.getValue();
+  //   if (!solutionText || solutionText.length === 0) return;
 
-    if (
-      solutionText !== authUserRoundSummary.solution?.sourceCode ||
-      solutionLanguage !== authUserRoundSummary.solution?.language
-    ) {
-      const result = await triggerSaveSolution({
-        gameId: gameInfo.id,
-        userId: authUser!.id,
-        solution: {
-          language: solutionLanguage,
-          sourceCode: solutionText,
-        },
-      }).unwrap();
+  //   if (
+  //     solutionText !== authUserRoundSummary.solution?.sourceCode ||
+  //     solutionLanguage !== authUserRoundSummary.solution?.language
+  //   ) {
+  //     const result = await triggerSaveSolution({
+  //       gameId: gameInfo.id,
+  //       userId: authUser!.id,
+  //       solution: {
+  //         language: solutionLanguage,
+  //         sourceCode: solutionText,
+  //       },
+  //     }).unwrap();
 
-      if (!result.isSuccess) return;
-      message.success('Solution saved!', 3);
-    }
-  }, 10000);
+  //     if (!result.isSuccess) return;
+  //     message.success('Solution saved!', 3);
+  //   }
+  // }, 10000);
 
   useUpdateEffect(() => {
     triggerStubGenerator({

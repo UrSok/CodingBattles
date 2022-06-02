@@ -209,7 +209,7 @@ internal class ChallengeRepository : BaseRepository, IChallengeRepository
         var update = Builders<ChallengeDocument>.Update
             .Set(x => x.Difficulty, difficulty)
             .Set(x => x.Fun, fun)
-            .Set(x => x.TestCasesRelvancy, testCasesRelevancy);
+            .Set(x => x.TestCasesRelevancy, testCasesRelevancy);
 
         var result = await this.challenges.UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
         return result.ModifiedCount == 1 || result.MatchedCount == 1;

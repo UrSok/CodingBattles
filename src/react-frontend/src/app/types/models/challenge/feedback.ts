@@ -5,5 +5,4 @@ export type Feedback = {
   fun: number;
   testCasesRelevancy: number;
   text: string;
-  hasIssues: boolean;
 };

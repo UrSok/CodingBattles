@@ -42,8 +42,12 @@ internal class EndRoundOnTimeHandler : IRequestHandler<EndRoundOnTimeCommand, in
                 await Task.Delay(remainingTime);
             }
 
-            var command = new EndRoundCommand(game.Id, true);
-            await this.mediator.Send(command);
+            remainingTime = currentRound.StartTime.Value.AddMinutes(currentRound.DurationMinutes) - DateTime.Now;
+            if (remainingTime.TotalSeconds <= 0)
+            {
+                var command = new EndRoundCommand(game.Id, true);
+                await this.mediator.Send(command);
+            }
         });
 
         return games.Count;

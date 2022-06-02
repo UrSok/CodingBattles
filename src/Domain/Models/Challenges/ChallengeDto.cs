@@ -33,7 +33,7 @@ public class ChallengeDto
 
     public float Fun { get; set; }
 
-    public float TestCasesRelvancy { get; set; }
+    public float TestCasesRelevancy { get; set; }
 
     public UserDto User { get; set; }
 

@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import CreateLobbyModal from './components/CreateLobbyModal';
 import JoinLobbyModal from './components/JoinLobbyModal';
 import { GameSearchItem } from 'app/types/models/game/gameSearchItem';
+import { Role } from 'app/types/enums/role';
 
 export default function GamesPage() {
   const { isAuthenticated, user: authUser } = useSelector(selectAuth);
@@ -47,7 +48,10 @@ export default function GamesPage() {
         toolBarRender={() => {
           const actions: React.ReactNode[] = [];
           if (isAuthenticated && authUser) {
-            actions.push(<CreateLobbyModal userId={authUser.id} />);
+            if (authUser.role === Role.Member || authUser.role === Role.Admin) {
+              actions.push(<CreateLobbyModal userId={authUser.id} />); 
+            }
+
             actions.push(<JoinLobbyModal userId={authUser.id} />);
           }
 

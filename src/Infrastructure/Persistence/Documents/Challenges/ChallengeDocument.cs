@@ -42,9 +42,9 @@ internal class ChallengeDocument : MongoDocumentWithId
     [BsonRepresentation(BsonType.Double)]
     public float Fun { get; set; }
 
-    [BsonElement("TestCasesRelvancy")]
+    [BsonElement("TestCasesRelevancy")]
     [BsonRepresentation(BsonType.Double)]
-    public float TestCasesRelvancy { get; set; }
+    public float TestCasesRelevancy { get; set; }
 
     [BsonElement("Difficulty")]
     [BsonRepresentation(BsonType.Double)]

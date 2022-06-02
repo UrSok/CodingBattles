@@ -8,7 +8,7 @@ public class Feedback : EntityWithId
 
     public float Fun { get; set; }
 
-    public float TestCasesRelvancy { get; set; }
+    public float TestCasesRelevancy { get; set; }
 
     public string Text { get; set; }
 }

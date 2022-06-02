@@ -51,7 +51,9 @@ export default function StubGenerator(props: StubGeneratorProps) {
     ev: monaco.editor.IModelContentChangedEvent,
   ) => {
     setInput(value);
-    onStubInputChangedDecorator && onStubInputChangedDecorator(value);
+    if (onStubInputChangedDecorator) {
+      onStubInputChangedDecorator(value);
+    }
   };
 
   const handleOnStubResultChange = async (
@@ -68,8 +70,9 @@ export default function StubGenerator(props: StubGeneratorProps) {
     const isValid =
       !isEmpty || (generatorResult.isSuccess && !generatorResult.value?.error);
 
-    onResultChanged &&
+    if (onResultChanged) {
       onResultChanged(input, generatorResult.value?.stub, isValid);
+    }
   };
 
   return (

@@ -47,7 +47,7 @@ export default function RoundSettings(props: RoundSettingsProps) {
     triggerUpdateRound({
       gameId,
       request: {
-        duraiton: values.duration,
+        duration: values.duration,
         restrictedLanguages: values.restrictedLanguages,
         gameMode: values.gamemode,
         challengeSelectorType: values.challengeSelectorType,
@@ -59,7 +59,7 @@ export default function RoundSettings(props: RoundSettingsProps) {
     if (!currentRound) return;
 
     form.setFieldsValue({
-      [`${RoundSettingsFields.duration}`]: 20,
+      [`${RoundSettingsFields.duration}`]: currentRound.durationMinutes,
       [`${RoundSettingsFields.gamemode}`]: currentRound.gameMode,
       [`${RoundSettingsFields.restrictedLanguages}`]:
         currentRound.restrictedLanguages,
@@ -101,7 +101,7 @@ export default function RoundSettings(props: RoundSettingsProps) {
             }
           />
         )}
-        {currentRound?.status === RoundStatus.InProgress && (
+        {/* {currentRound?.status === RoundStatus.InProgress && (
           <Alert
             type="error"
             message="Round in progress. Use the button on the right side to end the round forcefully."
@@ -111,7 +111,7 @@ export default function RoundSettings(props: RoundSettingsProps) {
               </Button>
             }
           />
-        )}
+        )} */}
         {currentRound && currentRound.status === RoundStatus.NotStarted && (
           <ProForm
             form={form}

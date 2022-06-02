@@ -29,7 +29,7 @@ public class Challenge : EntityWithId
 
     public float Fun { get; set; }
 
-    public float TestCasesRelvancy { get; set; }
+    public float TestCasesRelevancy { get; set; }
 
     public string CreatedByUserId { get; set; }
 

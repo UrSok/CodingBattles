@@ -97,7 +97,7 @@ internal class GetGameHandler : IRequestHandler<GetGameQuery, Result<GameDto>>
             var roundSummaryDto = mapper.Map<RoundSummaryDto>(roundSummary);
             roundSummaryDto.User = userDtos.First(x => x.Id == roundSummary.UserId);
             return roundSummaryDto;
-        }).OrderByDescending(x => x?.Score ?? 0).ThenBy(x => x?.TimePassed ?? 0).ToList();
+        }).OrderByDescending(x => x.Score).ThenBy(x => x.TimePassed).ToList();
 
         return roundDto;
     }

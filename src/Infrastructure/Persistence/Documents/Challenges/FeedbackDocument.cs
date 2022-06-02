@@ -13,8 +13,8 @@ internal class FeedbackDocument : MongoDocumentWithId
     [BsonElement("Fun")]
     public float Fun { get; set; }
 
-    [BsonElement("TestCasesRelvancy")]
-    public float TestCasesRelvancy { get; set; }
+    [BsonElement("TestCasesRelevancy")]
+    public float TestCasesRelevancy { get; set; }
 
     [BsonElement("Text")]
     public string Text { get; set; }
